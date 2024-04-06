@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neptune.mapper.MenuMapper">
+
+
+    <select id="listAll" resultType="com.neptune.vo.admin.MenuVo">
+        select t.id, t.name, t.code, t.route, t.component_name as componentName, t.component_path as componentPath,
+               t.icon, t.sort, t.level, t.parent_id as parentId, t2.name as parentName
+        from t_menu t
+        left join t_menu t2 on t2.id = t.parent_id
+        <where>
+            <if test="param.name != null and param.name != ''">
+                and t.name like concat('%',#{param.name},'%')
+            </if>
+            <if test="param.parentId != null">
+                and t.parent_id = #{param.parentId}
+            </if>
+        </where>
+        order by t.sort asc , t.create_time desc
+    </select>
+
+</mapper>

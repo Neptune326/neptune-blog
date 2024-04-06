@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--scan logback 扫描指定目录下的配置文件 发生变化 重新加载 60秒检测一次 开发环境 关闭调试模型-->
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+
+    <!--name 属性为dev 表示设置了dev 的值的话，就执行include 的标签，引入xxx-dev 文件-->
+    <springProfile name="dev">
+        <include resource="logback-dev.xml"/>
+    </springProfile>
+    <!--同上 ，这个的定义prod是application.yml的active那个的值-->
+    <springProfile name="prod">
+        <include resource="logback-prod.xml"/>
+    </springProfile>
+
+
+
+    <!--    <include resource="logback-${profile}.xml"/>-->
+    <!--        <include resource="logback-${spring.profiles.active}.xml"/>-->
+    <!-- 定义变量 logPath 值是value后面的 定义日志存放目录 -->
+    <property name="logPath" value="/java/logs"/>
+    <!--    日志输出的格式-->
+    <!--    %d{yyyy-MM-dd HH:mm:ss.SSS}：输出日志时间，格式为年-月-日 时:分:秒.毫秒。
+[%t-%L]：输出线程名称和所在代码行号。
+%-5level：输出日志级别，占用 5 个字符的宽度，左对齐。
+%logger{36}：输出 Logger 名称，最大长度为 36。
+%L：输出所在代码行号。
+%M：输出所在方法名。
+%msg：输出日志信息。
+%xEx：输出异常信息。
+%n：输出换行符。-->
+    <property name="PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} [%t-%L] %-5level %L %M - %msg%xEx%n"/>
+    <!--  应该是本文件的命令空间 ，有多个log 文件  -->
+    <contextName>logback</contextName>
+
+
+
+</configuration>

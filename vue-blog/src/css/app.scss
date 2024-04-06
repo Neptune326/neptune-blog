@@ -1,0 +1,67 @@
+::-webkit-scrollbar {
+  height: 12px;
+  width: 14px;
+  background: transparent;
+  z-index: 12;
+  overflow: visible
+}
+
+::-webkit-scrollbar-thumb {
+  width: 17px;
+  background-color: #00b4ff;
+  border-radius: 10px;
+  z-index: 12;
+  border: 4px solid rgba(0, 0, 0, 0);
+  background-clip: padding-box;
+  -webkit-transition: background-color .28s ease-in-out;
+  transition: background-color .28s ease-in-out;
+  margin: 4px;
+  min-height: 32px;
+  min-width: 32px
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #00B4FF
+}
+
+.neptune-text-one {
+
+  overflow: hidden; /* 必须要设置overflow属性值为“hidden” */
+
+  white-space: nowrap; /* 禁止文本换行 */
+
+  text-overflow: ellipsis; /* 超出容器大小的文本以省略号表示 */
+
+}
+
+.neptune-container {
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+@media (min-width: 1200px) {
+  .neptune-container {
+    max-width: 1000px;
+  }
+}
+
+@media (min-width: 992px) {
+  .neptune-container {
+    max-width: 960px;
+  }
+}
+
+@media (min-width: 768px) {
+  .neptune-container {
+    max-width: 720px;
+  }
+}
+
+@media (min-width: 576px) {
+  .neptune-container {
+    max-width: 540px;
+  }
+}

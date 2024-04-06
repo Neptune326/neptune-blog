@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:mysql://47.116.112.58:3306/neptune?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: B2GsQ7Q1#rA@X
+
+  redis:
+    host: 47.116.112.58
+    password: sGs$&q2cK4uc4
+
