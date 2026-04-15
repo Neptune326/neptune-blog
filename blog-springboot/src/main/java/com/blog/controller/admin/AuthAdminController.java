@@ -1,0 +1,53 @@
+package com.blog.controller.admin;
+
+import com.blog.common.result.Result;
+import com.blog.dto.LoginDTO;
+import com.blog.service.AuthService;
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * 管理员认证控制器
+ * 提供登录、登出接口，登录接口已在 Sa-Token 拦截器中排除鉴权
+ */
+@Slf4j
+@RestController
+@RequestMapping("/api/admin/auth")
+public class AuthAdminController {
+
+    /** 认证服务 */
+    private final AuthService authService;
+
+    public AuthAdminController(AuthService authService) {
+        this.authService = authService;
+    }
+
+    /**
+     * 管理员登录
+     * POST /api/admin/auth/login
+     *
+     * @param loginDTO 登录请求体（用户名、密码），参数校验由 @Valid 触发
+     * @return 包含 token 字符串的统一响应
+     */
+    @PostMapping("/login")
+    public Result<String> login(@RequestBody @Valid LoginDTO loginDTO) {
+        String token = authService.login(loginDTO);
+        return Result.success(token);
+    }
+
+    /**
+     * 管理员登出
+     * POST /api/admin/auth/logout
+     *
+     * @return 无数据的成功响应
+     */
+    @PostMapping("/logout")
+    public Result<Void> logout() {
+        authService.logout();
+        return Result.success();
+    }
+}

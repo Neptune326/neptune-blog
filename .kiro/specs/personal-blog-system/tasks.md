@@ -1,0 +1,363 @@
+# 实现计划：个人博客系统
+
+## 概述
+
+本计划基于需求文档和技术设计文档，将个人博客系统的实现拆分为有序的编码任务。
+系统由两个项目组成：
+- **blog-springboot**：Spring Boot 3.x 后端，提供前台和后台 API
+- **blog-vue**：Vue 3 单页应用，包含前台博客和后台管理界面
+
+## 任务列表
+
+- [x] 1. 项目初始化
+  - [x] 1.1 初始化 blog-springboot 项目
+    - 创建 Maven 项目，配置 pom.xml，添加 Spring Boot 3.x、MyBatis-Plus、MySQL Driver、Sa-Token、Lombok、Spring Validation、jqwik 等依赖
+    - 编写 application.yml，配置数据源（MySQL）、MyBatis-Plus（逻辑删除字段 deleted、驼峰映射）、Sa-Token（token 有效期 7 天）、日志级别
+    - 创建启动类 BlogApplication.java
+    - _需求：需求 8.1、需求 1.4_
+  - [x] 1.2 初始化 blog-vue 项目
+    - 使用 Vite 创建 Vue 3 项目（npm create vite@latest blog-vue -- --template vue）
+    - 安装依赖：vuetify、tailwindcss、pinia、vue-router、axios、@mdi/font、md-editor-v3（Markdown 编辑器）、marked（Markdown 渲染）
+    - 配置 Tailwind CSS（tailwind.config.js、postcss.config.cjs）
+    - 配置 Vuetify 插件（src/plugins/vuetify.js）
+    - 在 main.js 中注册 Vuetify、Pinia、Router
+    - _需求：需求 11.1、需求 11.2_
+- [x] 2. 数据库初始化
+  - [x] 2.1 创建数据库和所有表
+    - 创建 blog 数据库
+    - 按设计文档依次创建 admin、category、tag、article、article_tag、comment 六张表
+    - article 表包含软删除字段 deleted（TINYINT DEFAULT 0）和 view_count 字段
+    - article_tag 使用联合主键（article_id, tag_id）
+    - comment 表 status 字段：0=待审核，1=已通过，2=已拒绝
+    - _需求：需求 8.1、需求 8.2_
+  - [x] 2.2 插入初始管理员数据
+    - 向 admin 表插入一条初始管理员记录，密码使用 BCrypt 加密
+    - _需求：需求 1.1_
+
+- [x] 3. blog-springboot 公共模块
+  - [x] 3.1 实现统一响应体 Result<T> 和 ResultCode 枚举
+    - 创建 com.blog.common.result.Result<T>，包含 code、message、data 字段及 success()、error() 静态工厂方法
+    - 创建 com.blog.common.result.ResultCode 枚举，定义 SUCCESS(200)、BAD_REQUEST(400)、UNAUTHORIZED(401)、FORBIDDEN(403)、NOT_FOUND(404)、INTERNAL_ERROR(500) 及业务错误码 1001-1006
+    - _需求：需求 9.1、需求 9.2、需求 10.1、需求 10.2_
+  - [x] 3.2 实现业务异常 BusinessException
+    - 创建 com.blog.common.exception.BusinessException，继承 RuntimeException，持有 ResultCode 字段
+    - _需求：需求 9.4_
+  - [x] 3.3 实现全局异常处理器 GlobalExceptionHandler
+    - 创建 com.blog.common.exception.GlobalExceptionHandler，使用 @RestControllerAdvice
+    - 分别处理 BusinessException（返回对应业务错误码）、MethodArgumentNotValidException（返回 code=400 及字段错误信息）、系统未捕获 Exception（返回 code=500 并记录堆栈）
+    - _需求：需求 9.3、需求 9.4、需求 9.5、需求 9.6、需求 10.3_
+  - [x] 3.4 实现 BaseEntity 抽象基类
+    - 创建 com.blog.entity.BaseEntity，包含 createTime、createBy、updateTime、updateBy 四个字段，使用 @TableField(fill=...) 注解
+    - _需求：需求 2.3、需求 2.5_
+  - [x] 3.5 实现 BlogMetaObjectHandler 自动填充处理器
+    - 创建 com.blog.common.handler.BlogMetaObjectHandler，实现 MetaObjectHandler 接口
+    - insertFill 填充 createTime、updateTime、createBy、updateBy；updateFill 填充 updateTime、updateBy
+    - 通过 StpUtil.isLogin() 判断当前用户，已登录取用户名，未登录填 "visitor"
+    - _需求：需求 2.3、需求 2.5_
+  - [x] 3.6 实现请求日志拦截器 RequestLogInterceptor
+    - 创建 com.blog.common.interceptor.RequestLogInterceptor，实现 HandlerInterceptor
+    - preHandle 记录请求路径、HTTP 方法、请求参数；afterCompletion 记录响应耗时
+    - _需求：需求 9.8、需求 10.8_
+  - [x] 3.7 配置 MyBatis-Plus（分页插件、逻辑删除）
+    - 创建 com.blog.config.MybatisPlusConfig，注册 MybatisPlusInterceptor 并添加 PaginationInnerInterceptor
+    - 在 application.yml 中配置 mybatis-plus.global-config.db-config.logic-delete-field=deleted、logic-delete-value=1、logic-not-delete-value=0
+    - _需求：需求 2.6、需求 2.11_
+  - [x] 3.8 配置 Sa-Token 鉴权
+    - 创建 com.blog.config.SaTokenConfig，注册 Sa-Token 路由拦截器，拦截 /api/admin/** 路径，排除 /api/admin/auth/login
+    - 未登录时抛出异常，由 GlobalExceptionHandler 捕获并返回 code=401
+    - _需求：需求 1.6、需求 1.7_
+  - [x] 3.9 配置 CORS 跨域
+    - 创建 com.blog.config.CorsConfig，允许前端域名跨域访问 /api/** 和 /api/admin/** 路径
+    - _需求：需求 9.10、需求 10.9_
+  - [x] 3.10 配置 WebMvcConfig 注册拦截器
+    - 创建 com.blog.config.WebMvcConfig，实现 WebMvcConfigurer，注册 RequestLogInterceptor 拦截所有 /api/** 路径
+    - _需求：需求 9.8、需求 10.8_
+
+- [x] 4. 实体层、Mapper 层
+  - [x] 4.1 创建所有 Entity 实体类
+    - 创建 com.blog.entity.Admin，包含 id、username、password 字段，使用 @TableName("admin")、@TableId(type=IdType.AUTO)
+    - 创建 com.blog.entity.Category，继承 BaseEntity，包含 id、name、description 字段
+    - 创建 com.blog.entity.Tag，继承 BaseEntity，包含 id、name 字段
+    - 创建 com.blog.entity.Article，继承 BaseEntity，包含 id、title、content、summary、coverUrl、categoryId、status、viewCount 字段，@TableLogic 标注 deleted 字段
+    - 创建 com.blog.entity.ArticleTag，包含 articleId、tagId 字段，@TableId 使用联合主键或无主键配置
+    - 创建 com.blog.entity.Comment，继承 BaseEntity，包含 id、articleId、nickname、email、content、status 字段
+    - _需求：需求 8.1、需求 8.2_
+  - [x] 4.2 创建所有 Mapper 接口
+    - 创建 com.blog.mapper.AdminMapper，继承 BaseMapper<Admin>
+    - 创建 com.blog.mapper.CategoryMapper，继承 BaseMapper<Category>
+    - 创建 com.blog.mapper.TagMapper，继承 BaseMapper<Tag>
+    - 创建 com.blog.mapper.ArticleMapper，继承 BaseMapper<Article>，添加自定义方法 selectArticleListWithCategory（联表查询分类名称）
+    - 创建 com.blog.mapper.ArticleTagMapper，继承 BaseMapper<ArticleTag>
+    - 创建 com.blog.mapper.CommentMapper，继承 BaseMapper<Comment>
+    - 在 resources/mapper/ 目录下创建对应 XML 映射文件（ArticleMapper.xml 包含联表查询 SQL）
+    - _需求：需求 8.1、需求 8.7、需求 8.8_
+  - [x] 4.3 创建 DTO 请求参数对象
+    - 创建 com.blog.dto.LoginDTO，包含 username（@NotBlank）、password（@NotBlank）字段
+    - 创建 com.blog.dto.ArticleDTO，包含 title（@NotBlank）、content（@NotBlank）、summary、coverUrl、categoryId、tagIds（List<Long>）、status 字段
+    - 创建 com.blog.dto.CategoryDTO，包含 name（@NotBlank）、description 字段
+    - 创建 com.blog.dto.TagDTO，包含 name（@NotBlank）字段
+    - 创建 com.blog.dto.CommentDTO，包含 articleId（@NotNull）、nickname（@NotBlank）、email、content（@NotBlank）字段
+    - _需求：需求 2.1、需求 2.2、需求 3.1、需求 4.1、需求 5.1、需求 5.2_
+  - [x] 4.4 创建 VO 响应视图对象
+    - 创建 com.blog.vo.ArticleVO，包含文章完整信息及 categoryName（分类名称）、tags（List<TagVO>）字段
+    - 创建 com.blog.vo.ArticleListVO，包含文章列表摘要信息（不含正文 content）及 categoryName、tags 字段
+    - 创建 com.blog.vo.CategoryVO，包含 id、name、description、articleCount 字段
+    - 创建 com.blog.vo.TagVO，包含 id、name、articleCount 字段
+    - 创建 com.blog.vo.CommentVO，包含 id、articleId、nickname、content、status、createTime 字段
+    - 创建 com.blog.vo.DashboardVO，包含 articleCount、categoryCount、tagCount、commentCount、pendingCommentCount 字段
+    - _需求：需求 2.8、需求 3.6、需求 4.5、需求 7.1_
+
+- [x] 5. 用户认证模块（后台 API）
+  - [x] 5.1 实现 AuthAdminController
+    - 创建 com.blog.controller.admin.AuthAdminController，映射路径 /api/admin/auth
+    - 实现 POST /api/admin/auth/login：接收 @Valid LoginDTO，调用 AdminMapper 查询用户，使用 BCryptPasswordEncoder 比对密码，验证通过后调用 StpUtil.login(username) 创建会话，返回 token 字符串
+    - 实现 POST /api/admin/auth/logout：调用 StpUtil.logout() 销毁当前会话，返回 Result.success(null)
+    - 密码错误或用户不存在时抛出 BusinessException(ResultCode.USERNAME_OR_PASSWORD_ERROR)
+    - _需求：需求 1.1、需求 1.2、需求 1.3、需求 1.4、需求 1.5_
+  - [x] 5.2 实现 AuthService 及 AuthServiceImpl
+    - 创建 com.blog.service.AuthService 接口，定义 login(LoginDTO) 返回 token 字符串、logout() 方法
+    - 创建 com.blog.service.impl.AuthServiceImpl，注入 AdminMapper 和 BCryptPasswordEncoder
+    - login 方法：查询 admin 表，BCrypt 比对密码，失败抛 BusinessException，成功调用 StpUtil.login 并返回 StpUtil.getTokenValue()
+    - 在 com.blog.config 中注册 BCryptPasswordEncoder Bean
+    - _需求：需求 1.1、需求 1.2、需求 1.3_
+
+- [x] 6. 分类管理模块（后台 API）
+  - [x] 6.1 实现 CategoryService 及 CategoryServiceImpl
+    - 创建 com.blog.service.CategoryService 接口，定义 list()、create(CategoryDTO)、update(Long id, CategoryDTO)、delete(Long id) 方法
+    - 创建 com.blog.service.impl.CategoryServiceImpl，注入 CategoryMapper 和 ArticleMapper
+    - create 方法：查询同名分类是否存在，存在则抛 BusinessException(ResultCode.CATEGORY_NAME_DUPLICATE)，否则插入
+    - update 方法：查询同名分类（排除自身），存在则抛重复异常，否则更新
+    - delete 方法：查询该分类下文章数量（article 表 category_id 匹配且 deleted=0），大于 0 则抛 BusinessException(ResultCode.CATEGORY_HAS_ARTICLES)，否则删除
+    - list 方法：查询所有分类，并统计每个分类下的文章数量，返回 List<CategoryVO>
+    - _需求：需求 3.1、需求 3.2、需求 3.3、需求 3.4、需求 3.5、需求 3.6_
+  - [x] 6.2 实现 CategoryAdminController
+    - 创建 com.blog.controller.admin.CategoryAdminController，映射路径 /api/admin/categories
+    - 实现 GET /api/admin/categories：调用 categoryService.list()，返回分类列表
+    - 实现 POST /api/admin/categories：接收 @Valid CategoryDTO，调用 categoryService.create()
+    - 实现 PUT /api/admin/categories/{id}：接收 @Valid CategoryDTO，调用 categoryService.update()
+    - 实现 DELETE /api/admin/categories/{id}：调用 categoryService.delete()
+    - _需求：需求 3.1、需求 3.2、需求 3.3、需求 3.4、需求 3.5_
+
+- [x] 7. 标签管理模块（后台 API）
+  - [x] 7.1 实现 TagService 及 TagServiceImpl
+    - 创建 com.blog.service.TagService 接口，定义 list()、create(TagDTO)、update(Long id, TagDTO)、delete(Long id) 方法
+    - 创建 com.blog.service.impl.TagServiceImpl，注入 TagMapper 和 ArticleTagMapper
+    - create 方法：查询同名标签是否存在，存在则抛 BusinessException(ResultCode.TAG_NAME_DUPLICATE)，否则插入
+    - update 方法：查询同名标签（排除自身），存在则抛重复异常，否则更新
+    - delete 方法：先调用 ArticleTagMapper 删除该标签所有关联记录（DELETE FROM article_tag WHERE tag_id=?），再删除标签记录，使用 @Transactional 保证原子性
+    - list 方法：查询所有标签，并统计每个标签下的文章数量，返回 List<TagVO>
+    - _需求：需求 4.1、需求 4.2、需求 4.3、需求 4.4、需求 4.5_
+  - [x] 7.2 实现 TagAdminController
+    - 创建 com.blog.controller.admin.TagAdminController，映射路径 /api/admin/tags
+    - 实现 GET /api/admin/tags：调用 tagService.list()，返回标签列表
+    - 实现 POST /api/admin/tags：接收 @Valid TagDTO，调用 tagService.create()
+    - 实现 PUT /api/admin/tags/{id}：接收 @Valid TagDTO，调用 tagService.update()
+    - 实现 DELETE /api/admin/tags/{id}：调用 tagService.delete()
+    - _需求：需求 4.1、需求 4.2、需求 4.3、需求 4.4_
+
+- [x] 8. 文章管理模块（后台 API）
+  - [x] 8.1 实现 ArticleService 及 ArticleServiceImpl（后台部分）
+    - 创建 com.blog.service.ArticleService 接口，定义 adminList(pageNum, pageSize, categoryId, tagId, status, keyword)、getById(Long id)、create(ArticleDTO)、update(Long id, ArticleDTO)、delete(Long id) 方法
+    - 创建 com.blog.service.impl.ArticleServiceImpl，注入 ArticleMapper、ArticleTagMapper、CategoryMapper、TagMapper
+    - create 方法：校验 title 和 content 非空，插入 article 记录，再批量插入 article_tag 关联记录，使用 @Transactional
+    - update 方法：更新 article 记录，先删除旧的 article_tag 关联，再批量插入新关联，使用 @Transactional
+    - delete 方法：调用 MyBatis-Plus 逻辑删除（updateById 设置 deleted=1），不物理删除
+    - adminList 方法：使用 MyBatis-Plus Page 分页，支持 categoryId、tagId（通过 article_tag 子查询）、status、keyword（LIKE title 或 content）条件筛选，返回 PageVO
+    - _需求：需求 2.1、需求 2.2、需求 2.3、需求 2.4、需求 2.5、需求 2.6、需求 2.7、需求 2.10、需求 2.11_
+  - [x] 8.2 实现 ArticleAdminController
+    - 创建 com.blog.controller.admin.ArticleAdminController，映射路径 /api/admin/articles
+    - 实现 GET /api/admin/articles：接收 pageNum、pageSize、categoryId、tagId、status、keyword 参数，调用 articleService.adminList()
+    - 实现 POST /api/admin/articles：接收 @Valid ArticleDTO，调用 articleService.create()
+    - 实现 PUT /api/admin/articles/{id}：接收 @Valid ArticleDTO，调用 articleService.update()
+    - 实现 DELETE /api/admin/articles/{id}：调用 articleService.delete()（软删除）
+    - _需求：需求 2.1、需求 2.4、需求 2.6、需求 2.7、需求 2.10、需求 9.11、需求 9.12、需求 9.13_
+
+- [x] 9. 评论管理模块 + 仪表盘（后台 API）
+  - [x] 9.1 实现 CommentService 及 CommentServiceImpl（后台部分）
+    - 创建 com.blog.service.CommentService 接口，定义 adminList(pageNum, pageSize, status)、approve(Long id)、reject(Long id)、delete(Long id) 方法
+    - 创建 com.blog.service.impl.CommentServiceImpl，注入 CommentMapper
+    - adminList 方法：使用 MyBatis-Plus Page 分页，支持按 status 筛选，返回 PageVO<CommentVO>
+    - approve 方法：更新 comment 的 status=1（已通过）
+    - reject 方法：更新 comment 的 status=2（已拒绝）
+    - delete 方法：物理删除评论记录（调用 commentMapper.deleteById）
+    - _需求：需求 5.5、需求 5.6、需求 5.7、需求 5.8_
+  - [x] 9.2 实现 CommentAdminController
+    - 创建 com.blog.controller.admin.CommentAdminController，映射路径 /api/admin/comments
+    - 实现 GET /api/admin/comments：接收 pageNum、pageSize、status 参数，调用 commentService.adminList()
+    - 实现 PUT /api/admin/comments/{id}/approve：调用 commentService.approve()
+    - 实现 PUT /api/admin/comments/{id}/reject：调用 commentService.reject()
+    - 实现 DELETE /api/admin/comments/{id}：调用 commentService.delete()
+    - _需求：需求 5.5、需求 5.6、需求 5.7、需求 5.8、需求 7.5_
+  - [x] 9.3 实现 DashboardAdminController
+    - 创建 com.blog.controller.admin.DashboardAdminController，映射路径 /api/admin/dashboard
+    - 实现 GET /api/admin/dashboard：分别查询 article 总数（deleted=0）、category 总数、tag 总数、comment 总数、待审核评论数（status=0），封装为 DashboardVO 返回
+    - _需求：需求 7.1_
+
+- [x] 10. 前台 API 模块
+  - [x] 10.1 实现 ArticleService 前台方法
+    - 在 ArticleService 接口中补充 frontList(pageNum, pageSize, categoryId, tagId, keyword)、frontGetById(Long id)、archive() 方法
+    - frontList 方法：仅查询 status=1（已发布）且 deleted=0 的文章，支持分类/标签/关键词筛选，按 create_time 降序分页返回 PageVO<ArticleListVO>
+    - frontGetById 方法：查询 status=1 且 deleted=0 的文章详情，同时执行 UPDATE article SET view_count=view_count+1 WHERE id=?，返回 ArticleVO（含分类名和标签列表）
+    - archive 方法：查询所有已发布文章的 id、title、create_time，按年月分组返回
+    - _需求：需求 2.9、需求 6.1、需求 6.2、需求 6.4、需求 6.8、需求 8.4_
+  - [x] 10.2 实现 ArticleFrontController
+    - 创建 com.blog.controller.frontend.ArticleFrontController，映射路径 /api/articles
+    - 实现 GET /api/articles：接收 pageNum、pageSize、categoryId、tagId、keyword 参数，调用 articleService.frontList()
+    - 实现 GET /api/articles/{id}：调用 articleService.frontGetById()，返回文章详情
+    - 实现 GET /api/articles/archive：调用 articleService.archive()，返回归档数据
+    - _需求：需求 6.1、需求 6.2、需求 6.3、需求 6.4、需求 6.5、需求 6.8、需求 10.10_
+  - [x] 10.3 实现 CategoryFrontController
+    - 创建 com.blog.controller.frontend.CategoryFrontController，映射路径 /api/categories
+    - 实现 GET /api/categories：调用 categoryService.list()，返回分类列表（含文章数）
+    - 实现 GET /api/categories/{id}/articles：接收 pageNum、pageSize，调用 articleService.frontList(categoryId=id)，返回该分类下已发布文章分页列表
+    - _需求：需求 3.6、需求 3.7、需求 6.6_
+  - [x] 10.4 实现 TagFrontController
+    - 创建 com.blog.controller.frontend.TagFrontController，映射路径 /api/tags
+    - 实现 GET /api/tags：调用 tagService.list()，返回标签列表（含文章数）
+    - 实现 GET /api/tags/{id}/articles：接收 pageNum、pageSize，调用 articleService.frontList(tagId=id)，返回该标签下已发布文章分页列表
+    - _需求：需求 4.5、需求 4.6、需求 6.7_
+  - [x] 10.5 实现 CommentService 前台方法及 CommentFrontController
+    - 在 CommentService 接口中补充 submit(CommentDTO)、listByArticle(Long articleId, pageNum, pageSize) 方法
+    - submit 方法：校验 articleId 对应文章存在且已发布，插入评论记录，status 默认 0（待审核）
+    - listByArticle 方法：查询指定文章下 status=1（已通过）的评论，按 create_time 升序分页返回
+    - 创建 com.blog.controller.frontend.CommentFrontController，映射路径 /api
+    - 实现 POST /api/comments：接收 @Valid CommentDTO，调用 commentService.submit()
+    - 实现 GET /api/articles/{id}/comments：调用 commentService.listByArticle()
+    - _需求：需求 5.1、需求 5.2、需求 5.3、需求 5.4、需求 5.9_
+
+- [x] 11. blog-vue 工程基础
+  - [x] 11.1 实现 axios 封装（src/api/request.js）
+    - 创建 src/api/request.js，使用 axios.create 创建实例，配置 baseURL 和 timeout
+    - 请求拦截器：判断请求 URL 是否以 /api/admin 开头，若是则从 Pinia auth store 读取 token 并注入 Authorization 请求头，否则不注入
+    - 响应拦截器：提取 response.data，若 code 非 200 则调用 toast 展示 data.message；若 code 为 401 则调用 authStore.clearAuth() 并跳转 /admin/login；返回 data.data 供调用方使用
+    - 网络错误（catch）：toast 提示"网络异常，请稍后重试"
+    - _需求：需求 11.5、需求 11.6、需求 11.7_
+  - [x] 11.2 实现 Pinia auth store（src/store/auth.js）
+    - 创建 src/store/auth.js，使用 defineStore 定义 useAuthStore
+    - state：token（从 localStorage 读取初始值）、userInfo
+    - actions：setAuth(token) 保存 token 到 state 和 localStorage；clearAuth() 清除 state 和 localStorage 中的 token；isLoggedIn 计算属性返回 token 是否存在
+    - _需求：需求 11.3、需求 11.4、需求 11.9_
+  - [x] 11.3 配置 Vue Router（src/router/index.js）
+    - 创建 src/router/index.js，使用 createRouter + createWebHistory
+    - 前台路由（/ 根路径）：HomeView、ArticleDetailView、CategoryView、TagView、ArchiveView、SearchView
+    - 后台路由（/admin 前缀）：LoginView（/admin/login）、DashboardView（/admin/dashboard）、ArticleListView、ArticleEditView、CategoryView、TagView、CommentView
+    - 路由守卫（beforeEach）：访问 /admin 前缀路由时检查 authStore.isLoggedIn，未登录则重定向至 /admin/login
+    - _需求：需求 11.1、需求 11.2、需求 11.3、需求 11.4_
+  - [x] 11.4 创建各模块 API 文件
+    - 创建 src/api/auth.js：封装 login(data)、logout() 方法，调用 request.js
+    - 创建 src/api/article.js：封装 getArticles(params)、getArticleById(id)、getArchive()、adminGetArticles(params)、createArticle(data)、updateArticle(id, data)、deleteArticle(id) 方法
+    - 创建 src/api/category.js：封装 getCategories()、getCategoryArticles(id, params)、adminCreateCategory(data)、adminUpdateCategory(id, data)、adminDeleteCategory(id) 方法
+    - 创建 src/api/tag.js：封装 getTags()、getTagArticles(id, params)、adminCreateTag(data)、adminUpdateTag(id, data)、adminDeleteTag(id) 方法
+    - 创建 src/api/comment.js：封装 submitComment(data)、getArticleComments(articleId, params)、adminGetComments(params)、approveComment(id)、rejectComment(id)、deleteComment(id) 方法
+    - _需求：需求 11.5_
+
+- [x] 12. 前台页面开发（blog-vue）
+  - [x] 12.1 实现公共组件
+    - 创建 src/components/frontend/ArticleCard.vue：展示文章封面、标题、摘要、发布时间、分类、标签，点击跳转文章详情页
+    - 创建 src/components/frontend/Pagination.vue：接收 total、pageNum、pageSize props，emit page-change 事件，使用 Vuetify v-pagination 组件
+    - 创建 src/components/frontend/CommentList.vue：接收 comments 数组 prop，按时间升序展示评论昵称、内容、时间
+    - _需求：需求 6.1、需求 5.9_
+  - [x] 12.2 实现 HomeView.vue
+    - 创建 src/views/frontend/HomeView.vue
+    - onMounted 调用 article.js getArticles() 获取文章列表，展示 ArticleCard 列表
+    - 底部使用 Pagination 组件，page-change 时重新请求数据
+    - _需求：需求 6.1、需求 6.2_
+  - [x] 12.3 实现 ArticleDetailView.vue
+    - 创建 src/views/frontend/ArticleDetailView.vue
+    - onMounted 根据路由 id 调用 getArticleById() 获取文章详情
+    - 使用 marked 库将 content（Markdown）渲染为 HTML，v-html 展示
+    - 展示文章标题、分类、标签、发布时间、阅读次数
+    - 底部展示 CommentList 组件（调用 getArticleComments()）和评论提交表单（昵称、邮箱、内容，提交调用 submitComment()）
+    - _需求：需求 6.3、需求 6.4、需求 5.1、需求 5.9_
+  - [x] 12.4 实现 CategoryView.vue、TagView.vue、ArchiveView.vue、SearchView.vue
+    - 创建 src/views/frontend/CategoryView.vue：展示所有分类列表（含文章数），点击分类展示该分类下文章列表（含分页）
+    - 创建 src/views/frontend/TagView.vue：展示所有标签列表（含文章数），点击标签展示该标签下文章列表（含分页）
+    - 创建 src/views/frontend/ArchiveView.vue：调用 getArchive() 获取归档数据，按年月分组展示文章标题和时间
+    - 创建 src/views/frontend/SearchView.vue：顶部搜索框，输入关键词后调用 getArticles({keyword}) 展示结果列表（含分页）
+    - _需求：需求 3.7、需求 4.6、需求 6.5、需求 6.6、需求 6.7、需求 6.8_
+
+- [x] 13. 后台页面开发（blog-vue）
+  - [x] 13.1 实现 AdminLayout.vue 和 LoginView.vue
+    - 创建 src/components/admin/AdminLayout.vue：包含左侧导航栏（仪表盘、文章管理、分类管理、标签管理、评论管理）和右侧内容区 router-view，顶部展示登出按钮（调用 logout() 后清除 auth 并跳转 /admin/login）
+    - 创建 src/views/admin/LoginView.vue：用户名和密码输入框，提交调用 auth.js login()，成功后调用 authStore.setAuth(token) 并跳转 /admin/dashboard
+    - _需求：需求 7.6、需求 1.1、需求 11.3、需求 11.4_
+  - [x] 13.2 实现 DashboardView.vue
+    - 创建 src/views/admin/DashboardView.vue
+    - onMounted 调用 /api/admin/dashboard 获取统计数据
+    - 使用 Vuetify v-card 展示文章总数、分类总数、标签总数、评论总数、待审核评论数
+    - _需求：需求 7.1_
+  - [x] 13.3 实现 ArticleListView.vue 和 ArticleEditView.vue
+    - 创建 src/views/admin/ArticleListView.vue：调用 adminGetArticles() 展示文章列表（含分页），支持按分类/标签/状态/关键词筛选，每行提供编辑（跳转 ArticleEditView）、删除（确认后调用 deleteArticle()）操作
+    - 创建 src/views/admin/ArticleEditView.vue：新建/编辑文章表单，包含标题、分类选择、标签多选、摘要、封面 URL、发布状态切换、Markdown 编辑器（使用 md-editor-v3 组件）；提交时调用 createArticle() 或 updateArticle()
+    - _需求：需求 2.1、需求 2.4、需求 2.6、需求 7.2、需求 7.7_
+  - [x] 13.4 实现 CategoryView.vue 和 TagView.vue（后台）
+    - 创建 src/views/admin/CategoryView.vue：展示分类列表，提供新建（弹窗表单）、编辑（弹窗表单）、删除（确认后调用 adminDeleteCategory()）操作
+    - 创建 src/views/admin/TagView.vue：展示标签列表，提供新建（弹窗表单）、编辑（弹窗表单）、删除（确认后调用 adminDeleteTag()）操作
+    - _需求：需求 3.1、需求 3.3、需求 3.4、需求 4.1、需求 4.3、需求 4.4、需求 7.3、需求 7.4_
+  - [x] 13.5 实现 CommentView.vue（后台）
+    - 创建 src/views/admin/CommentView.vue：调用 adminGetComments() 展示评论列表（含分页），支持按审核状态筛选
+    - 每行提供审核通过（调用 approveComment()）、拒绝（调用 rejectComment()）、删除（调用 deleteComment()）操作
+    - _需求：需求 5.5、需求 5.6、需求 5.7、需求 7.5_
+
+- [x] 14. 属性测试（后端 jqwik）
+  - [x] 14.1 属性 1：软删除后访客不可见
+    - 在 src/test/java/com/blog/property/ArticlePropertyTest.java 中编写属性测试
+    - 注释：Feature: personal-blog-system, Property 1: 软删除后访客不可见
+    - 使用 @Property(tries=100)，生成合法文章数据，插入数据库并设置 status=1，执行软删除（deleted=1），调用前台 ArticleService.frontList() 和 frontGetById()，断言均不返回该文章
+    - **属性 1：软删除后访客不可见**
+    - **验证：需求 2.6、需求 2.9**
+  - [x] 14.2 属性 2：含文章分类不可删除
+    - 在 ArticlePropertyTest.java 中编写属性测试
+    - 注释：Feature: personal-blog-system, Property 2: 含文章分类不可删除
+    - 使用 @Property(tries=100)，生成分类和文章数据，文章关联该分类，调用 CategoryService.delete()，断言抛出 BusinessException 且 code=CATEGORY_HAS_ARTICLES
+    - **属性 2：含文章的分类不可删除**
+    - **验证：需求 3.4**
+  - [x] 14.3 属性 3：评论初始状态为待审核
+    - 在 src/test/java/com/blog/property/CommentPropertyTest.java 中编写属性测试
+    - 注释：Feature: personal-blog-system, Property 3: 评论初始状态为待审核
+    - 使用 @Property(tries=100)，生成合法评论提交数据，调用 CommentService.submit()，查询数据库断言 status=0，调用前台 listByArticle() 断言不包含该评论
+    - **属性 3：评论初始状态为待审核**
+    - **验证：需求 5.3、需求 5.4**
+  - [x] 14.4 属性 4：评论审核状态流转合法性
+    - 在 CommentPropertyTest.java 中编写属性测试
+    - 注释：Feature: personal-blog-system, Property 4: 评论审核状态流转合法性
+    - 使用 @Property(tries=100)，插入待审核评论，分别测试 approve() 后 status=1 且前台可见、reject() 后 status=2 且前台不可见
+    - **属性 4：评论审核状态流转合法性**
+    - **验证：需求 5.4、需求 5.5、需求 5.6**
+  - [x] 14.5 属性 5：分页查询结果一致性
+    - 在 src/test/java/com/blog/property/PaginationPropertyTest.java 中编写属性测试
+    - 注释：Feature: personal-blog-system, Property 5: 分页查询结果一致性
+    - 使用 @Property(tries=100)，生成合法 pageNum（>=1）和 pageSize（1-50），调用 ArticleService.adminList()，断言返回 list.size() <= pageSize 且 total 与实际数据量一致
+    - **属性 5：分页查询结果一致性**
+    - **验证：需求 2.11、需求 9.12、需求 9.13**
+  - [x] 14.6 属性 6：Token 过期后接口拒绝访问
+    - 在 src/test/java/com/blog/property/AuthPropertyTest.java 中编写属性测试
+    - 注释：Feature: personal-blog-system, Property 6: Token 过期后接口拒绝访问
+    - 使用 @Property(tries=100)，生成随机无效/过期 token 字符串，携带该 token 请求任意 /api/admin/** 接口，断言响应 code=401 且业务逻辑未执行
+    - **属性 6：Token 过期后接口拒绝访问**
+    - **验证：需求 1.6、需求 1.7**
+  - [x] 14.7 属性 7：统一响应结构完整性
+    - 在 src/test/java/com/blog/property/ResponsePropertyTest.java 中编写属性测试
+    - 注释：Feature: personal-blog-system, Property 7: 统一响应结构完整性
+    - 使用 @Property(tries=100)，对前台和后台各类接口（成功和失败场景）发起请求，断言响应体均包含 code（Integer）、message（String）、data 三个字段
+    - **属性 7：统一响应结构完整性**
+    - **验证：需求 9.1、需求 10.1**
+
+- [x] 15. 属性测试（前端 fast-check）
+  - [x] 15.1 属性 8：axios Token 注入规则
+    - 在 blog-vue/src/api/__tests__/request.test.js 中编写属性测试
+    - 注释：Feature: personal-blog-system, Property 8: axios Token 注入规则
+    - 使用 fast-check fc.assert + fc.property，生成以 /api/admin 开头的随机路径字符串（numRuns: 100），mock authStore 返回有效 token，调用 request.js 请求拦截器逻辑，断言请求配置中包含 Authorization 头且值为 token
+    - 生成以 /api 开头但不以 /api/admin 开头的随机路径字符串，断言请求配置中不包含 Authorization 头
+    - **属性 8：axios 请求 Token 注入规则**
+    - **验证：需求 11.5**
+
+- [x] 16. 最终检查点
+  - 确保所有测试通过，如有问题请向用户说明。
+
+## 备注
+
+- 标注 `*` 的子任务为可选任务，可跳过以加快 MVP 进度
+- 每个任务均引用具体需求条目，保证可追溯性
+- 检查点任务确保增量验证，及时发现问题
+- 属性测试验证系统的通用正确性属性，单元测试验证具体示例和边界条件

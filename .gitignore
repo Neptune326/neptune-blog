@@ -1,0 +1,26 @@
+# Java
+target/
+*.class
+*.jar
+
+# Maven
+.mvn/
+mvnw
+mvnw.cmd
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Node
+node_modules/
+dist/
+.env.local
+
+# 日志
+*.log
+logs/
+
+# 正式环境配置（含敏感信息，不提交）
+blog-springboot/src/main/resources/application-prod.yml

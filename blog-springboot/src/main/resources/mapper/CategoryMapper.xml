@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 分类 Mapper XML -->
+<mapper namespace="com.blog.mapper.CategoryMapper">
+
+    <!-- 查询所有分类及其关联的文章数量 -->
+    <select id="selectCategoryWithArticleCount" resultType="com.blog.vo.CategoryVO">
+        SELECT c.id,
+               c.name,
+               c.description,
+               COUNT(a.id) AS articleCount
+        FROM category c
+                 LEFT JOIN article a ON a.category_id = c.id AND a.deleted = 0
+        GROUP BY c.id, c.name, c.description
+        ORDER BY c.id ASC
+    </select>
+
+</mapper>

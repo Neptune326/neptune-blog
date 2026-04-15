@@ -1,0 +1,113 @@
+<template>
+  <!-- 文章卡片 —— Google Material Design 3 风格 -->
+  <v-card
+    class="mb-4 card-clickable"
+    rounded="lg"
+    elevation="0"
+    style="border: 1px solid #e8eaed;"
+    @click="goDetail"
+  >
+    <!-- 封面图 -->
+    <v-img
+      v-if="article.coverUrl"
+      :src="article.coverUrl"
+      height="220"
+      cover
+      class="rounded-t-lg"
+    >
+      <!-- 分类标签浮层 -->
+      <template #default>
+        <div class="pa-3">
+          <v-chip
+            v-if="article.categoryName"
+            size="small"
+            color="primary"
+            style="background: rgba(26,115,232,0.9); backdrop-filter: blur(4px);"
+          >
+            {{ article.categoryName }}
+          </v-chip>
+        </div>
+      </template>
+    </v-img>
+
+    <v-card-text class="pa-5">
+      <!-- 无封面时显示分类 -->
+      <div v-if="!article.coverUrl && article.categoryName" class="mb-2">
+        <v-chip size="small" color="primary" variant="tonal">
+          {{ article.categoryName }}
+        </v-chip>
+      </div>
+
+      <!-- 标题 -->
+      <h3
+        class="text-h6 font-weight-bold mb-2 line-clamp-2"
+        style="color: #202124; line-height: 1.4;"
+      >
+        {{ article.title }}
+      </h3>
+
+      <!-- 摘要 -->
+      <p
+        v-if="article.summary"
+        class="text-body-2 line-clamp-3 mb-3"
+        style="color: #5f6368; line-height: 1.6;"
+      >
+        {{ article.summary }}
+      </p>
+
+      <!-- 底部：时间 + 阅读数 + 标签 -->
+      <div class="d-flex align-center justify-space-between flex-wrap" style="gap: 8px;">
+        <!-- 左侧：时间和阅读数 -->
+        <div class="d-flex align-center" style="gap: 12px; color: #80868b; font-size: 13px;">
+          <span class="d-flex align-center" style="gap: 4px;">
+            <v-icon size="14" color="grey">mdi-calendar-outline</v-icon>
+            {{ formatDate(article.createTime) }}
+          </span>
+          <span v-if="article.viewCount !== undefined" class="d-flex align-center" style="gap: 4px;">
+            <v-icon size="14" color="grey">mdi-eye-outline</v-icon>
+            {{ article.viewCount }}
+          </span>
+        </div>
+
+        <!-- 右侧：标签 -->
+        <div class="d-flex flex-wrap" style="gap: 4px;">
+          <v-chip
+            v-for="tag in (article.tags || []).slice(0, 3)"
+            :key="tag.id"
+            size="x-small"
+            variant="outlined"
+            color="primary"
+            class="tag-chip"
+          >
+            {{ tag.name }}
+          </v-chip>
+        </div>
+      </div>
+    </v-card-text>
+  </v-card>
+</template>
+
+<script>
+import { useRouter } from 'vue-router'
+
+export default {
+  name: 'ArticleCard',
+  props: {
+    article: { type: Object, required: true }
+  },
+  setup: function(props) {
+    var router = useRouter()
+
+    function goDetail() {
+      router.push('/article/' + props.article.id)
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return ''
+      return dateStr.substring(0, 10)
+    }
+
+    return { goDetail, formatDate }
+  }
+}
+</script>

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 文章 Mapper XML -->
+<mapper namespace="com.blog.mapper.ArticleMapper">
+
+    <!-- 文章列表视图结果映射（不含正文） -->
+    <resultMap id="ArticleListVOMap" type="com.blog.vo.ArticleListVO">
+        <id     column="id"           property="id"/>
+        <result column="title"        property="title"/>
+        <result column="summary"      property="summary"/>
+        <result column="cover_url"    property="coverUrl"/>
+        <result column="category_id"  property="categoryId"/>
+        <result column="category_name" property="categoryName"/>
+        <result column="status"       property="status"/>
+        <result column="view_count"   property="viewCount"/>
+        <result column="create_time"  property="createTime"/>
+        <!-- 标签列表通过子查询填充 -->
+        <collection property="tags" ofType="com.blog.vo.TagVO"
+                    select="selectTagsByArticleId" column="id"/>
+    </resultMap>
+
+    <!-- 文章详情视图结果映射（含正文） -->
+    <resultMap id="ArticleVOMap" type="com.blog.vo.ArticleVO">
+        <id     column="id"           property="id"/>
+        <result column="title"        property="title"/>
+        <result column="content"      property="content"/>
+        <result column="summary"      property="summary"/>
+        <result column="cover_url"    property="coverUrl"/>
+        <result column="category_id"  property="categoryId"/>
+        <result column="category_name" property="categoryName"/>
+        <result column="status"       property="status"/>
+        <result column="view_count"   property="viewCount"/>
+        <result column="create_time"  property="createTime"/>
+        <!-- 标签列表通过子查询填充 -->
+        <collection property="tags" ofType="com.blog.vo.TagVO"
+                    select="selectTagsByArticleId" column="id"/>
+    </resultMap>
+
+    <!-- 根据文章 ID 查询关联标签列表（供 collection 子查询使用，参数为列值 id） -->
+    <select id="selectTagsByArticleId" resultType="com.blog.vo.TagVO">
+        SELECT t.id, t.name, 0 AS articleCount
+        FROM tag t
+                 INNER JOIN article_tag at ON at.tag_id = t.id
+        WHERE at.article_id = #{id}
+    </select>
+
+    <!-- 分页查询文章列表视图，支持分类/标签/状态/关键词动态筛选 -->
+    <select id="selectArticleListVO" resultMap="ArticleListVOMap">
+        SELECT DISTINCT
+            a.id,
+            a.title,
+            a.summary,
+            a.cover_url,
+            a.category_id,
+            c.name AS category_name,
+            a.status,
+            a.view_count,
+            a.create_time
+        FROM article a
+                 LEFT JOIN category c ON c.id = a.category_id
+        <if test="tagId != null">
+            INNER JOIN article_tag at ON at.article_id = a.id AND at.tag_id = #{tagId}
+        </if>
+        <where>
+            a.deleted = 0
+            <if test="categoryId != null">
+                AND a.category_id = #{categoryId}
+            </if>
+            <if test="status != null">
+                AND a.status = #{status}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (a.title LIKE CONCAT('%', #{keyword}, '%')
+                    OR a.summary LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY a.create_time DESC
+    </select>
+
+    <!-- 根据 ID 查询文章详情视图（含分类名和标签列表） -->
+    <select id="selectArticleVOById" resultMap="ArticleVOMap">
+        SELECT a.id,
+               a.title,
+               a.content,
+               a.summary,
+               a.cover_url,
+               a.category_id,
+               c.name AS category_name,
+               a.status,
+               a.view_count,
+               a.create_time
+        FROM article a
+                 LEFT JOIN category c ON c.id = a.category_id
+        WHERE a.id = #{id}
+          AND a.deleted = 0
+    </select>
+
+    <!-- 查询已发布文章的归档数据，按年月分组统计，按年月倒序排列 -->
+    <select id="selectArchive" resultType="com.blog.vo.ArchiveVO">
+        SELECT DATE_FORMAT(create_time, '%Y-%m') AS yearMonth,
+               COUNT(*)                          AS count
+        FROM article
+        WHERE status = 1
+          AND deleted = 0
+        GROUP BY yearMonth
+        ORDER BY yearMonth DESC
+    </select>
+
+</mapper>

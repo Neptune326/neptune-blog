@@ -1,0 +1,28 @@
+server:
+  port: 8080
+
+spring:
+  # 激活的环境配置，可选值：dev（开发）、test（测试）、prod（正式）
+  profiles:
+    active: dev
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+# MyBatis-Plus 公共配置（各环境共用）
+mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*.xml
+  configuration:
+    # 开启驼峰命名映射（数据库下划线 -> Java 驼峰）
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# Sa-Token 公共配置
+sa-token:
+  token-name: Authorization
+  # Token 有效期：7 天（单位：秒）
+  timeout: 604800
+  is-concurrent: false
