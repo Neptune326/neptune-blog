@@ -155,7 +155,10 @@ export default {
       mobileMenu: false,
       navItems: [
         { to: '/', label: '首页', icon: 'mdi-home-outline' },
+        { to: '/articles', label: '文章', icon: 'mdi-file-document-outline' },
         { to: '/archive', label: '归档', icon: 'mdi-archive-outline' },
+        { to: '/about', label: '关于', icon: 'mdi-account-circle-outline' },
+        { to: '/message', label: '留言', icon: 'mdi-message-text-outline' },
         { to: '/search', label: '搜索', icon: 'mdi-magnify' }
       ]
     }

@@ -202,6 +202,14 @@ export function mockHandler(method, url, params, data) {
     return ok(null)
   }
 
+  // POST /api/admin/auth/change-password - 修改密码
+  if (method === 'post' && url === '/api/admin/auth/change-password') {
+    if (data.oldPassword === 'admin123') {
+      return ok(null)
+    }
+    return { code: 1001, message: '旧密码不正确', data: null }
+  }
+
   // GET /api/admin/dashboard - 仪表盘
   if (method === 'get' && url === '/api/admin/dashboard') {
     return ok(dashboard)
@@ -424,6 +432,17 @@ export function mockHandler(method, url, params, data) {
     }
     return ok(visitData)
   }
+
+  // ===== 系列管理 =====
+  if (method === 'get' && url === '/api/admin/series') {
+    return ok([
+      { id: 1, name: 'Spring Boot 系列', description: 'Spring Boot 从入门到精通', sort: 1 },
+      { id: 2, name: 'Vue 3 系列', description: 'Vue 3 全栈开发实战', sort: 2 }
+    ])
+  }
+  if (method === 'post' && url === '/api/admin/series') { return ok(null) }
+  if (method === 'put' && url.match(/^\/api\/admin\/series\/\d+$/)) { return ok(null) }
+  if (method === 'delete' && url.match(/^\/api\/admin\/series\/\d+$/)) { return ok(null) }
 
   // GET /api/admin/users - 管理员列表
   if (method === 'get' && url === '/api/admin/users') {

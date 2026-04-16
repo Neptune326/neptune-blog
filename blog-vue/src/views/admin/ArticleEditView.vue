@@ -30,7 +30,7 @@
           </v-col>
 
           <!-- 发布状态 -->
-          <v-col cols="12" sm="6">
+          <v-col cols="12" sm="4">
             <v-select
               v-model="form.status"
               :items="statusOptions"
@@ -38,6 +38,21 @@
               item-value="value"
               label="发布状态"
               variant="outlined"
+            />
+          </v-col>
+
+          <!-- 定时发布 -->
+          <v-col cols="12" sm="4">
+            <v-text-field
+              v-model="form.publishTime"
+              label="定时发布时间（可选）"
+              variant="outlined"
+              type="datetime-local"
+              density="comfortable"
+              prepend-inner-icon="mdi-clock-outline"
+              hint="设置后将在指定时间自动发布"
+              persistent-hint
+              clearable
             />
           </v-col>
         </v-row>
@@ -173,7 +188,8 @@ export default {
         summary: '',
         coverUrl: '',
         content: '',
-        status: 0
+        status: 0,
+        publishTime: null
       }
     }
   },
@@ -254,7 +270,8 @@ export default {
         summary: self.form.summary,
         coverUrl: self.form.coverUrl,
         content: self.form.content,
-        status: self.form.status
+        status: self.form.status,
+        publishTime: self.form.publishTime || null
       }
 
       var promise = self.isEdit

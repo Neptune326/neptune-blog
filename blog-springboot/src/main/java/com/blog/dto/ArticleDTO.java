@@ -33,4 +33,13 @@ public class ArticleDTO {
 
     /** 发布状态：0=草稿，1=已发布，默认为草稿 */
     private Integer status = 0;
+
+    /** 定时发布时间（null 表示立即发布） */
+    private java.time.LocalDateTime publishTime;
+
+    /** 所属系列 ID（可选） */
+    private Long seriesId;
+
+    /** 在系列中的顺序 */
+    private Integer seriesSort;
 }

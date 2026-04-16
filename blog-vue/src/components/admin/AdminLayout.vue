@@ -206,6 +206,7 @@ export default {
       navItems: [
         { title: '仪表盘', icon: 'mdi-view-dashboard-outline', to: '/admin/dashboard' },
         { title: '文章管理', icon: 'mdi-file-document-outline', to: '/admin/articles' },
+        { title: '文章系列', icon: 'mdi-book-open-variant-outline', to: '/admin/series' },
         { title: '分类管理', icon: 'mdi-folder-outline', to: '/admin/categories' },
         { title: '标签管理', icon: 'mdi-tag-outline', to: '/admin/tags' },
         { title: '评论管理', icon: 'mdi-comment-outline', to: '/admin/comments' },
@@ -224,6 +225,7 @@ export default {
         '/admin/dashboard': '仪表盘',
         '/admin/articles': '文章管理',
         '/admin/articles/edit': '新建文章',
+        '/admin/series': '文章系列',
         '/admin/categories': '分类管理',
         '/admin/tags': '标签管理',
         '/admin/comments': '评论管理',

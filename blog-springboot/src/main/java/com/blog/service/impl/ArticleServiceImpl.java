@@ -78,7 +78,10 @@ public class ArticleServiceImpl implements ArticleService {
         article.setSummary(dto.getSummary());
         article.setCoverUrl(dto.getCoverUrl());
         article.setCategoryId(dto.getCategoryId());
+        article.setSeriesId(dto.getSeriesId());
+        article.setSeriesSort(dto.getSeriesSort());
         article.setStatus(dto.getStatus() != null ? dto.getStatus() : 0);
+        article.setPublishTime(dto.getPublishTime());
         article.setViewCount(0);
         articleMapper.insert(article);
 
@@ -125,7 +128,10 @@ public class ArticleServiceImpl implements ArticleService {
         article.setSummary(dto.getSummary());
         article.setCoverUrl(dto.getCoverUrl());
         article.setCategoryId(dto.getCategoryId());
+        article.setSeriesId(dto.getSeriesId());
+        article.setSeriesSort(dto.getSeriesSort());
         article.setStatus(dto.getStatus() != null ? dto.getStatus() : 0);
+        article.setPublishTime(dto.getPublishTime());
         articleMapper.updateById(article);
 
         // 删除旧的标签关联
