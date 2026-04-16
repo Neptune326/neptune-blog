@@ -126,7 +126,7 @@ export var comments = {
 
 // 仪表盘统计
 export var dashboard = {
-  articleCount: 6, categoryCount: 3, tagCount: 8, commentCount: 8, pendingCommentCount: 2
+  articleCount: 6, categoryCount: 3, tagCount: 8, commentCount: 8, pendingCommentCount: 2, messageCount: 3
 }
 
 // 归档数据

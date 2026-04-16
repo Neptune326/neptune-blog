@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../store/auth.js'
 
 // 前台视图
+import LandingView from '../views/frontend/LandingView.vue'
 import HomeView from '../views/frontend/HomeView.vue'
 import ArticleDetailView from '../views/frontend/ArticleDetailView.vue'
 import FrontCategoryView from '../views/frontend/CategoryView.vue'
@@ -35,6 +36,10 @@ var routes = [
   // ===== 前台路由（无需登录）=====
   {
     path: '/',
+    component: LandingView
+  },
+  {
+    path: '/articles',
     component: HomeView
   },
   {
