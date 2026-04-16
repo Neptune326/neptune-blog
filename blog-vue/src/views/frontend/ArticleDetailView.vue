@@ -126,6 +126,15 @@
                     <v-icon size="15">mdi-clock-outline</v-icon>
                     约 {{ readingTime }} 分钟阅读
                   </span>
+                  <v-spacer />
+                  <!-- 分享按钮组 -->
+                  <div class="d-flex align-center" style="gap: 6px;">
+                    <span style="font-size: 12px; color: #9aa0a6;">分享：</span>
+                    <button @click="shareWeibo" title="分享到微博" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:4px;color:#e6162d;font-size:12px;transition:background 0.15s;" class="share-btn">微博</button>
+                    <button @click="copyLink" title="复制链接" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:4px;color:#5f6368;font-size:12px;transition:background 0.15s;" class="share-btn">
+                      <v-icon size="14">mdi-link-variant</v-icon>
+                    </button>
+                  </div>
                 </div>
 
                 <!-- Markdown 正文 -->
@@ -205,6 +214,43 @@
               </div>
             </v-card>
 
+                <!-- 相关文章推荐 -->
+                <div v-if="relatedArticles.length > 0" style="margin-top: 24px;">
+                  <div style="font-size: 14px; font-weight: 600; color: #5f6368; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#5f6368"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+                    相关文章
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <router-link
+                      v-for="rel in relatedArticles"
+                      :key="rel.id"
+                      :to="'/article/' + rel.id"
+                      style="
+                        display: flex; align-items: center; gap: 10px;
+                        padding: 10px 12px;
+                        background: #f8f9fa;
+                        border-radius: 8px;
+                        text-decoration: none;
+                        transition: all 0.15s;
+                        border: 1px solid transparent;
+                      "
+                      class="related-link"
+                    >
+                      <div style="flex: 1; min-width: 0;">
+                        <div style="font-size: 13px; font-weight: 500; color: #202124; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                          {{ rel.title }}
+                        </div>
+                        <div style="font-size: 11px; color: #9aa0a6; margin-top: 2px;">
+                          {{ rel.createTime ? String(rel.createTime).substring(0, 10) : '' }}
+                        </div>
+                      </div>
+                    </router-link>
+                  </div>
+                </div>
+
+              </div>
+            </v-card>
+
             <!-- 评论区 -->
             <v-card elevation="0" rounded="lg" style="border: 1px solid #e8eaed;">
               <div class="pa-6">
@@ -216,7 +262,11 @@
                   </span>
                 </div>
 
-                <CommentList :comments="comments" />
+                <CommentList
+                  :comments="comments"
+                  :article-id="$route.params.id"
+                  @reply-submitted="loadComments"
+                />
 
                 <v-divider class="my-6" style="border-color: #e8eaed;" />
 
@@ -301,6 +351,7 @@ import TableOfContents from '../../components/frontend/TableOfContents.vue'
 import { getArticleById } from '../../api/article.js'
 import { getArticleComments, submitComment } from '../../api/comment.js'
 import { smoothScrollToTop } from '../../utils/smoothScroll.js'
+import request from '../../api/request.js'
 
 export default {
   name: 'ArticleDetailView',
@@ -310,6 +361,7 @@ export default {
       article: null,
       renderedContent: '',
       comments: [],
+      relatedArticles: [],
       loading: false,
       submitting: false,
       commentSuccess: false,
@@ -355,7 +407,6 @@ export default {
       getArticleById(id)
         .then(function(data) {
           self.article = data
-          // 配置 marked 渲染器，为标题添加 id
           var renderer = new marked.Renderer()
           var headingCount = {}
           renderer.heading = function(text, level) {
@@ -365,6 +416,8 @@ export default {
             return '<h' + level + ' id="' + id + '">' + text + '</h' + level + '>'
           }
           self.renderedContent = marked(data.content || '', { renderer: renderer })
+          // 加载相关文章
+          self.loadRelated(id)
         })
         .catch(function(err) {
           console.error('加载文章失败:', err)
@@ -372,6 +425,14 @@ export default {
         .finally(function() {
           self.loading = false
         })
+    },
+    loadRelated: function(id) {
+      var self = this
+      request({ method: 'get', url: '/api/articles/' + id + '/related', params: { limit: 5 } })
+        .then(function(data) {
+          self.relatedArticles = data || []
+        })
+        .catch(function() {})
     },
     loadComments: function() {
       var self = this
@@ -446,6 +507,11 @@ export default {
         self.snackbar.show = true
       })
     },
+    shareWeibo: function() {
+      var url = encodeURIComponent(window.location.href)
+      var title = encodeURIComponent(this.article ? this.article.title : '')
+      window.open('https://service.weibo.com/share/share.php?url=' + url + '&title=' + title, '_blank')
+    },
     formatDate: function(dateStr) {
       if (!dateStr) return ''
       return dateStr.substring(0, 10)
@@ -458,6 +524,10 @@ export default {
 .prev-next-link:hover {
   border-color: #1a73e8 !important;
   background: #f8fbff !important;
+}
+.related-link:hover {
+  background: #e8f0fe !important;
+  border-color: #1a73e8 !important;
 }
 
 .skeleton {

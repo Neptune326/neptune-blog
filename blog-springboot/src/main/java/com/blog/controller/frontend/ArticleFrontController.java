@@ -51,4 +51,13 @@ public class ArticleFrontController {
     public Result<ArticleVO> getById(@PathVariable Long id) {
         return Result.success(articleService.frontGetById(id));
     }
+
+    /**
+     * 获取相关文章推荐
+     */
+    @GetMapping("/{id}/related")
+    public Result<List<ArticleListVO>> related(@PathVariable Long id,
+                                               @RequestParam(defaultValue = "5") Integer limit) {
+        return Result.success(articleService.getRelated(id, limit));
+    }
 }

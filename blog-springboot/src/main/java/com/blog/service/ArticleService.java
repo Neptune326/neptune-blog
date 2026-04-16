@@ -62,4 +62,7 @@ public interface ArticleService {
      * 查询文章归档数据（按年月分组）
      */
     List<ArchiveVO> archive();
+
+    /** 获取相关文章（根据标签/分类推荐，排除自身） */
+    List<ArticleListVO> getRelated(Long articleId, Integer limit);
 }

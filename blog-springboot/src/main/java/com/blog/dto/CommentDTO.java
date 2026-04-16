@@ -14,6 +14,12 @@ public class CommentDTO {
     @NotNull(message = "文章 ID 不能为空")
     private Long articleId;
 
+    /** 父评论 ID（回复时传入，顶级评论为 null） */
+    private Long parentId;
+
+    /** 被回复的用户昵称 */
+    private String replyTo;
+
     /** 评论者昵称，不能为空 */
     @NotBlank(message = "昵称不能为空")
     private String nickname;

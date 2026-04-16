@@ -129,6 +129,62 @@ public class ArticleServiceImpl implements ArticleService {
         }
     }
 
+    @Override
+    public List<ArticleListVO> getRelated(Long articleId, Integer limit) {
+        if (limit == null || limit <= 0) limit = 5;
+        // 获取当前文章的标签和分类
+        ArticleVO current = articleMapper.selectArticleVOById(articleId);
+        if (current == null) return new ArrayList<>();
+
+        // 先按标签匹配，再按分类补充
+        java.util.Set<Long> relatedIds = new java.util.LinkedHashSet<>();
+
+        // 标签匹配
+        if (current.getTags() != null && !current.getTags().isEmpty()) {
+            for (com.blog.vo.TagVO tag : current.getTags()) {
+                List<com.blog.entity.ArticleTag> ats = articleTagMapper.selectList(
+                        new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<com.blog.entity.ArticleTag>()
+                                .eq(com.blog.entity.ArticleTag::getTagId, tag.getId())
+                );
+                for (com.blog.entity.ArticleTag at : ats) {
+                    if (!at.getArticleId().equals(articleId)) {
+                        relatedIds.add(at.getArticleId());
+                    }
+                }
+                if (relatedIds.size() >= limit) break;
+            }
+        }
+
+        // 分类补充
+        if (relatedIds.size() < limit && current.getCategoryId() != null) {
+            List<Article> catArticles = articleMapper.selectList(
+                    new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<Article>()
+                            .eq(Article::getCategoryId, current.getCategoryId())
+                            .eq(Article::getStatus, 1)
+                            .ne(Article::getId, articleId)
+                            .last("LIMIT " + (limit - relatedIds.size()))
+            );
+            for (Article a : catArticles) {
+                relatedIds.add(a.getId());
+            }
+        }
+
+        if (relatedIds.isEmpty()) return new ArrayList<>();
+
+        // 查询相关文章详情
+        List<ArticleListVO> result = new ArrayList<>();
+        for (Long rid : relatedIds) {
+            if (result.size() >= limit) break;
+            ArticleVO vo = articleMapper.selectArticleVOById(rid);
+            if (vo != null && vo.getStatus() == 1) {
+                ArticleListVO listVO = new ArticleListVO();
+                org.springframework.beans.BeanUtils.copyProperties(vo, listVO);
+                result.add(listVO);
+            }
+        }
+        return result;
+    }
+
     /**
      * 前台分页查询已发布文章列表（固定 status=1）
      */

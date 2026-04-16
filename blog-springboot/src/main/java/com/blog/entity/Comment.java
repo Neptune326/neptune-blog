@@ -22,6 +22,12 @@ public class Comment extends BaseEntity {
     /** 所属文章 ID */
     private Long articleId;
 
+    /** 父评论 ID（null 表示顶级评论） */
+    private Long parentId;
+
+    /** 回复的用户昵称 */
+    private String replyTo;
+
     /** 评论者昵称 */
     private String nickname;
 

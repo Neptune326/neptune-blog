@@ -78,6 +78,14 @@ export function mockHandler(method, url, params, data) {
     return ok(archive)
   }
 
+  // GET /api/articles/:id/related - 相关文章
+  var relatedMatch = url.match(/^\/api\/articles\/(\d+)\/related$/)
+  if (method === 'get' && relatedMatch) {
+    var relId = parseInt(relatedMatch[1])
+    var relList = articleList.filter(function(a) { return a.id !== relId }).slice(0, 5)
+    return ok(relList)
+  }
+
   // GET /api/articles/:id - 文章详情
   var articleDetailMatch = url.match(/^\/api\/articles\/(\d+)$/)
   if (method === 'get' && articleDetailMatch) {
@@ -104,7 +112,9 @@ export function mockHandler(method, url, params, data) {
   var commentsMatch = url.match(/^\/api\/articles\/(\d+)\/comments$/)
   if (method === 'get' && commentsMatch) {
     var cid = parseInt(commentsMatch[1])
-    var cList = comments[cid] || []
+    var cList = (comments[cid] || []).map(function(c) {
+      return Object.assign({}, c, { children: [] })
+    })
     return ok(pageResult(cList, pageNum, pageSize))
   }
 
