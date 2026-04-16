@@ -10,13 +10,25 @@ public class BusinessException extends RuntimeException {
 
     /** 业务错误码 */
     private final ResultCode resultCode;
+    private final String customMessage;
 
     public BusinessException(ResultCode resultCode) {
         super(resultCode.getMessage());
         this.resultCode = resultCode;
+        this.customMessage = null;
+    }
+
+    public BusinessException(ResultCode resultCode, String message) {
+        super(message);
+        this.resultCode = resultCode;
+        this.customMessage = message;
     }
 
     public ResultCode getResultCode() {
         return resultCode;
+    }
+
+    public String getCustomMessage() {
+        return customMessage != null ? customMessage : resultCode.getMessage();
     }
 }

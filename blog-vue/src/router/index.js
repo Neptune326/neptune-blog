@@ -29,6 +29,7 @@ import OperationLogView from '../views/admin/OperationLogView.vue'
 import LoginLogView from '../views/admin/LoginLogView.vue'
 import AboutEditView from '../views/admin/AboutEditView.vue'
 import MessageAdminView from '../views/admin/MessageAdminView.vue'
+import AdminUserView from '../views/admin/AdminUserView.vue'
 
 var routes = [
   // ===== 前台路由（无需登录）=====
@@ -134,6 +135,11 @@ var routes = [
       {
         path: 'messages',
         component: MessageAdminView,
+        meta: { requiresAuth: true }
+      },
+      {
+        path: 'admin-users',
+        component: AdminUserView,
         meta: { requiresAuth: true }
       },
       {

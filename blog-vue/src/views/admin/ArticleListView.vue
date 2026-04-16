@@ -48,10 +48,38 @@
       </v-row>
     </v-card>
 
-    <!-- 新建按钮 -->
-    <div class="d-flex justify-end mb-3">
+    <!-- 操作按钮区 -->
+    <div class="d-flex justify-end mb-3" style="gap: 8px;">
+      <!-- 导入 -->
+      <v-btn
+        variant="outlined"
+        prepend-icon="mdi-upload"
+        :loading="importing"
+        @click="triggerImport"
+        style="font-size: 13px;"
+      >
+        导入 Markdown
+      </v-btn>
+      <input ref="importInput" type="file" accept=".zip" style="display:none;" @change="handleImport" />
+
+      <!-- 导出 -->
+      <v-btn
+        variant="outlined"
+        prepend-icon="mdi-download"
+        @click="exportArticles"
+        style="font-size: 13px;"
+      >
+        导出全部
+      </v-btn>
+
+      <!-- 新建 -->
       <v-btn color="primary" prepend-icon="mdi-plus" :to="'/admin/articles/edit'">新建文章</v-btn>
     </div>
+
+    <!-- 导入结果提示 -->
+    <v-snackbar v-model="importSnackbar.show" :color="importSnackbar.color" timeout="4000" location="top" rounded="lg">
+      {{ importSnackbar.text }}
+    </v-snackbar>
 
     <!-- 文章列表表格 -->
     <v-card>
@@ -98,6 +126,13 @@
               <v-btn
                 size="small"
                 variant="text"
+                :color="article.isTop === 1 ? 'warning' : 'default'"
+                @click="toggleTop(article)"
+                :title="article.isTop === 1 ? '取消置顶' : '置顶'"
+              >{{ article.isTop === 1 ? '取消置顶' : '置顶' }}</v-btn>
+              <v-btn
+                size="small"
+                variant="text"
                 color="error"
                 @click="confirmDelete(article)"
               >删除</v-btn>
@@ -137,6 +172,7 @@
 <script>
 import { adminGetArticles, deleteArticle } from '../../api/article.js'
 import { adminGetCategories } from '../../api/category.js'
+import request from '../../api/request.js'
 
 export default {
   name: 'ArticleListView',
@@ -165,7 +201,10 @@ export default {
       // 删除相关
       deleteDialog: false,
       deleteLoading: false,
-      deleteTarget: null
+      deleteTarget: null,
+      // 导入导出
+      importing: false,
+      importSnackbar: { show: false, text: '', color: 'success' }
     }
   },
   mounted: function() {
@@ -246,6 +285,65 @@ export default {
       return d.getFullYear() + '-' +
         String(d.getMonth() + 1).padStart(2, '0') + '-' +
         String(d.getDate()).padStart(2, '0')
+    },
+    // 置顶切换
+    toggleTop: function(article) {
+      var self = this
+      request({ method: 'put', url: '/api/admin/articles/' + article.id + '/top' })
+        .then(function() { self.loadArticles() })
+        .catch(function(err) { console.error('置顶操作失败:', err) })
+    },
+    // 触发导入文件选择
+    triggerImport: function() {
+      this.$refs.importInput.click()
+    },
+    // 处理导入
+    handleImport: function(event) {
+      var self = this
+      var file = event.target.files[0]
+      if (!file) return
+      self.importing = true
+      var formData = new FormData()
+      formData.append('file', file)
+      request({
+        method: 'post',
+        url: '/api/admin/articles/import',
+        data: formData,
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+        .then(function(msg) {
+          self.importSnackbar = { show: true, text: msg || '导入成功', color: 'success' }
+          self.loadArticles()
+        })
+        .catch(function(err) {
+          self.importSnackbar = { show: true, text: '导入失败：' + (err.message || '请检查文件格式'), color: 'error' }
+        })
+        .finally(function() {
+          self.importing = false
+          event.target.value = ''
+        })
+    },
+    // 导出文章
+    exportArticles: function() {
+      // 直接跳转下载链接（带 token）
+      var token = localStorage.getItem('blog_token') || ''
+      var url = '/api/admin/articles/export'
+      // 创建隐藏 a 标签触发下载
+      var a = document.createElement('a')
+      a.href = url
+      a.setAttribute('download', 'articles.zip')
+      // 通过 fetch 下载（携带 Authorization 头）
+      fetch(url, { headers: { 'Authorization': token } })
+        .then(function(res) { return res.blob() })
+        .then(function(blob) {
+          var blobUrl = URL.createObjectURL(blob)
+          a.href = blobUrl
+          document.body.appendChild(a)
+          a.click()
+          document.body.removeChild(a)
+          URL.revokeObjectURL(blobUrl)
+        })
+        .catch(function(err) { console.error('导出失败:', err) })
     }
   }
 }

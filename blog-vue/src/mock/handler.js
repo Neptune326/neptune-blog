@@ -411,6 +411,30 @@ export function mockHandler(method, url, params, data) {
   if (method === 'put' && url.match(/^\/api\/admin\/messages\/\d+\/(approve|reject)$/)) { return ok(null) }
   if (method === 'delete' && url.match(/^\/api\/admin\/messages\/\d+$/)) { return ok(null) }
 
+  // GET /api/admin/stats/visit - 访问统计
+  if (method === 'get' && url === '/api/admin/stats/visit') {
+    var visitData = []
+    for (var i = 6; i >= 0; i--) {
+      var d = new Date(Date.now() - i * 86400000)
+      visitData.push({
+        visitDate: d.toISOString().substring(0, 10),
+        pv: Math.floor(Math.random() * 80) + 20,
+        uv: Math.floor(Math.random() * 30) + 10
+      })
+    }
+    return ok(visitData)
+  }
+
+  // GET /api/admin/users - 管理员列表
+  if (method === 'get' && url === '/api/admin/users') {
+    return ok([
+      { id: 1, username: 'admin', role: 'super', createTime: new Date(Date.now() - 86400000 * 30).toISOString() }
+    ])
+  }
+  if (method === 'post' && url === '/api/admin/users') { return ok(null) }
+  if (method === 'put' && url.match(/^\/api\/admin\/users\/\d+\/reset-password$/)) { return ok(null) }
+  if (method === 'delete' && url.match(/^\/api\/admin\/users\/\d+$/)) { return ok(null) }
+
   // 未匹配到任何路由
   return null
 }

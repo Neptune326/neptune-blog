@@ -140,7 +140,35 @@
                 <!-- Markdown 正文 -->
                 <div class="markdown-body" ref="articleContent" v-html="renderedContent" />
 
-                <!-- 文章底部：版权声明 -->
+                <!-- 文章底部：点赞 + 版权声明 -->
+                <div class="d-flex align-center justify-center my-6" style="gap: 16px;">
+                  <button
+                    @click="toggleLike"
+                    :disabled="likeLoading"
+                    style="
+                      display: flex; align-items: center; gap: 8px;
+                      padding: 10px 24px;
+                      border-radius: 24px;
+                      border: 2px solid;
+                      cursor: pointer;
+                      font-size: 15px;
+                      font-weight: 600;
+                      transition: all 0.2s;
+                      background: none;
+                    "
+                    :style="liked
+                      ? 'border-color: #ea4335; color: #ea4335; background: #fce8e6;'
+                      : 'border-color: #e8eaed; color: #5f6368; background: white;'"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" :fill="liked ? '#ea4335' : 'none'" :stroke="liked ? '#ea4335' : '#5f6368'" stroke-width="2">
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+                    {{ liked ? '已点赞' : '点个赞' }}
+                    <span style="font-size: 13px; opacity: 0.8;">{{ likeCount }}</span>
+                  </button>
+                </div>
+
+                <!-- 版权声明 -->
                 <div
                   style="
                     margin-top: 32px;
@@ -362,6 +390,9 @@ export default {
       renderedContent: '',
       comments: [],
       relatedArticles: [],
+      liked: false,
+      likeCount: 0,
+      likeLoading: false,
       loading: false,
       submitting: false,
       commentSuccess: false,
@@ -418,6 +449,8 @@ export default {
           self.renderedContent = marked(data.content || '', { renderer: renderer })
           // 加载相关文章
           self.loadRelated(id)
+          // 加载点赞状态
+          self.loadLikeStatus(id)
         })
         .catch(function(err) {
           console.error('加载文章失败:', err)
@@ -433,6 +466,27 @@ export default {
           self.relatedArticles = data || []
         })
         .catch(function() {})
+    },
+    loadLikeStatus: function(id) {
+      var self = this
+      request({ method: 'get', url: '/api/articles/' + id + '/like' })
+        .then(function(data) {
+          self.liked = data.liked || false
+          self.likeCount = data.likeCount || 0
+        })
+        .catch(function() {})
+    },
+    toggleLike: function() {
+      var self = this
+      var id = self.$route.params.id
+      self.likeLoading = true
+      request({ method: 'post', url: '/api/articles/' + id + '/like' })
+        .then(function(data) {
+          self.liked = data.liked
+          self.likeCount = data.likeCount
+        })
+        .catch(function() {})
+        .finally(function() { self.likeLoading = false })
     },
     loadComments: function() {
       var self = this

@@ -5,26 +5,17 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-/**
- * 管理员实体类
- */
 @Data
-@TableName("admin")
-public class Admin {
-
+@TableName("visit_log")
+public class VisitLog {
     @TableId(type = IdType.AUTO)
     private Long id;
-
-    private String username;
-
-    /** 密码（BCrypt 加密，接口返回时不输出） */
-    private String password;
-
-    /** 角色：super=超级管理员，admin=普通管理员 */
-    private String role;
-
+    private LocalDate visitDate;
+    private Integer pv;
+    private Integer uv;
+    private Long articleId;
     private LocalDateTime createTime;
-    private LocalDateTime updateTime;
 }

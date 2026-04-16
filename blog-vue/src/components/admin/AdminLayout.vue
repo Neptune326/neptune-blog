@@ -213,6 +213,7 @@ export default {
         { title: '操作日志', icon: 'mdi-clipboard-text-clock-outline', to: '/admin/logs/operation' },
         { title: '登录日志', icon: 'mdi-login-variant', to: '/admin/logs/login' },
         { title: '关于我', icon: 'mdi-account-circle-outline', to: '/admin/about' },
+        { title: '管理员账号', icon: 'mdi-account-key-outline', to: '/admin/admin-users' },
         { title: '系统设置', icon: 'mdi-cog-outline', to: '/admin/sys-config' }
       ]
     }
@@ -230,6 +231,7 @@ export default {
         '/admin/logs/operation': '操作日志',
         '/admin/logs/login': '登录日志',
         '/admin/about': '关于我',
+        '/admin/admin-users': '管理员账号',
         '/admin/sys-config': '系统设置'
       }
       return map[this.route.path] || '博客管理'

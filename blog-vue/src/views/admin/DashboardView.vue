@@ -95,6 +95,38 @@
         </v-btn>
       </div>
     </div>
+
+    <!-- 近 7 天访问趋势 -->
+    <div v-if="visitStats.length > 0" class="mt-6">
+      <h2 style="font-size: 16px; font-weight: 600; color: #202124; margin: 0 0 16px;">近 7 天访问趋势</h2>
+      <v-card elevation="0" rounded="xl" style="border: 1px solid #e8eaed; padding: 20px;">
+        <div style="display: flex; align-items: flex-end; gap: 8px; height: 80px;">
+          <div
+            v-for="stat in visitStats"
+            :key="stat.visitDate"
+            style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;"
+          >
+            <div style="font-size: 10px; color: #80868b;">{{ stat.pv || 0 }}</div>
+            <div
+              :style="{
+                width: '100%',
+                background: '#1a73e8',
+                borderRadius: '4px 4px 0 0',
+                minHeight: '4px',
+                height: Math.max(4, ((stat.pv || 0) / Math.max(...visitStats.map(function(s) { return s.pv || 1 }))) * 60) + 'px',
+                opacity: 0.8
+              }"
+            ></div>
+            <div style="font-size: 10px; color: #9aa0a6; white-space: nowrap;">
+              {{ stat.visitDate ? String(stat.visitDate).substring(5) : '' }}
+            </div>
+          </div>
+        </div>
+        <div style="font-size: 12px; color: #80868b; margin-top: 8px; text-align: right;">
+          总 PV：{{ visitStats.reduce(function(sum, s) { return sum + (s.pv || 0) }, 0) }}
+        </div>
+      </v-card>
+    </div>
   </div>
 </template>
 
@@ -106,6 +138,7 @@ export default {
   data: function() {
     return {
       pendingCount: 0,
+      visitStats: [],
       stats: [
         {
           label: '文章总数',
@@ -149,6 +182,7 @@ export default {
   },
   mounted: function() {
     this.loadDashboard()
+    this.loadVisitStats()
   },
   methods: {
     loadDashboard: function() {
@@ -165,6 +199,14 @@ export default {
         .catch(function(err) {
           console.error('加载仪表盘失败:', err)
         })
+    },
+    loadVisitStats: function() {
+      var self = this
+      request({ method: 'get', url: '/api/admin/stats/visit', params: { days: 7 } })
+        .then(function(data) {
+          self.visitStats = data || []
+        })
+        .catch(function() {})
     }
   }
 }
