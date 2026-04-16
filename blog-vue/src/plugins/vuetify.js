@@ -36,6 +36,21 @@ var vuetify = createVuetify({
           // 次要文字色
           'on-surface-variant': '#5f6368'
         }
+      },
+      // 深色主题
+      googleDark: {
+        dark: true,
+        colors: {
+          primary: '#8ab4f8',
+          secondary: '#81c995',
+          error: '#f28b82',
+          warning: '#fdd663',
+          info: '#8ab4f8',
+          success: '#81c995',
+          background: '#202124',
+          surface: '#292a2d',
+          'on-surface-variant': '#9aa0a6'
+        }
       }
     }
   },

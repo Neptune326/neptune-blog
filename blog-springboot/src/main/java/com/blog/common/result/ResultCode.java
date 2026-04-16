@@ -20,7 +20,8 @@ public enum ResultCode {
     TAG_NAME_DUPLICATE(1003, "标签名称已存在"),
     CATEGORY_HAS_ARTICLES(1004, "该分类下存在文章，无法删除"),
     ARTICLE_NOT_FOUND(1005, "文章不存在"),
-    COMMENT_ARTICLE_NOT_PUBLISHED(1006, "文章不存在或未发布");
+    COMMENT_ARTICLE_NOT_PUBLISHED(1006, "文章不存在或未发布"),
+    LOGIN_TOO_MANY_ATTEMPTS(1007, "登录失败次数过多，请 10 分钟后再试");
 
     /** 状态码 */
     private final Integer code;

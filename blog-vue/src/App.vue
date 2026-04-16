@@ -65,14 +65,19 @@
     <div v-if="ready" :style="isMockMode ? 'padding-top: 36px;' : ''">
       <router-view />
     </div>
+
+    <!-- Live2D 看板娘（全局挂载，仅前台页面显示） -->
+    <Live2DWidget v-if="ready && isFrontend" />
   </v-app>
 </template>
 
 <script>
 import { detectBackend, isMockMode } from './api/request.js'
+import Live2DWidget from './components/frontend/Live2DWidget.vue'
 
 export default {
   name: 'App',
+  components: { Live2DWidget },
   data: function() {
     return {
       showMockBanner: false,
@@ -80,18 +85,21 @@ export default {
       ready: false
     }
   },
+  computed: {
+    isMockMode: function() {
+      return this.showMockBanner && !this.bannerDismissed
+    },
+    // 仅在前台页面显示 Live2D（后台管理页面不显示）
+    isFrontend: function() {
+      return this.$route && !this.$route.path.startsWith('/admin')
+    }
+  },
   mounted: function() {
     var self = this
-    // 先检测后端，确定 mock 模式后再渲染页面（避免组件先发请求再确定 mock 状态）
     detectBackend().then(function(backendOk) {
       self.showMockBanner = !backendOk
       self.ready = true
     })
-  },
-  computed: {
-    isMockMode: function() {
-      return this.showMockBanner && !this.bannerDismissed
-    }
   },
   methods: {
     dismissBanner: function() {

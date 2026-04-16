@@ -23,6 +23,7 @@
           <v-btn variant="text" to="/search" class="nav-link" style="min-width: auto;">
             <v-icon size="18" class="mr-1">mdi-magnify</v-icon>搜索
           </v-btn>
+          <DarkModeToggle class="ml-1" />
         </div>
 
         <!-- 移动端汉堡菜单 -->
@@ -133,12 +134,13 @@ import Pagination from '../../components/frontend/Pagination.vue'
 import ArticleSkeleton from '../../components/frontend/ArticleSkeleton.vue'
 import BlogSidebar from '../../components/frontend/BlogSidebar.vue'
 import ReadingProgress from '../../components/frontend/ReadingProgress.vue'
+import DarkModeToggle from '../../components/frontend/DarkModeToggle.vue'
 import { getArticles } from '../../api/article.js'
 import { smoothScrollToTop } from '../../utils/smoothScroll.js'
 
 export default {
   name: 'HomeView',
-  components: { ArticleCard, Pagination, ArticleSkeleton, BlogSidebar, ReadingProgress },
+  components: { ArticleCard, Pagination, ArticleSkeleton, BlogSidebar, ReadingProgress, DarkModeToggle },
   data: function() {
     return {
       articles: [],

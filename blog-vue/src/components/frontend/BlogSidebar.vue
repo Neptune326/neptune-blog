@@ -2,6 +2,9 @@
   <!-- 博客侧边栏 -->
   <div style="display: flex; flex-direction: column; gap: 16px;">
 
+    <!-- 每日一言 -->
+    <DailyQuote />
+
     <!-- 博主简介卡片 -->
     <div
       style="
@@ -213,9 +216,12 @@
 import { getCategories } from '../../api/category.js'
 import { getTags } from '../../api/tag.js'
 import { getArticles } from '../../api/article.js'
+import DailyQuote from './DailyQuote.vue'
+import TypewriterText from './TypewriterText.vue'
 
 export default {
   name: 'BlogSidebar',
+  components: { DailyQuote, TypewriterText },
   data: function() {
     return {
       categories: [],

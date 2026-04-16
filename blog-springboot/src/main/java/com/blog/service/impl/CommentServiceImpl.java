@@ -1,5 +1,6 @@
 package com.blog.service.impl;
 
+import com.blog.common.util.XssUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.blog.common.exception.BusinessException;
@@ -100,12 +101,12 @@ public class CommentServiceImpl implements CommentService {
             throw new BusinessException(ResultCode.COMMENT_ARTICLE_NOT_PUBLISHED);
         }
 
-        // 构建评论实体，初始状态为待审核
+        // 构建评论实体，初始状态为待审核，对用户输入进行 XSS 过滤
         Comment comment = new Comment();
         comment.setArticleId(dto.getArticleId());
-        comment.setNickname(dto.getNickname());
+        comment.setNickname(XssUtils.sanitize(dto.getNickname()));
         comment.setEmail(dto.getEmail());
-        comment.setContent(dto.getContent());
+        comment.setContent(XssUtils.sanitize(dto.getContent()));
         comment.setStatus(0);
         commentMapper.insert(comment);
     }

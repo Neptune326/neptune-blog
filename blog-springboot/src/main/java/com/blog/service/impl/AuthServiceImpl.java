@@ -4,70 +4,97 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.blog.common.exception.BusinessException;
 import com.blog.common.result.ResultCode;
+import com.blog.common.util.LoginRateLimiter;
 import com.blog.dto.LoginDTO;
 import com.blog.entity.Admin;
 import com.blog.mapper.AdminMapper;
 import com.blog.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
  * 认证服务实现类
- * 处理管理员登录校验与登出逻辑
  */
+@Slf4j
 @Service
 public class AuthServiceImpl implements AuthService {
 
-    /** 管理员数据访问层 */
     private final AdminMapper adminMapper;
-
-    /** BCrypt 密码编码器，用于密码比对 */
     private final BCryptPasswordEncoder passwordEncoder;
+    private final LoginRateLimiter rateLimiter;
 
-    public AuthServiceImpl(AdminMapper adminMapper, BCryptPasswordEncoder passwordEncoder) {
+    public AuthServiceImpl(AdminMapper adminMapper,
+                           BCryptPasswordEncoder passwordEncoder,
+                           LoginRateLimiter rateLimiter) {
         this.adminMapper = adminMapper;
         this.passwordEncoder = passwordEncoder;
+        this.rateLimiter = rateLimiter;
     }
 
-    /**
-     * 管理员登录
-     * 1. 根据用户名查询管理员记录
-     * 2. 用户不存在则抛出业务异常
-     * 3. BCrypt 比对密码，不匹配则抛出业务异常
-     * 4. 通过 Sa-Token 创建登录会话
-     * 5. 返回生成的 token
-     */
     @Override
     public String login(LoginDTO loginDTO) {
-        // 根据用户名查询管理员
+        String ip = getClientIp();
+
+        // 检查 IP 是否被锁定
+        if (rateLimiter.isLocked(ip)) {
+            long remaining = rateLimiter.getLockRemainingSeconds(ip);
+            log.warn("IP {} 登录频率超限，剩余锁定时间 {}s", ip, remaining);
+            throw new BusinessException(ResultCode.LOGIN_TOO_MANY_ATTEMPTS);
+        }
+
+        // 查询管理员
         Admin admin = adminMapper.selectOne(
                 new LambdaQueryWrapper<Admin>()
                         .eq(Admin::getUsername, loginDTO.getUsername())
         );
 
-        // 用户不存在，抛出统一错误（不区分用户名/密码，防止枚举攻击）
-        if (admin == null) {
+        // 用户不存在或密码错误（统一错误信息，防止用户名枚举）
+        if (admin == null || !passwordEncoder.matches(loginDTO.getPassword(), admin.getPassword())) {
+            rateLimiter.recordFail(ip);
+            log.warn("IP {} 登录失败，用户名: {}", ip, loginDTO.getUsername());
             throw new BusinessException(ResultCode.USERNAME_OR_PASSWORD_ERROR);
         }
 
-        // 密码比对失败，抛出统一错误
-        if (!passwordEncoder.matches(loginDTO.getPassword(), admin.getPassword())) {
-            throw new BusinessException(ResultCode.USERNAME_OR_PASSWORD_ERROR);
-        }
-
-        // 登录成功，以用户名为 loginId 创建 Sa-Token 会话
+        // 登录成功
+        rateLimiter.recordSuccess(ip);
         StpUtil.login(admin.getUsername());
-
-        // 返回当前会话的 token 值
+        log.info("管理员 {} 登录成功，IP: {}", admin.getUsername(), ip);
         return StpUtil.getTokenValue();
     }
 
-    /**
-     * 管理员登出
-     * 清除当前请求对应的 Sa-Token 会话
-     */
     @Override
     public void logout() {
         StpUtil.logout();
+    }
+
+    /**
+     * 获取客户端真实 IP（兼容反向代理）
+     */
+    private String getClientIp() {
+        try {
+            ServletRequestAttributes attrs =
+                    (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (attrs == null) return "unknown";
+            HttpServletRequest request = attrs.getRequest();
+            // 依次检查代理头
+            String[] headers = {
+                "X-Forwarded-For", "X-Real-IP", "Proxy-Client-IP",
+                "WL-Proxy-Client-IP", "HTTP_CLIENT_IP"
+            };
+            for (String header : headers) {
+                String ip = request.getHeader(header);
+                if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip)) {
+                    // X-Forwarded-For 可能包含多个 IP，取第一个
+                    return ip.split(",")[0].trim();
+                }
+            }
+            return request.getRemoteAddr();
+        } catch (Exception e) {
+            return "unknown";
+        }
     }
 }

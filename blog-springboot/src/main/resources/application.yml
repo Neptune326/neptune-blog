@@ -1,5 +1,12 @@
 server:
   port: 8080
+  # 请求体大小限制，防止大文件上传攻击
+  tomcat:
+    max-http-form-post-size: 10MB
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 
 spring:
   # 激活的环境配置，可选值：dev（开发）、test（测试）、prod（正式）
@@ -7,6 +14,13 @@ spring:
     active: dev
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
+  # Jackson 全局配置：防止序列化漏洞
+  jackson:
+    # 禁止序列化空值（减少信息泄露）
+    default-property-inclusion: non_null
+    # 日期格式统一
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
 
 # MyBatis-Plus 公共配置（各环境共用）
 mybatis-plus:
@@ -26,3 +40,5 @@ sa-token:
   # Token 有效期：7 天（单位：秒）
   timeout: 604800
   is-concurrent: false
+  # Token 风格：uuid（不可预测）
+  token-style: uuid
