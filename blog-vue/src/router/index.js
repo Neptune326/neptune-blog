@@ -22,6 +22,9 @@ import ArticleEditView from '../views/admin/ArticleEditView.vue'
 import AdminCategoryView from '../views/admin/CategoryView.vue'
 import AdminTagView from '../views/admin/TagView.vue'
 import CommentView from '../views/admin/CommentView.vue'
+import SysConfigView from '../views/admin/SysConfigView.vue'
+import OperationLogView from '../views/admin/OperationLogView.vue'
+import LoginLogView from '../views/admin/LoginLogView.vue'
 
 var routes = [
   // ===== 前台路由（无需登录）=====
@@ -104,6 +107,21 @@ var routes = [
       {
         path: 'comments',
         component: CommentView,
+        meta: { requiresAuth: true }
+      },
+      {
+        path: 'sys-config',
+        component: SysConfigView,
+        meta: { requiresAuth: true }
+      },
+      {
+        path: 'logs/operation',
+        component: OperationLogView,
+        meta: { requiresAuth: true }
+      },
+      {
+        path: 'logs/login',
+        component: LoginLogView,
         meta: { requiresAuth: true }
       }
     ]

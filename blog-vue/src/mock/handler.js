@@ -290,6 +290,66 @@ export function mockHandler(method, url, params, data) {
     return ok(null)
   }
 
+  // ===== 系统配置 =====
+
+  // GET /api/admin/sys-config
+  if (method === 'get' && url === '/api/admin/sys-config') {
+    return ok({
+      live2d_enabled: 'true',
+      login_max_fail_count: '5',
+      login_lock_duration: '10',
+      comment_audit_enabled: 'true',
+      blog_name: '我的博客',
+      blog_description: '记录技术成长，分享开发心得',
+      blog_author: 'Admin'
+    })
+  }
+
+  // PUT /api/admin/sys-config
+  if (method === 'put' && url === '/api/admin/sys-config') {
+    return ok(null)
+  }
+
+  // ===== 操作日志 =====
+
+  // GET /api/admin/logs/operation
+  if (method === 'get' && url === '/api/admin/logs/operation') {
+    var mockOpLogs = [
+      { id: 1, operator: 'admin', module: '文章管理', action: '创建文章', method: 'POST', requestUrl: '/api/admin/articles', requestIp: '127.0.0.1', costTime: 45, status: 1, createTime: new Date(Date.now() - 3600000).toISOString() },
+      { id: 2, operator: 'admin', module: '分类管理', action: '创建分类', method: 'POST', requestUrl: '/api/admin/categories', requestIp: '127.0.0.1', costTime: 23, status: 1, createTime: new Date(Date.now() - 7200000).toISOString() },
+      { id: 3, operator: 'admin', module: '文章管理', action: '删除文章', method: 'DELETE', requestUrl: '/api/admin/articles/3', requestIp: '127.0.0.1', costTime: 18, status: 1, createTime: new Date(Date.now() - 86400000).toISOString() },
+      { id: 4, operator: 'admin', module: '标签管理', action: '更新标签', method: 'PUT', requestUrl: '/api/admin/tags/1', requestIp: '127.0.0.1', costTime: 31, status: 1, createTime: new Date(Date.now() - 172800000).toISOString() }
+    ]
+    return ok(pageResult(mockOpLogs, pageNum, pageSize))
+  }
+
+  // DELETE /api/admin/logs/operation
+  if (method === 'delete' && url === '/api/admin/logs/operation') {
+    return ok(null)
+  }
+
+  // ===== 登录日志 =====
+
+  // GET /api/admin/logs/login
+  if (method === 'get' && url === '/api/admin/logs/login') {
+    var mockLoginLogs = [
+      { id: 1, username: 'admin', loginIp: '127.0.0.1', loginTime: new Date(Date.now() - 1800000).toISOString(), status: 1, failReason: null, userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0' },
+      { id: 2, username: 'admin', loginIp: '192.168.1.100', loginTime: new Date(Date.now() - 3600000).toISOString(), status: 0, failReason: '用户名或密码错误', userAgent: 'Mozilla/5.0 (Macintosh) Safari/537.36' },
+      { id: 3, username: 'hacker', loginIp: '10.0.0.1', loginTime: new Date(Date.now() - 7200000).toISOString(), status: 0, failReason: '用户名或密码错误', userAgent: 'curl/7.68.0' },
+      { id: 4, username: 'admin', loginIp: '127.0.0.1', loginTime: new Date(Date.now() - 86400000).toISOString(), status: 1, failReason: null, userAgent: 'Mozilla/5.0 (Windows NT 10.0) Firefox/121.0' }
+    ]
+    var filteredLogs = mockLoginLogs
+    if (params.status !== undefined && params.status !== null && params.status !== '') {
+      filteredLogs = filteredLogs.filter(function(l) { return l.status === parseInt(params.status) })
+    }
+    return ok(pageResult(filteredLogs, pageNum, pageSize))
+  }
+
+  // DELETE /api/admin/logs/login
+  if (method === 'delete' && url === '/api/admin/logs/login') {
+    return ok(null)
+  }
+
   // 未匹配到任何路由
   return null
 }

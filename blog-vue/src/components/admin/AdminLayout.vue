@@ -138,7 +138,10 @@ export default {
         { title: '文章管理', icon: 'mdi-file-document-outline', to: '/admin/articles' },
         { title: '分类管理', icon: 'mdi-folder-outline', to: '/admin/categories' },
         { title: '标签管理', icon: 'mdi-tag-outline', to: '/admin/tags' },
-        { title: '评论管理', icon: 'mdi-comment-outline', to: '/admin/comments' }
+        { title: '评论管理', icon: 'mdi-comment-outline', to: '/admin/comments' },
+        { title: '操作日志', icon: 'mdi-clipboard-text-clock-outline', to: '/admin/logs/operation' },
+        { title: '登录日志', icon: 'mdi-login-variant', to: '/admin/logs/login' },
+        { title: '系统设置', icon: 'mdi-cog-outline', to: '/admin/sys-config' }
       ]
     }
   },
@@ -150,7 +153,10 @@ export default {
         '/admin/articles/edit': '新建文章',
         '/admin/categories': '分类管理',
         '/admin/tags': '标签管理',
-        '/admin/comments': '评论管理'
+        '/admin/comments': '评论管理',
+        '/admin/logs/operation': '操作日志',
+        '/admin/logs/login': '登录日志',
+        '/admin/sys-config': '系统设置'
       }
       return map[this.route.path] || '博客管理'
     }
