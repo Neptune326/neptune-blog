@@ -160,6 +160,33 @@ export function mockHandler(method, url, params, data) {
     })
   }
 
+  // GET /api/messages - 留言列表
+  if (method === 'get' && url === '/api/messages') {
+    var mockMessages = [
+      { id: 1, nickname: '路人甲', content: '博客写得很好，继续加油！', status: 1, createTime: new Date(Date.now() - 86400000).toISOString() },
+      { id: 2, nickname: '技术爱好者', content: '请问有没有关于 Kubernetes 的文章？', status: 1, createTime: new Date(Date.now() - 172800000).toISOString() },
+      { id: 3, nickname: '前端开发者', content: 'Vue 3 那篇文章帮了我大忙，感谢！', status: 1, createTime: new Date(Date.now() - 259200000).toISOString() }
+    ]
+    return ok(pageResult(mockMessages, pageNum, pageSize))
+  }
+
+  // POST /api/messages - 提交留言
+  if (method === 'post' && url === '/api/messages') {
+    return ok(null)
+  }
+
+  // GET /api/articles/:id/like - 点赞状态
+  var likeStatusMatch = url.match(/^\/api\/articles\/(\d+)\/like$/)
+  if (method === 'get' && likeStatusMatch) {
+    return ok({ liked: false, likeCount: Math.floor(Math.random() * 50) })
+  }
+
+  // POST /api/articles/:id/like - 点赞
+  var likeMatch = url.match(/^\/api\/articles\/(\d+)\/like$/)
+  if (method === 'post' && likeMatch) {
+    return ok({ liked: true, likeCount: Math.floor(Math.random() * 50) + 1 })
+  }
+
   // ===== 后台 API =====
 
   // POST /api/admin/auth/login - 登录
@@ -368,6 +395,21 @@ export function mockHandler(method, url, params, data) {
   if (method === 'delete' && url === '/api/admin/logs/login') {
     return ok(null)
   }
+
+  // GET /api/admin/messages - 后台留言列表
+  if (method === 'get' && url === '/api/admin/messages') {
+    var adminMessages = [
+      { id: 1, nickname: '路人甲', content: '博客写得很好，继续加油！', status: 1, createTime: new Date(Date.now() - 86400000).toISOString() },
+      { id: 2, nickname: '技术爱好者', content: '请问有没有关于 Kubernetes 的文章？', status: 0, createTime: new Date(Date.now() - 172800000).toISOString() },
+      { id: 3, nickname: '前端开发者', content: 'Vue 3 那篇文章帮了我大忙，感谢！', status: 1, createTime: new Date(Date.now() - 259200000).toISOString() }
+    ]
+    if (params.status !== undefined && params.status !== null && params.status !== '') {
+      adminMessages = adminMessages.filter(function(m) { return m.status === parseInt(params.status) })
+    }
+    return ok(pageResult(adminMessages, pageNum, pageSize))
+  }
+  if (method === 'put' && url.match(/^\/api\/admin\/messages\/\d+\/(approve|reject)$/)) { return ok(null) }
+  if (method === 'delete' && url.match(/^\/api\/admin\/messages\/\d+$/)) { return ok(null) }
 
   // 未匹配到任何路由
   return null

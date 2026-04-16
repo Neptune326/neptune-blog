@@ -36,14 +36,26 @@ public class Article extends BaseEntity {
     /** 所属分类 ID */
     private Long categoryId;
 
+    /** 所属系列 ID */
+    private Long seriesId;
+
+    /** 在系列中的顺序 */
+    private Integer seriesSort;
+
     /** 发布状态：0=草稿，1=已发布 */
     private Integer status;
+
+    /** 定时发布时间（null 表示立即发布） */
+    private java.time.LocalDateTime publishTime;
 
     /** 是否置顶：0=否，1=是 */
     private Integer isTop;
 
     /** 阅读次数 */
     private Integer viewCount;
+
+    /** 点赞数 */
+    private Integer likeCount;
 
     /** 软删除标志：0=正常，1=已删除，MyBatis-Plus 自动处理 */
     @TableLogic

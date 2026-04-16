@@ -7,7 +7,9 @@ import com.blog.common.exception.BusinessException;
 import com.blog.common.result.ResultCode;
 import com.blog.dto.ArticleDTO;
 import com.blog.entity.Article;
+import com.blog.entity.ArticleHistory;
 import com.blog.entity.ArticleTag;
+import com.blog.mapper.ArticleHistoryMapper;
 import com.blog.mapper.ArticleMapper;
 import com.blog.mapper.ArticleTagMapper;
 import com.blog.service.ArticleService;
@@ -16,10 +18,12 @@ import com.blog.vo.ArticleListVO;
 import com.blog.vo.ArticleVO;
 import com.blog.vo.PageVO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,12 +32,14 @@ import java.util.stream.Collectors;
 /**
  * 文章服务实现类
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ArticleServiceImpl implements ArticleService {
 
     private final ArticleMapper articleMapper;
     private final ArticleTagMapper articleTagMapper;
+    private final ArticleHistoryMapper articleHistoryMapper;
 
     /**
      * 后台分页查询文章列表
@@ -88,6 +94,29 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void update(Long id, ArticleDTO dto) {
+        // 自动保存版本历史（更新前备份当前版本）
+        Article current = articleMapper.selectById(id);
+        if (current != null && current.getContent() != null) {
+            try {
+                ArticleHistory latest = articleHistoryMapper.selectOne(
+                        new LambdaQueryWrapper<ArticleHistory>()
+                                .eq(ArticleHistory::getArticleId, id)
+                                .orderByDesc(ArticleHistory::getVersion).last("LIMIT 1")
+                );
+                int nextVersion = (latest != null ? latest.getVersion() : 0) + 1;
+                ArticleHistory history = new ArticleHistory();
+                history.setArticleId(id);
+                history.setTitle(current.getTitle());
+                history.setContent(current.getContent());
+                history.setVersion(nextVersion);
+                history.setRemark("自动保存 v" + nextVersion);
+                history.setCreateTime(LocalDateTime.now());
+                articleHistoryMapper.insert(history);
+                log.debug("文章 {} 自动保存版本 v{}", id, nextVersion);
+            } catch (Exception e) {
+                log.warn("版本历史保存失败", e);
+            }
+        }
         // 更新文章基本信息
         Article article = new Article();
         article.setId(id);
