@@ -118,6 +118,17 @@ public class ArticleServiceImpl implements ArticleService {
         articleMapper.deleteById(id);
     }
 
+    @Override
+    public void toggleTop(Long id) {
+        Article article = articleMapper.selectById(id);
+        if (article != null) {
+            Article update = new Article();
+            update.setId(id);
+            update.setIsTop(article.getIsTop() != null && article.getIsTop() == 1 ? 0 : 1);
+            articleMapper.updateById(update);
+        }
+    }
+
     /**
      * 前台分页查询已发布文章列表（固定 status=1）
      */

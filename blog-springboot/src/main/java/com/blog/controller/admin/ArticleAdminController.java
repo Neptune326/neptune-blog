@@ -63,4 +63,13 @@ public class ArticleAdminController {
         articleService.delete(id);
         return Result.success();
     }
+
+    /** 切换置顶状态 */
+    @OperationLog(module = "文章管理", action = "切换置顶")
+    @PutMapping("/{id}/top")
+    public Result<Void> toggleTop(@PathVariable Long id) {
+        log.info("切换文章置顶 ID={}", id);
+        articleService.toggleTop(id);
+        return Result.success();
+    }
 }

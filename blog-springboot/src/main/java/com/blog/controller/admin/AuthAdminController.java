@@ -42,12 +42,20 @@ public class AuthAdminController {
     /**
      * 管理员登出
      * POST /api/admin/auth/logout
-     *
-     * @return 无数据的成功响应
      */
     @PostMapping("/logout")
     public Result<Void> logout() {
         authService.logout();
+        return Result.success();
+    }
+
+    /**
+     * 修改密码
+     * POST /api/admin/auth/change-password
+     */
+    @PostMapping("/change-password")
+    public Result<Void> changePassword(@RequestBody @Valid com.blog.dto.ChangePasswordDTO dto) {
+        authService.changePassword(dto);
         return Result.success();
     }
 }

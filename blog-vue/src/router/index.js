@@ -10,6 +10,7 @@ import FrontTagView from '../views/frontend/TagView.vue'
 import ArchiveView from '../views/frontend/ArchiveView.vue'
 import SearchView from '../views/frontend/SearchView.vue'
 import NotFoundView from '../views/frontend/NotFoundView.vue'
+import AboutView from '../views/frontend/AboutView.vue'
 
 // 后台布局
 import AdminLayout from '../components/admin/AdminLayout.vue'
@@ -25,6 +26,7 @@ import CommentView from '../views/admin/CommentView.vue'
 import SysConfigView from '../views/admin/SysConfigView.vue'
 import OperationLogView from '../views/admin/OperationLogView.vue'
 import LoginLogView from '../views/admin/LoginLogView.vue'
+import AboutEditView from '../views/admin/AboutEditView.vue'
 
 var routes = [
   // ===== 前台路由（无需登录）=====
@@ -47,6 +49,10 @@ var routes = [
   {
     path: '/archive',
     component: ArchiveView
+  },
+  {
+    path: '/about',
+    component: AboutView
   },
   {
     path: '/search',
@@ -112,6 +118,11 @@ var routes = [
       {
         path: 'sys-config',
         component: SysConfigView,
+        meta: { requiresAuth: true }
+      },
+      {
+        path: 'about',
+        component: AboutEditView,
         meta: { requiresAuth: true }
       },
       {

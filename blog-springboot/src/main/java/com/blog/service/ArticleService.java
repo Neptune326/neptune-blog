@@ -42,6 +42,9 @@ public interface ArticleService {
      */
     void delete(Long id);
 
+    /** 切换置顶状态 */
+    void toggleTop(Long id);
+
     // ===== 前台接口 =====
 
     /**

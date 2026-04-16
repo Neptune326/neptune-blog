@@ -20,6 +20,7 @@
         <div class="d-none d-sm-flex align-center" style="gap: 4px;">
           <v-btn variant="text" to="/" class="nav-link" style="min-width: auto;">首页</v-btn>
           <v-btn variant="text" to="/archive" class="nav-link" style="min-width: auto;">归档</v-btn>
+          <v-btn variant="text" to="/about" class="nav-link" style="min-width: auto;">关于</v-btn>
           <v-btn variant="text" to="/search" class="nav-link" style="min-width: auto;">
             <v-icon size="18" class="mr-1">mdi-magnify</v-icon>搜索
           </v-btn>

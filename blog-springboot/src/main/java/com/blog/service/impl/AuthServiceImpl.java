@@ -95,6 +95,25 @@ public class AuthServiceImpl implements AuthService {
         StpUtil.logout();
     }
 
+    @Override
+    public void changePassword(com.blog.dto.ChangePasswordDTO dto) {
+        String username = (String) StpUtil.getLoginId();
+        Admin admin = adminMapper.selectOne(
+                new LambdaQueryWrapper<Admin>().eq(Admin::getUsername, username)
+        );
+        if (admin == null) {
+            throw new BusinessException(ResultCode.USERNAME_OR_PASSWORD_ERROR);
+        }
+        if (!passwordEncoder.matches(dto.getOldPassword(), admin.getPassword())) {
+            throw new BusinessException(ResultCode.USERNAME_OR_PASSWORD_ERROR);
+        }
+        admin.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        adminMapper.updateById(admin);
+        log.info("管理员 {} 修改密码成功", username);
+        // 修改密码后强制重新登录
+        StpUtil.logout();
+    }
+
     /** 保存登录日志 */
     private void saveLoginLog(String username, String ip, String ua,
                                boolean success, String failReason) {

@@ -66,14 +66,46 @@
           class="mb-4"
         />
 
-        <!-- 封面 URL -->
-        <v-text-field
-          v-model="form.coverUrl"
-          label="封面图片 URL"
-          variant="outlined"
-          prepend-inner-icon="mdi-image"
-          class="mb-4"
-        />
+        <!-- 封面图：支持 URL 输入 + 本地上传 -->
+        <div class="mb-4">
+          <div style="font-size: 13px; color: #5f6368; margin-bottom: 8px;">封面图片</div>
+          <div class="d-flex align-start" style="gap: 12px;">
+            <v-text-field
+              v-model="form.coverUrl"
+              label="封面图片 URL"
+              variant="outlined"
+              density="comfortable"
+              prepend-inner-icon="mdi-image-outline"
+              hide-details
+              style="flex: 1;"
+            />
+            <v-btn
+              variant="outlined"
+              color="primary"
+              prepend-icon="mdi-upload"
+              :loading="uploading"
+              @click="triggerUpload"
+              style="height: 48px; white-space: nowrap;"
+            >
+              上传图片
+            </v-btn>
+            <input
+              ref="fileInput"
+              type="file"
+              accept="image/*"
+              style="display: none;"
+              @change="handleFileChange"
+            />
+          </div>
+          <!-- 封面预览 -->
+          <div v-if="form.coverUrl" class="mt-2">
+            <img
+              :src="form.coverUrl"
+              style="max-height: 120px; border-radius: 8px; border: 1px solid #e8eaed; object-fit: cover;"
+              @error="form.coverUrl = ''"
+            />
+          </div>
+        </div>
 
         <!-- Markdown 编辑器 -->
         <div class="mb-4">
@@ -110,6 +142,7 @@ import 'md-editor-v3/lib/style.css'
 import { adminGetArticleById, createArticle, updateArticle } from '../../api/article.js'
 import { adminGetCategories } from '../../api/category.js'
 import { adminGetTags } from '../../api/tag.js'
+import { uploadImage } from '../../api/upload.js'
 import { useRoute, useRouter } from 'vue-router'
 
 export default {
@@ -123,6 +156,7 @@ export default {
   data: function() {
     return {
       submitting: false,
+      uploading: false,
       errorMsg: '',
       categories: [],
       tags: [],
@@ -241,6 +275,27 @@ export default {
     // 返回列表页
     goBack: function() {
       this.router.push('/admin/articles')
+    },
+    triggerUpload: function() {
+      this.$refs.fileInput.click()
+    },
+    handleFileChange: function(event) {
+      var self = this
+      var file = event.target.files[0]
+      if (!file) return
+      self.uploading = true
+      uploadImage(file)
+        .then(function(url) {
+          self.form.coverUrl = url
+        })
+        .catch(function(err) {
+          self.errorMsg = '图片上传失败：' + (err.message || '请重试')
+        })
+        .finally(function() {
+          self.uploading = false
+          // 清空 input，允许重复上传同一文件
+          event.target.value = ''
+        })
     }
   }
 }

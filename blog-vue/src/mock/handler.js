@@ -141,6 +141,15 @@ export function mockHandler(method, url, params, data) {
     return ok(pageResult(tagList, pageNum, pageSize))
   }
 
+  // GET /api/about - 关于我
+  if (method === 'get' && url === '/api/about') {
+    return ok({
+      content: '# 关于我\n\n你好，我是博客的作者。\n\n这里是我的个人博客，记录技术成长，分享开发心得。\n\n## 技术栈\n\n- 后端：Java、Spring Boot、MySQL\n- 前端：Vue 3、Vuetify\n\n## 联系方式\n\n- GitHub：https://github.com/Neptune326\n- Email：your-email@example.com',
+      authorName: 'Admin',
+      description: '记录技术成长，分享开发心得'
+    })
+  }
+
   // ===== 后台 API =====
 
   // POST /api/admin/auth/login - 登录

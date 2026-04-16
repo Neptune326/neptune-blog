@@ -16,9 +16,9 @@ public interface AuthService {
      */
     String login(LoginDTO loginDTO);
 
-    /**
-     * 管理员登出
-     * 清除当前会话的 token
-     */
+    /** 管理员登出 */
     void logout();
+
+    /** 修改密码 */
+    void changePassword(com.blog.dto.ChangePasswordDTO dto);
 }
