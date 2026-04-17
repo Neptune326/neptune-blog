@@ -15,8 +15,8 @@ CREATE TABLE IF NOT EXISTS article_series (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='文章系列表';
 
 -- 文章与系列关联（一篇文章可属于一个系列，有顺序）
-ALTER TABLE article ADD COLUMN IF NOT EXISTS series_id BIGINT DEFAULT NULL COMMENT '所属系列 ID' AFTER category_id;
-ALTER TABLE article ADD COLUMN IF NOT EXISTS series_sort INT NOT NULL DEFAULT 0 COMMENT '在系列中的顺序' AFTER series_id;
+ALTER TABLE article ADD COLUMN series_id BIGINT DEFAULT NULL COMMENT '所属系列 ID' AFTER category_id;
+ALTER TABLE article ADD COLUMN series_sort INT NOT NULL DEFAULT 0 COMMENT '在系列中的顺序' AFTER series_id;
 
 -- 访问统计表（按天记录 PV/UV）
 CREATE TABLE IF NOT EXISTS visit_log (
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS article_history (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='文章版本历史表';
 
 -- 文章定时发布（在 article 表加字段）
-ALTER TABLE article ADD COLUMN IF NOT EXISTS publish_time DATETIME DEFAULT NULL COMMENT '定时发布时间（NULL 表示立即发布）' AFTER status;
+ALTER TABLE article ADD COLUMN publish_time DATETIME DEFAULT NULL COMMENT '定时发布时间（NULL 表示立即发布）' AFTER status;
 
 -- 留言板表
 CREATE TABLE IF NOT EXISTS message (
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS article_like (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='文章点赞表';
 
 -- article 表加点赞数字段
-ALTER TABLE article ADD COLUMN IF NOT EXISTS like_count INT NOT NULL DEFAULT 0 COMMENT '点赞数' AFTER view_count;
+ALTER TABLE article ADD COLUMN like_count INT NOT NULL DEFAULT 0 COMMENT '点赞数' AFTER view_count;
 
 -- 系统配置补充
 INSERT IGNORE INTO sys_config (config_key, config_value, config_desc, create_time, update_time) VALUES

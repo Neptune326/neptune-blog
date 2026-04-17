@@ -19,7 +19,7 @@ class AuthPropertyTest {
         // 模拟 Sa-Token 对无效 token 抛出 NotLoginException
         // 验证 GlobalExceptionHandler 将其转换为 code=401 的响应
         NotLoginException notLoginException = NotLoginException.newInstance(
-                "Authorization", NotLoginException.NOT_TOKEN, invalidToken);
+                "Authorization", NotLoginException.NOT_TOKEN,"无效", invalidToken);
 
         // 直接测试异常处理逻辑：NotLoginException 应被转换为 UNAUTHORIZED 响应
         GlobalExceptionHandler handler = new GlobalExceptionHandler();

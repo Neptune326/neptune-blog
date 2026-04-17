@@ -276,8 +276,6 @@
                   </div>
                 </div>
 
-              </div>
-            </v-card>
 
             <!-- 评论区 -->
             <v-card elevation="0" rounded="lg" style="border: 1px solid #e8eaed;">

@@ -3,6 +3,7 @@ package com.blog.property;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.blog.common.exception.BusinessException;
 import com.blog.common.result.ResultCode;
+import com.blog.mapper.ArticleHistoryMapper;
 import com.blog.mapper.ArticleMapper;
 import com.blog.mapper.ArticleTagMapper;
 import com.blog.mapper.CategoryMapper;
@@ -24,7 +25,8 @@ class ArticlePropertyTest {
         // 准备 mock
         ArticleMapper articleMapper = Mockito.mock(ArticleMapper.class);
         ArticleTagMapper articleTagMapper = Mockito.mock(ArticleTagMapper.class);
-        ArticleServiceImpl articleService = new ArticleServiceImpl(articleMapper, articleTagMapper);
+        ArticleHistoryMapper articleHistoryMapper = Mockito.mock(ArticleHistoryMapper.class);
+        ArticleServiceImpl articleService = new ArticleServiceImpl(articleMapper, articleTagMapper,articleHistoryMapper);
 
         // mock：前台查询文章详情返回 null（模拟软删除后不可见）
         Mockito.when(articleMapper.selectArticleVOById(articleId)).thenReturn(null);

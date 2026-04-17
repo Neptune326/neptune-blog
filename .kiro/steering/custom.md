@@ -1,0 +1,1 @@
+mysql数据库没有 ALTER TABLE comment ADD COLUMN IF NOT EXISTS a varchar(20)(这种写法，没有IF NOT EXISTS
