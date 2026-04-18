@@ -42,3 +42,4 @@ L.push('');
 const existing = fs.readFileSync('.kiro/specs/personal-blog-system/tasks.md', 'utf8');
 fs.writeFileSync('.kiro/specs/personal-blog-system/tasks.md', existing + L.join('\n') + '\n', 'utf8');
 console.log('task3 ok');
+console.log('task3 ok ok');
