@@ -356,7 +356,7 @@ export function mockHandler(method, url, params, data) {
       anime_theme_enabled: 'false',
       gallery_images: '[]',
       click_effect_enabled: 'true',
-      particle_enabled: 'false',
+      particle_enabled: 'true',
       particle_type: 'sakura'
     })
   }

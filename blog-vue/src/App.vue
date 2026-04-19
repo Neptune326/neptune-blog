@@ -140,9 +140,9 @@ export default {
           self.clickEffectEnabled = data.click_effect_enabled !== 'false'
         })
         .catch(function() {
-          // 默认开启点击特效，关闭粒子
+          // 默认开启点击特效和粒子特效
           self.clickEffectEnabled = true
-          self.particleEnabled = false
+          self.particleEnabled = true
         })
     }
   }
