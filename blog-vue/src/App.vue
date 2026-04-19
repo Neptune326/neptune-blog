@@ -84,8 +84,8 @@
       </router-view>
     </div>
 
-    <!-- Live2D 看板娘（全局挂载，仅前台页面显示） -->
-    <Live2DWidget v-if="ready && isFrontend" />
+    <!-- Live2D 看板娘（全局挂载，仅前台页面显示，且配置开启时） -->
+    <Live2DWidget v-if="ready && isFrontend && live2dEnabled" />
 
     <!-- 粒子飘落特效（仅前台，可通过系统配置控制） -->
     <ParticleCanvas
@@ -121,7 +121,8 @@ export default {
       particleEnabled: false,
       particleType: 'sakura',
       particleCount: 25,
-      clickEffectEnabled: true
+      clickEffectEnabled: true,
+      live2dEnabled: false
     }
   },
   computed: {
@@ -180,10 +181,12 @@ export default {
           self.particleType = data.particle_type || 'sakura'
           self.particleCount = parseInt(data.particle_count || '25')
           self.clickEffectEnabled = data.click_effect_enabled !== 'false'
+          self.live2dEnabled = data.live2d_enabled === 'true'
         })
         .catch(function() {
           self.clickEffectEnabled = true
           self.particleEnabled = true
+          self.live2dEnabled = false
         })
     }
   }

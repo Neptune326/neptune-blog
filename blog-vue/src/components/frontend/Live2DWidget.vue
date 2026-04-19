@@ -70,69 +70,47 @@ export default {
       // 动态 import oh-my-live2d（避免 SSR 问题）
       import('oh-my-live2d').then(function(module) {
         var loadOml2d = module.loadOml2d || module.default
+        if (typeof loadOml2d !== 'function') {
+          console.warn('[Live2D] loadOml2d 不是函数，module:', module)
+          return
+        }
 
         loadOml2d({
-          // 模型配置（使用免费公开的模型资源）
+          // 模型配置 —— 使用 jsdelivr CDN（国内相对稳定）
           models: [
             {
-              // 小埋模型（来自 eikanya/Live2d-model）
-              path: 'https://fastly.jsdelivr.net/gh/eikanya/Live2d-model/Live2D/Senko_Normals/senko.model3.json',
+              path: 'https://cdn.jsdelivr.net/gh/eikanya/Live2d-model@master/Live2D/Senko_Normals/senko.model3.json',
               scale: 0.12,
               position: [0, 50],
-              stageStyle: {
-                width: 200,
-                height: 250
-              }
+              stageStyle: { width: 200, height: 250 }
             },
             {
-              // 备用模型
-              path: 'https://fastly.jsdelivr.net/gh/guansss/pixi-live2d-display/test/assets/haru/haru_greeter_t03.model3.json',
+              path: 'https://cdn.jsdelivr.net/gh/guansss/pixi-live2d-display@master/test/assets/haru/haru_greeter_t03.model3.json',
               scale: 0.1,
               position: [0, 30],
-              stageStyle: {
-                width: 200,
-                height: 250
-              }
+              stageStyle: { width: 200, height: 250 }
             }
           ],
-          // 舞台样式
-          stageStyle: {
-            width: 200,
-            height: 250
-          },
-          // 提示框配置（使用内置提示框）
+          stageStyle: { width: 200, height: 250 },
           tips: {
-            style: {
-              width: 180,
-              height: 80,
-              offsetX: 20,
-              offsetY: 80
-            },
-            // 自定义提示内容
+            style: { width: 180, height: 80, offsetX: 20, offsetY: 80 },
             idleTips: {
               wordTheDay: function(wordTheDayData) {
-                return wordTheDayData.hitokoto
+                return wordTheDayData && wordTheDayData.hitokoto
               }
             }
           },
-          // 菜单按钮
           menus: {
-            items: function(defaultItems) {
-              return defaultItems
-            }
+            items: function(defaultItems) { return defaultItems }
           },
-          // 位置：左下角
           dockedPosition: 'left',
-          // 初始化完成后显示问候
           onLoad: function() {
             self.showGreeting()
-            // 每 30 秒换一句问候
             self.greetingTimer = setInterval(self.showGreeting.bind(self), 30000)
           }
         })
       }).catch(function(err) {
         console.warn('[Live2D] oh-my-live2d 加载失败:', err)
-        // 降级：尝试 CDN 方式
         self.loadFallback()
       })
     },
