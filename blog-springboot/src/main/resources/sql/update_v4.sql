@@ -52,7 +52,9 @@ CREATE TABLE IF NOT EXISTS message (
     content     TEXT NOT NULL COMMENT '留言内容',
     status      TINYINT NOT NULL DEFAULT 0 COMMENT '状态：0=待审核，1=已通过，2=已拒绝',
     create_time DATETIME COMMENT '留言时间',
-    create_by   VARCHAR(50) COMMENT '创建人'
+    create_by   VARCHAR(50) COMMENT '创建人',
+    update_time DATETIME COMMENT '更新时间',
+    update_by   VARCHAR(50) COMMENT '更新人'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='留言板表';
 
 -- 文章点赞表（防重复点赞，用 IP + 文章 ID 唯一）
