@@ -5,6 +5,9 @@
     <!-- 每日一言 -->
     <DailyQuote />
 
+    <!-- 天气组件 -->
+    <WeatherWidget />
+
     <!-- 博主简介卡片 -->
     <div
       style="
@@ -268,10 +271,11 @@ import { getArticles } from '../../api/article.js'
 import request from '../../api/request.js'
 import DailyQuote from './DailyQuote.vue'
 import TypewriterText from './TypewriterText.vue'
+import WeatherWidget from './WeatherWidget.vue'
 
 export default {
   name: 'BlogSidebar',
-  components: { DailyQuote, TypewriterText },
+  components: { DailyQuote, TypewriterText, WeatherWidget },
   data: function() {
     return {
       categories: [],

@@ -144,6 +144,47 @@
                 false-value="false"
               />
             </div>
+
+            <!-- 鼠标点击特效 -->
+            <div class="d-flex align-center justify-space-between" style="padding: 12px 16px; background: #f8f9fa; border-radius: 10px;">
+              <div>
+                <div style="font-size: 14px; font-weight: 500; color: #202124;">鼠标点击特效</div>
+                <div style="font-size: 12px; color: #80868b; margin-top: 2px;">点击页面时飘出 Emoji 粒子动画</div>
+              </div>
+              <v-switch
+                v-model="form.click_effect_enabled"
+                color="pink"
+                hide-details
+                true-value="true"
+                false-value="false"
+              />
+            </div>
+
+            <!-- 粒子飘落特效 -->
+            <div style="padding: 12px 16px; background: #f8f9fa; border-radius: 10px;">
+              <div class="d-flex align-center justify-space-between mb-2">
+                <div>
+                  <div style="font-size: 14px; font-weight: 500; color: #202124;">粒子飘落特效</div>
+                  <div style="font-size: 12px; color: #80868b; margin-top: 2px;">全屏飘落动画（樱花 / 雪花 / 星星）</div>
+                </div>
+                <v-switch
+                  v-model="form.particle_enabled"
+                  color="pink"
+                  hide-details
+                  true-value="true"
+                  false-value="false"
+                />
+              </div>
+              <!-- 粒子类型选择 -->
+              <div v-if="form.particle_enabled === 'true'" class="d-flex align-center" style="gap: 8px; margin-top: 8px;">
+                <span style="font-size: 12px; color: #80868b;">类型：</span>
+                <v-btn-toggle v-model="form.particle_type" density="compact" variant="outlined" color="pink">
+                  <v-btn value="sakura" size="small">🌸 樱花</v-btn>
+                  <v-btn value="snow" size="small">❄️ 雪花</v-btn>
+                  <v-btn value="star" size="small">⭐ 星星</v-btn>
+                </v-btn-toggle>
+              </div>
+            </div>
           </div>
         </div>
       </v-card>
@@ -251,7 +292,10 @@ export default {
         live2d_enabled: 'true',
         comment_audit_enabled: 'true',
         anime_theme_enabled: 'false',
-        gallery_images: '[]'
+        gallery_images: '[]',
+        click_effect_enabled: 'true',
+        particle_enabled: 'false',
+        particle_type: 'sakura'
       }
     }
   },

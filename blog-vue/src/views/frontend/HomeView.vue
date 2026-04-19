@@ -143,10 +143,11 @@
     <!-- 底部 -->
     <v-footer color="white" style="border-top: 1px solid #e8eaed; padding: 20px 16px;">
       <v-container style="max-width: 1200px; text-align: center;">
-        <div style="color: #80868b; font-size: 13px; margin-bottom: 6px;">
+        <div style="color: #80868b; font-size: 13px; margin-bottom: 8px;">
           © {{ new Date().getFullYear() }} 我的博客 · 用 ❤️ 构建
         </div>
-        <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
+        <SiteRuntime class="mb-2" />
+        <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-top: 8px;">
           <router-link to="/" style="color: #9aa0a6; font-size: 12px; text-decoration: none;">首页</router-link>
           <router-link to="/archive" style="color: #9aa0a6; font-size: 12px; text-decoration: none;">归档</router-link>
           <router-link to="/search" style="color: #9aa0a6; font-size: 12px; text-decoration: none;">搜索</router-link>
@@ -165,10 +166,11 @@ import ReadingProgress from '../../components/frontend/ReadingProgress.vue'
 import DarkModeToggle from '../../components/frontend/DarkModeToggle.vue'
 import { getArticles } from '../../api/article.js'
 import { smoothScrollToTop } from '../../utils/smoothScroll.js'
+import SiteRuntime from '../../components/frontend/SiteRuntime.vue'
 
 export default {
   name: 'HomeView',
-  components: { ArticleCard, Pagination, ArticleSkeleton, BlogSidebar, ReadingProgress, DarkModeToggle },
+  components: { ArticleCard, Pagination, ArticleSkeleton, BlogSidebar, ReadingProgress, DarkModeToggle, SiteRuntime },
   data: function() {
     return {
       articles: [],

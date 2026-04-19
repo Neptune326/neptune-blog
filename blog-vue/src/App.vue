@@ -61,35 +61,55 @@
       </div>
     </div>
 
-    <!-- 主内容区 -->
+    <!-- 主内容区（带路由过渡动画） -->
     <div v-if="ready" :style="isMockMode ? 'padding-top: 36px;' : ''">
-      <router-view />
+      <router-view v-slot="{ Component }">
+        <transition name="page-fade" mode="out-in">
+          <component :is="Component" />
+        </transition>
+      </router-view>
     </div>
 
     <!-- Live2D 看板娘（全局挂载，仅前台页面显示） -->
     <Live2DWidget v-if="ready && isFrontend" />
+
+    <!-- 粒子飘落特效（仅前台，可通过系统配置控制） -->
+    <ParticleCanvas
+      v-if="ready && isFrontend && particleEnabled"
+      :type="particleType"
+      :count="particleCount"
+    />
+
+    <!-- 鼠标点击特效（仅前台） -->
+    <ClickEffect v-if="ready && isFrontend && clickEffectEnabled" />
   </v-app>
 </template>
 
 <script>
 import { detectBackend, isMockMode } from './api/request.js'
+import request from './api/request.js'
 import Live2DWidget from './components/frontend/Live2DWidget.vue'
+import ParticleCanvas from './components/frontend/ParticleCanvas.vue'
+import ClickEffect from './components/frontend/ClickEffect.vue'
 
 export default {
   name: 'App',
-  components: { Live2DWidget },
+  components: { Live2DWidget, ParticleCanvas, ClickEffect },
   data: function() {
     return {
       showMockBanner: false,
       bannerDismissed: false,
-      ready: false
+      ready: false,
+      particleEnabled: false,
+      particleType: 'sakura',
+      particleCount: 25,
+      clickEffectEnabled: true
     }
   },
   computed: {
     isMockMode: function() {
       return this.showMockBanner && !this.bannerDismissed
     },
-    // 仅在前台页面显示 Live2D（后台管理页面不显示）
     isFrontend: function() {
       return this.$route && !this.$route.path.startsWith('/admin')
     }
@@ -99,11 +119,31 @@ export default {
     detectBackend().then(function(backendOk) {
       self.showMockBanner = !backendOk
       self.ready = true
+      // 加载特效配置
+      self.loadEffectConfig()
     })
   },
   methods: {
     dismissBanner: function() {
       this.bannerDismissed = true
+    },
+    loadEffectConfig: function() {
+      var self = this
+      request({ method: 'get', url: '/api/admin/sys-config' })
+        .then(function(data) {
+          if (!data) return
+          // 粒子特效开关
+          self.particleEnabled = data.particle_enabled === 'true'
+          self.particleType = data.particle_type || 'sakura'
+          self.particleCount = parseInt(data.particle_count || '25')
+          // 点击特效开关（默认开启）
+          self.clickEffectEnabled = data.click_effect_enabled !== 'false'
+        })
+        .catch(function() {
+          // 默认开启点击特效，关闭粒子
+          self.clickEffectEnabled = true
+          self.particleEnabled = false
+        })
     }
   }
 }
@@ -287,6 +327,22 @@ a:hover {
 /* 加载旋转动画 */
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* 页面路由切换过渡 */
+.page-fade-enter-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.page-fade-leave-active {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.page-fade-enter-from {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.page-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
 }
 
 /* 全局平滑滚动 */

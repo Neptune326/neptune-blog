@@ -396,9 +396,11 @@
       ? 'border-top: 1px solid rgba(255,255,255,0.06);'
       : 'border-top: 1px solid rgba(99,102,241,0.1); background: #f8f7ff;'"
       style="padding: 32px 24px; text-align: center;">
-      <div :style="animeMode ? 'color: rgba(255,255,255,0.25);' : 'color: #9ca3af;'" style="font-size: 13px;">
+      <div :style="animeMode ? 'color: rgba(255,255,255,0.25);' : 'color: #9ca3af;'" style="font-size: 13px; margin-bottom: 10px;">
         © {{ new Date().getFullYear() }} 我的博客 · 用 ❤️ 和代码构建
       </div>
+      <!-- 运行时间 + 访客计数 -->
+      <SiteRuntime class="mb-3" />
       <div style="display: flex; justify-content: center; gap: 20px; margin-top: 12px; flex-wrap: wrap;">
         <router-link v-for="item in navItems" :key="item.to" :to="item.to"
           :style="animeMode ? 'color: rgba(255,255,255,0.3);' : 'color: #d1d5db;'"
@@ -413,6 +415,7 @@
 <script>
 import { getArticles } from '../../api/article.js'
 import request from '../../api/request.js'
+import SiteRuntime from '../../components/frontend/SiteRuntime.vue'
 
 // 默认二次元背景图（使用 picsum 的动漫风格占位，实际可替换为真实二次元图源）
 var DEFAULT_ANIME_IMAGES = [
@@ -425,6 +428,7 @@ var DEFAULT_ANIME_IMAGES = [
 
 export default {
   name: 'LandingView',
+  components: { SiteRuntime },
   data: function() {
     return {
       mobileMenu: false,

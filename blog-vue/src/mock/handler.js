@@ -354,7 +354,10 @@ export function mockHandler(method, url, params, data) {
       blog_description: '记录技术成长，分享开发心得',
       blog_author: 'Admin',
       anime_theme_enabled: 'false',
-      gallery_images: '[]'
+      gallery_images: '[]',
+      click_effect_enabled: 'true',
+      particle_enabled: 'false',
+      particle_type: 'sakura'
     })
   }
 
