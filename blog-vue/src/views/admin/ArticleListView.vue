@@ -1,5 +1,21 @@
 ﻿<template>
   <div>
+    <!-- 草稿恢复提示横幅 -->
+    <div v-if="hasDraft" style="
+      background: #fff8e1; border: 1px solid #ffe082; border-radius: 10px;
+      padding: 12px 16px; margin-bottom: 16px;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    ">
+      <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #f57f17;">
+        <v-icon size="18" color="warning">mdi-file-restore-outline</v-icon>
+        你有一篇未完成的文章草稿（{{ draftTitle }}），是否继续编辑？
+      </div>
+      <div style="display: flex; gap: 8px; flex-shrink: 0;">
+        <v-btn size="small" color="warning" variant="flat" prepend-icon="mdi-restore" @click="continueDraft">继续编辑</v-btn>
+        <v-btn size="small" variant="text" color="grey" @click="discardDraft">丢弃草稿</v-btn>
+      </div>
+    </div>
+
     <!-- 筛选工具栏 -->
     <v-card class="mb-4 pa-4">
       <v-row align="center">
@@ -191,14 +207,24 @@
 import { adminGetArticles, deleteArticle } from '../../api/article.js'
 import { adminGetCategories } from '../../api/category.js'
 import request from '../../api/request.js'
+import { useRouter } from 'vue-router'
+
+var DRAFT_KEY = 'article_new_draft'
 
 export default {
   name: 'ArticleListView',
+  setup: function() {
+    var router = useRouter()
+    return { router }
+  },
   data: function() {
     return {
       loading: false,
       articles: [],
       categories: [],
+      // 草稿提示
+      hasDraft: false,
+      draftTitle: '',
       // 筛选条件
       filters: {
         keyword: '',
@@ -240,8 +266,31 @@ export default {
   mounted: function() {
     this.loadCategories()
     this.loadArticles()
+    this.checkDraft()
   },
   methods: {
+    // 检测是否有未提交草稿
+    checkDraft: function() {
+      try {
+        var raw = localStorage.getItem(DRAFT_KEY)
+        if (!raw) return
+        var data = JSON.parse(raw)
+        if (!data.title && !data.content) return
+        this.hasDraft = true
+        this.draftTitle = data.title ? '"' + data.title + '"' : '（无标题）'
+      } catch (e) {}
+    },
+    // 继续编辑草稿：跳转到新建页，由新建页的 mounted 读取草稿
+    continueDraft: function() {
+      // 跳转前标记需要恢复，新建页通过 query 参数感知
+      this.router.push('/admin/articles/edit?restore=1')
+    },
+    // 丢弃草稿
+    discardDraft: function() {
+      try { localStorage.removeItem(DRAFT_KEY) } catch (e) {}
+      this.hasDraft = false
+      this.draftTitle = ''
+    },
     // 加载分类列表（用于筛选下拉）
     loadCategories: function() {
       var self = this

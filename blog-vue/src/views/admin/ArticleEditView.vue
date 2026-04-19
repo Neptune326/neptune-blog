@@ -244,10 +244,12 @@ export default {
     this.loadTags()
     if (this.isEdit) {
       this.loadArticle()
-    } else {
-      // 新建模式：自动静默恢复草稿
+    } else if (this.route.query.restore === '1') {
+      // 只有从文章列表页点"继续编辑"才恢复草稿
       this._restoreDraft()
     }
+    // 新建模式：不自动恢复草稿，只开启自动保存
+    // 草稿恢复入口在文章列表页
   },
   beforeUnmount: function() {
     // 离开页面时立即保存一次（仅新建模式且有内容）
@@ -372,6 +374,10 @@ export default {
     },
     clearDraftBanner: function() {
       this.draftRestored = false
+    },
+    // 供外部（文章列表页）调用，恢复草稿内容
+    restoreFromDraft: function() {
+      this._restoreDraft()
     },
     triggerUpload: function() {
       this.$refs.fileInput.click()
