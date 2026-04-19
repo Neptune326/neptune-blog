@@ -72,4 +72,35 @@ public class ArticleAdminController {
         articleService.toggleTop(id);
         return Result.success();
     }
+
+    /** 批量修改文章状态（发布/转草稿） */
+    @OperationLog(module = "文章管理", action = "批量修改状态")
+    @PutMapping("/batch-status")
+    public Result<Void> batchUpdateStatus(@RequestBody java.util.Map<String, Object> body) {
+        @SuppressWarnings("unchecked")
+        java.util.List<Long> ids = ((java.util.List<?>) body.get("ids")).stream()
+                .map(o -> Long.valueOf(o.toString())).collect(java.util.stream.Collectors.toList());
+        Integer status = Integer.valueOf(body.get("status").toString());
+        if (ids.isEmpty()) {
+            return Result.error(com.blog.common.result.ResultCode.BAD_REQUEST, "参数不能为空");
+        }
+        log.info("批量修改文章状态，ids={}, status={}", ids, status);
+        articleService.batchUpdateStatus(ids, status);
+        return Result.success();
+    }
+
+    /** 批量删除文章 */
+    @OperationLog(module = "文章管理", action = "批量删除文章")
+    @DeleteMapping("/batch")
+    public Result<Void> batchDelete(@RequestBody java.util.Map<String, Object> body) {
+        @SuppressWarnings("unchecked")
+        java.util.List<Long> ids = ((java.util.List<?>) body.get("ids")).stream()
+                .map(o -> Long.valueOf(o.toString())).collect(java.util.stream.Collectors.toList());
+        if (ids.isEmpty()) {
+            return Result.error(com.blog.common.result.ResultCode.BAD_REQUEST, "参数不能为空");
+        }
+        log.info("批量删除文章，ids={}", ids);
+        ids.forEach(id -> articleService.delete(id));
+        return Result.success();
+    }
 }

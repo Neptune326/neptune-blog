@@ -165,6 +165,16 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    public void batchUpdateStatus(java.util.List<Long> ids, Integer status) {
+        if (ids == null || ids.isEmpty()) return;
+        Article update = new Article();
+        update.setStatus(status);
+        articleMapper.update(update,
+                new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<Article>()
+                        .in(Article::getId, ids));
+    }
+
+    @Override
     public List<ArticleListVO> getRelated(Long articleId, Integer limit) {
         if (limit == null || limit <= 0) limit = 5;
         // 获取当前文章的标签和分类

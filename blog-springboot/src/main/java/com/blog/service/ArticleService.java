@@ -45,6 +45,9 @@ public interface ArticleService {
     /** 切换置顶状态 */
     void toggleTop(Long id);
 
+    /** 批量修改文章状态 */
+    void batchUpdateStatus(java.util.List<Long> ids, Integer status);
+
     // ===== 前台接口 =====
 
     /**
