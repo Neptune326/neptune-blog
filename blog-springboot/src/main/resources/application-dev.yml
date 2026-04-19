@@ -24,7 +24,7 @@ spring:
 #   Linux/Mac: /home/yourname/blog-uploads/
 blog:
   upload:
-    path: D:/blog-uploads/
+    path: E:/temp/blog-uploads/
     url-prefix: http://localhost:8080/uploads/
 
 # 日志：开发环境输出 debug 级别，方便排查问题
