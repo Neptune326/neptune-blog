@@ -19,11 +19,12 @@ spring:
       max-request-size: 10MB
 
 # 文件上传存储路径（开发环境）
-# 使用绝对路径避免 Windows 下相对路径问题
-# 可根据实际情况修改为任意目录，如 D:/blog-uploads/
+# 请修改为你本地的绝对路径，例如：
+#   Windows: D:/blog-uploads/
+#   Linux/Mac: /home/yourname/blog-uploads/
 blog:
   upload:
-    path: ${user.home}/blog-uploads/
+    path: D:/blog-uploads/
     url-prefix: http://localhost:8080/uploads/
 
 # 日志：开发环境输出 debug 级别，方便排查问题

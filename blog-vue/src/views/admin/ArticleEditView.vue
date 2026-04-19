@@ -1,5 +1,21 @@
 <template>
   <div>
+    <!-- 草稿恢复提示条 -->
+    <div v-if="draftRestored" style="
+      background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 8px;
+      padding: 10px 16px; margin-bottom: 16px;
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 13px; color: #2e7d32;
+    ">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <v-icon size="16" color="success">mdi-restore</v-icon>
+        已自动恢复上次未保存的草稿（{{ draftSavedAt }}）
+      </div>
+      <button @click="clearDraftBanner" style="background: none; border: none; cursor: pointer; color: #2e7d32; font-size: 12px; padding: 2px 8px; border-radius: 4px; transition: background 0.15s;" @mouseenter="$event.target.style.background='rgba(0,0,0,0.06)'" @mouseleave="$event.target.style.background='none'">
+        知道了
+      </button>
+    </div>
+
     <v-card class="pa-6">
       <v-card-title class="text-h6 mb-4">
         {{ isEdit ? '编辑文章' : '新建文章' }}
@@ -126,9 +142,9 @@
         <div class="mb-4">
           <div class="d-flex align-center justify-space-between mb-2">
             <div class="text-body-2 text-grey">文章内容（Markdown）</div>
-            <div v-if="draftSaved" style="font-size: 12px; color: #34a853; display: flex; align-items: center; gap: 4px;">
-              <v-icon size="14" color="success">mdi-check-circle-outline</v-icon>
-              草稿已自动保存
+            <div v-if="autoSaveIndicator" style="font-size: 12px; color: #9aa0a6; display: flex; align-items: center; gap: 4px;">
+              <v-icon size="13" color="grey">mdi-content-save-outline</v-icon>
+              已自动保存
             </div>
           </div>
           <MdEditor
@@ -166,6 +182,8 @@ import { adminGetTags } from '../../api/tag.js'
 import { uploadImage } from '../../api/upload.js'
 import { useRoute, useRouter } from 'vue-router'
 
+var DRAFT_KEY = 'article_new_draft'
+
 export default {
   name: 'ArticleEditView',
   components: { MdEditor },
@@ -181,12 +199,10 @@ export default {
       errorMsg: '',
       categories: [],
       tags: [],
-      // 状态选项（与后端一致：0=草稿，1=已发布）
       statusOptions: [
         { label: '草稿', value: 0 },
         { label: '已发布', value: 1 }
       ],
-      // 表单数据
       form: {
         title: '',
         categoryId: null,
@@ -197,15 +213,30 @@ export default {
         status: 0,
         publishTime: null
       },
-      autoSaveTimer: null,
-      draftSaved: false,
-      draftRestored: false
+      // 草稿相关
+      draftRestored: false,
+      draftSavedAt: '',
+      autoSaveIndicator: false,
+      _debounceTimer: null
     }
   },
   computed: {
-    // 是否为编辑模式（URL 中有 id 参数）
     isEdit: function() {
       return !!this.route.params.id
+    }
+  },
+  watch: {
+    // 监听 form 变化，防抖 800ms 后自动保存草稿（仅新建模式）
+    form: {
+      deep: true,
+      handler: function() {
+        if (this.isEdit) return
+        var self = this
+        if (self._debounceTimer) clearTimeout(self._debounceTimer)
+        self._debounceTimer = setTimeout(function() {
+          self._saveDraft()
+        }, 800)
+      }
     }
   },
   mounted: function() {
@@ -214,39 +245,26 @@ export default {
     if (this.isEdit) {
       this.loadArticle()
     } else {
-      // 新建文章时，尝试恢复草稿
-      this.restoreDraft()
+      // 新建模式：自动静默恢复草稿
+      this._restoreDraft()
     }
-    // 自动保存草稿（每 30 秒）
-    this.autoSaveTimer = setInterval(this.saveDraft, 30000)
   },
   beforeUnmount: function() {
-    if (this.autoSaveTimer) clearInterval(this.autoSaveTimer)
+    // 离开页面时立即保存一次（仅新建模式且有内容）
+    if (!this.isEdit) {
+      this._saveDraft()
+    }
+    if (this._debounceTimer) clearTimeout(this._debounceTimer)
   },
   methods: {
-    // 加载分类列表
     loadCategories: function() {
       var self = this
-      adminGetCategories()
-        .then(function(data) {
-          self.categories = data || []
-        })
-        .catch(function(err) {
-          console.error('加载分类失败:', err)
-        })
+      adminGetCategories().then(function(data) { self.categories = data || [] }).catch(function() {})
     },
-    // 加载标签列表
     loadTags: function() {
       var self = this
-      adminGetTags()
-        .then(function(data) {
-          self.tags = data || []
-        })
-        .catch(function(err) {
-          console.error('加载标签失败:', err)
-        })
+      adminGetTags().then(function(data) { self.tags = data || [] }).catch(function() {})
     },
-    // 加载文章详情（编辑模式）
     loadArticle: function() {
       var self = this
       adminGetArticleById(self.route.params.id)
@@ -257,7 +275,6 @@ export default {
           self.form.coverUrl = data.coverUrl || ''
           self.form.content = data.content || ''
           self.form.status = data.status !== undefined ? data.status : 0
-          // 回填标签（后端返回标签对象数组）
           self.form.tagIds = data.tags || []
         })
         .catch(function(err) {
@@ -265,7 +282,6 @@ export default {
           self.errorMsg = '加载文章失败'
         })
     },
-    // 提交表单
     handleSubmit: function() {
       var self = this
       if (!self.form.title) {
@@ -275,7 +291,6 @@ export default {
       self.submitting = true
       self.errorMsg = ''
 
-      // 处理标签 ID 列表（兼容对象和字符串两种情况）
       var tagIds = (self.form.tagIds || []).map(function(t) {
         return typeof t === 'object' ? t.id : t
       }).filter(function(id) { return !!id })
@@ -297,8 +312,8 @@ export default {
 
       promise
         .then(function() {
-          // 提交成功后清除草稿
-          try { localStorage.removeItem('article_draft') } catch (e) {}
+          // 发布成功后清除草稿
+          try { localStorage.removeItem(DRAFT_KEY) } catch (e) {}
           self.router.push('/admin/articles')
         })
         .catch(function(err) {
@@ -308,40 +323,52 @@ export default {
           self.submitting = false
         })
     },
-    // 返回列表页
     goBack: function() {
       this.router.push('/admin/articles')
     },
-    // 草稿自动保存
-    saveDraft: function() {
+    // 内部：保存草稿到 localStorage
+    _saveDraft: function() {
       if (!this.form.title && !this.form.content) return
       try {
-        localStorage.setItem('article_draft', JSON.stringify({
+        var now = new Date()
+        var timeStr = now.getHours() + ':' +
+          String(now.getMinutes()).padStart(2, '0') + ':' +
+          String(now.getSeconds()).padStart(2, '0')
+        localStorage.setItem(DRAFT_KEY, JSON.stringify({
           title: this.form.title,
           content: this.form.content,
           summary: this.form.summary,
-          savedAt: new Date().toLocaleTimeString()
+          coverUrl: this.form.coverUrl,
+          categoryId: this.form.categoryId,
+          status: this.form.status,
+          savedAt: timeStr
         }))
-        this.draftSaved = true
+        // 短暂显示"已自动保存"
         var self = this
-        setTimeout(function() { self.draftSaved = false }, 2000)
+        self.autoSaveIndicator = true
+        setTimeout(function() { self.autoSaveIndicator = false }, 1500)
       } catch (e) {}
     },
-    // 恢复草稿
-    restoreDraft: function() {
+    // 内部：静默恢复草稿（不弹窗）
+    _restoreDraft: function() {
       try {
-        var draft = localStorage.getItem('article_draft')
-        if (!draft) return
-        var data = JSON.parse(draft)
+        var raw = localStorage.getItem(DRAFT_KEY)
+        if (!raw) return
+        var data = JSON.parse(raw)
         if (!data.title && !data.content) return
-        if (confirm('检测到未保存的草稿（' + (data.savedAt || '') + '），是否恢复？')) {
-          this.form.title = data.title || ''
-          this.form.content = data.content || ''
-          this.form.summary = data.summary || ''
-          this.draftRestored = true
-        }
-        localStorage.removeItem('article_draft')
+        // 直接恢复，不询问
+        this.form.title = data.title || ''
+        this.form.content = data.content || ''
+        this.form.summary = data.summary || ''
+        this.form.coverUrl = data.coverUrl || ''
+        if (data.categoryId) this.form.categoryId = data.categoryId
+        if (data.status !== undefined) this.form.status = data.status
+        this.draftSavedAt = data.savedAt || ''
+        this.draftRestored = true
       } catch (e) {}
+    },
+    clearDraftBanner: function() {
+      this.draftRestored = false
     },
     triggerUpload: function() {
       this.$refs.fileInput.click()
@@ -360,7 +387,6 @@ export default {
         })
         .finally(function() {
           self.uploading = false
-          // 清空 input，允许重复上传同一文件
           event.target.value = ''
         })
     }
