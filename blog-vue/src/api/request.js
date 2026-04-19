@@ -64,8 +64,12 @@ request.interceptors.response.use(
     var data = response.data
     if (data.code !== 200) {
       if (data.code === 401) {
-        useAuthStore().clearAuth()
-        window.location.href = '/admin/login'
+        // 只有在后台页面才跳转登录，前台页面的 401 静默忽略
+        if (window.location.pathname.startsWith('/admin') &&
+            !window.location.pathname.startsWith('/admin/login')) {
+          useAuthStore().clearAuth()
+          window.location.href = '/admin/login'
+        }
       } else {
         console.error('接口错误 [' + data.code + ']:', data.message || '未知错误')
       }
@@ -116,6 +120,15 @@ request.interceptors.response.use(
     }
 
     console.error('请求失败:', error.message || error)
+    // HTTP 401：只在后台页面跳转登录
+    if (error.response && error.response.status === 401) {
+      if (window.location.pathname.startsWith('/admin') &&
+          !window.location.pathname.startsWith('/admin/login')) {
+        useAuthStore().clearAuth()
+        window.location.href = '/admin/login'
+      }
+      return Promise.reject(error)
+    }
     return Promise.reject(error)
   }
 )

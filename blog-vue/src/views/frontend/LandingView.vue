@@ -509,11 +509,10 @@ export default {
     },
     loadAnimeConfig: function() {
       var self = this
-      // 读取系统配置中的动漫主题开关和画廊图片
-      request({ method: 'get', url: '/api/admin/sys-config' })
+      // 读取公开的前台站点配置（不需要鉴权）
+      request({ method: 'get', url: '/api/site-config' })
         .then(function(data) {
           self.animeMode = data && data.anime_theme_enabled === 'true'
-          // 画廊图片列表（JSON 数组字符串）
           if (data && data.gallery_images) {
             try {
               var imgs = JSON.parse(data.gallery_images)

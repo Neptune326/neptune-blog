@@ -145,18 +145,16 @@ export default {
     },
     loadEffectConfig: function() {
       var self = this
-      request({ method: 'get', url: '/api/admin/sys-config' })
+      // 读取公开的前台站点配置（不需要鉴权）
+      request({ method: 'get', url: '/api/site-config' })
         .then(function(data) {
           if (!data) return
-          // 粒子特效开关
           self.particleEnabled = data.particle_enabled === 'true'
           self.particleType = data.particle_type || 'sakura'
           self.particleCount = parseInt(data.particle_count || '25')
-          // 点击特效开关（默认开启）
           self.clickEffectEnabled = data.click_effect_enabled !== 'false'
         })
         .catch(function() {
-          // 默认开启点击特效和粒子特效
           self.clickEffectEnabled = true
           self.particleEnabled = true
         })

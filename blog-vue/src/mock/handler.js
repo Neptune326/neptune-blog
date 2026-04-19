@@ -151,6 +151,21 @@ export function mockHandler(method, url, params, data) {
     return ok(pageResult(tagList, pageNum, pageSize))
   }
 
+  // GET /api/site-config - 前台公开配置（不需要鉴权）
+  if (method === 'get' && url === '/api/site-config') {
+    return ok({
+      blog_name: '我的博客',
+      blog_description: '记录技术成长，分享开发心得',
+      blog_author: 'Admin',
+      anime_theme_enabled: 'false',
+      gallery_images: '[]',
+      click_effect_enabled: 'true',
+      particle_enabled: 'true',
+      particle_type: 'sakura',
+      particle_count: '25'
+    })
+  }
+
   // GET /api/about - 关于我
   if (method === 'get' && url === '/api/about') {
     return ok({
