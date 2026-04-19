@@ -21,7 +21,7 @@ var mockPlugin = {
    */
   detect: function() {
     return fetch('/api/articles?pageNum=1&pageSize=1', {
-      signal: AbortSignal.timeout ? AbortSignal.timeout(3000) : undefined
+      signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined
     })
       .then(function(res) {
         return res.ok

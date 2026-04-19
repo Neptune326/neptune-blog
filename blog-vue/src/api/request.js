@@ -24,7 +24,7 @@ export function setupMock(plugin) {
 // ===== axios 实例 =====
 var request = axios.create({
   baseURL: '',
-  timeout: 4000
+  timeout: 15000  // 15秒，避免后端响应慢时误触发降级
 })
 
 // ===== 请求拦截器 =====
@@ -87,17 +87,16 @@ request.interceptors.response.use(
       return Promise.resolve(mockResult.data)
     }
 
-    // 后端不可用时，通过插件降级
+    // 后端不可用时，通过插件降级（仅网络完全不通或502/503/504时）
     if (_mockPlugin) {
-      var isNetworkError = !error.response
-      var isTimeout = error.code === 'ECONNABORTED' || error.code === 'ERR_NETWORK'
+      var isNetworkError = !error.response && error.code === 'ERR_NETWORK'
       var isProxyError = error.response && (
         error.response.status === 502 ||
         error.response.status === 503 ||
         error.response.status === 504
       )
 
-      if (isNetworkError || isTimeout || isProxyError) {
+      if (isNetworkError || isProxyError) {
         var config = error.config || {}
         var method = (config.method || 'get').toLowerCase()
         var url = config.url || ''
@@ -109,7 +108,7 @@ request.interceptors.response.use(
         if (fallbackResult !== null) {
           if (!_mockMode) {
             _mockMode = true
-            console.warn('[Mock] 后端未启动，已切换到 Mock 数据模式。')
+            console.warn('[Mock] 后端网络不可达，已切换到 Mock 数据模式。')
           }
           if (fallbackResult.code !== 200) {
             return Promise.reject(new Error(fallbackResult.message || '请求失败'))
