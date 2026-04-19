@@ -186,7 +186,7 @@ export default {
         .catch(function() {
           self.clickEffectEnabled = true
           self.particleEnabled = true
-          self.live2dEnabled = false
+          self.live2dEnabled = true
         })
     }
   }

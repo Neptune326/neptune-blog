@@ -162,7 +162,8 @@ export function mockHandler(method, url, params, data) {
       click_effect_enabled: 'true',
       particle_enabled: 'true',
       particle_type: 'sakura',
-      particle_count: '25'
+      particle_count: '25',
+      live2d_enabled: 'true'
     })
   }
 
