@@ -134,7 +134,7 @@ export default {
       request({ method: 'post', url: '/api/admin/users', data: self.createForm })
         .then(function() {
           self.createDialog = false
-          self.$toast.success('管理员创建成功')
+          // handled by interceptor
           self.loadAdmins()
         })
         .catch(function(err) { self.createError = err.message || '创建失败' })
@@ -152,7 +152,7 @@ export default {
       request({ method: 'put', url: '/api/admin/users/' + self.resetTarget.id + '/reset-password', data: { newPassword: self.newPassword } })
         .then(function() {
           self.resetPwdDialog = false
-          self.$toast.success('密码重置成功')
+          // handled by interceptor
         })
         .catch(function(err) { self.$toast.error(err.message || '重置失败') })
         .finally(function() { self.resetLoading = false })
@@ -162,7 +162,7 @@ export default {
       if (!confirm('确认删除管理员 ' + admin.username + '？')) return
       request({ method: 'delete', url: '/api/admin/users/' + admin.id })
         .then(function() {
-          self.$toast.success('删除成功')
+          // handled by interceptor
           self.loadAdmins()
         })
         .catch(function(err) { self.$toast.error(err.message || '删除失败') })
@@ -171,4 +171,5 @@ export default {
   }
 }
 </script>
+
 

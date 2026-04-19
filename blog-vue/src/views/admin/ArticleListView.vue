@@ -429,6 +429,7 @@ export default {
       request({
         method: 'post',
         url: '/api/admin/articles/import',
+        _silent: true,
         data: formData,
         headers: { 'Content-Type': 'multipart/form-data' }
       })
