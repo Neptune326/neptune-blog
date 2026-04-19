@@ -189,12 +189,9 @@ export function mockHandler(method, url, params, data) {
 
   // ===== 后台 API =====
 
-  // POST /api/admin/auth/login - 登录
+  // POST /api/admin/auth/login - 登录（mock 模式下任意账号密码均可登录）
   if (method === 'post' && url === '/api/admin/auth/login') {
-    if (data.username === 'admin' && data.password === 'admin123') {
-      return ok('mock-token-' + Date.now())
-    }
-    return { code: 1001, message: '用户名或密码错误', data: null }
+    return ok('mock-token-' + Date.now())
   }
 
   // POST /api/admin/auth/logout - 登出
@@ -355,13 +352,21 @@ export function mockHandler(method, url, params, data) {
       comment_audit_enabled: 'true',
       blog_name: '我的博客',
       blog_description: '记录技术成长，分享开发心得',
-      blog_author: 'Admin'
+      blog_author: 'Admin',
+      anime_theme_enabled: 'false',
+      gallery_images: '[]'
     })
   }
 
   // PUT /api/admin/sys-config
   if (method === 'put' && url === '/api/admin/sys-config') {
     return ok(null)
+  }
+
+  // POST /api/admin/upload/image - mock 图片上传（返回随机图片 URL）
+  if (method === 'post' && url === '/api/admin/upload/image') {
+    var seed = 'upload' + Date.now()
+    return ok('https://picsum.photos/seed/' + seed + '/1920/1080')
   }
 
   // ===== 操作日志 =====
@@ -453,6 +458,29 @@ export function mockHandler(method, url, params, data) {
   if (method === 'post' && url === '/api/admin/users') { return ok(null) }
   if (method === 'put' && url.match(/^\/api\/admin\/users\/\d+\/reset-password$/)) { return ok(null) }
   if (method === 'delete' && url.match(/^\/api\/admin\/users\/\d+$/)) { return ok(null) }
+
+  // ===== 友情链接 =====
+  var mockFriendLinks = [
+    { id: 1, name: 'Vue.js 官网', url: 'https://vuejs.org', description: 'Vue 3 官方文档', iconUrl: '', sort: 1 },
+    { id: 2, name: 'Spring Boot', url: 'https://spring.io/projects/spring-boot', description: 'Spring Boot 官方', iconUrl: '', sort: 2 },
+    { id: 3, name: 'MDN Web Docs', url: 'https://developer.mozilla.org', description: 'Web 技术权威文档', iconUrl: '', sort: 3 }
+  ]
+  // GET /api/friend-links - 前台友情链接
+  if (method === 'get' && url === '/api/friend-links') {
+    return ok(mockFriendLinks)
+  }
+  // GET /api/admin/friend-links - 后台友情链接列表
+  if (method === 'get' && url === '/api/admin/friend-links') {
+    return ok(mockFriendLinks)
+  }
+  if (method === 'post' && url === '/api/admin/friend-links') { return ok(null) }
+  if (method === 'put' && url.match(/^\/api\/admin\/friend-links\/\d+$/)) { return ok(null) }
+  if (method === 'delete' && url.match(/^\/api\/admin\/friend-links\/\d+$/)) { return ok(null) }
+
+  // ===== 文章批量操作 =====
+  if (method === 'put' && url === '/api/admin/articles/batch-status') { return ok(null) }
+  if (method === 'delete' && url === '/api/admin/articles/batch') { return ok(null) }
+  if (method === 'put' && url.match(/^\/api\/admin\/articles\/\d+\/top$/)) { return ok(null) }
 
   // 未匹配到任何路由
   return null

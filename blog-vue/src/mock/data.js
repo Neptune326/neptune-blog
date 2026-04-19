@@ -39,7 +39,7 @@ export var articleList = [
     title: '使用 Vue 3 + Vuetify 构建现代化博客系统',
     summary: '本文介绍如何使用 Vue 3 的 Composition API 结合 Vuetify 3 组件库，打造一个具有 Material Design 风格的个人博客系统，包括前台展示和后台管理两套界面的完整实现。',
     coverUrl: 'https://picsum.photos/seed/vue3blog/800/400',
-    categoryId: 1, categoryName: '前端开发', status: 1, viewCount: 1280,
+    categoryId: 1, categoryName: '前端开发', status: 1, viewCount: 1280, commentCount: 2, isTop: 0,
     createTime: dateStr(2),
     tags: [{ id: 1, name: 'Vue3' }, { id: 7, name: 'Tailwind CSS' }]
   },
@@ -48,7 +48,7 @@ export var articleList = [
     title: 'Spring Boot 3.x + MyBatis-Plus 企业级最佳实践',
     summary: '深入探讨 Spring Boot 3.x 与 MyBatis-Plus 的整合方案，包括多环境配置、统一响应封装、全局异常处理、Sa-Token 鉴权等企业级开发规范，助你快速搭建生产级后端服务。',
     coverUrl: 'https://picsum.photos/seed/springboot/800/400',
-    categoryId: 2, categoryName: '后端开发', status: 1, viewCount: 2340,
+    categoryId: 2, categoryName: '后端开发', status: 1, viewCount: 2340, commentCount: 2, isTop: 1,
     createTime: dateStr(5),
     tags: [{ id: 2, name: 'Spring Boot' }, { id: 8, name: 'MyBatis' }]
   },
@@ -57,7 +57,7 @@ export var articleList = [
     title: 'MySQL 索引优化与查询性能调优实战',
     summary: '从 B+ 树索引原理出发，讲解覆盖索引、联合索引、索引下推等优化技巧，结合 EXPLAIN 分析工具，系统性地提升 MySQL 查询性能，附真实慢查询优化案例。',
     coverUrl: 'https://picsum.photos/seed/mysqlopt/800/400',
-    categoryId: 2, categoryName: '后端开发', status: 1, viewCount: 1560,
+    categoryId: 2, categoryName: '后端开发', status: 1, viewCount: 1560, commentCount: 1, isTop: 0,
     createTime: dateStr(10),
     tags: [{ id: 3, name: 'MySQL' }]
   },
@@ -66,7 +66,7 @@ export var articleList = [
     title: 'TypeScript 高级类型体操实战',
     summary: '深入 TypeScript 的类型系统，掌握条件类型、映射类型、模板字面量类型等高级特性，通过实际案例理解类型编程的精髓，让你的代码更加健壮。',
     coverUrl: 'https://picsum.photos/seed/typescript/800/400',
-    categoryId: 1, categoryName: '前端开发', status: 1, viewCount: 943,
+    categoryId: 1, categoryName: '前端开发', status: 1, viewCount: 943, commentCount: 1, isTop: 0,
     createTime: dateStr(15),
     tags: [{ id: 4, name: 'TypeScript' }]
   },
@@ -75,7 +75,7 @@ export var articleList = [
     title: 'Docker 容器化部署完整实践指南',
     summary: '从 Docker 基础概念到 Dockerfile 编写，再到 docker-compose 多服务编排，手把手带你完成一个完整的前后端分离项目容器化部署，包含 Nginx 反向代理配置。',
     coverUrl: 'https://picsum.photos/seed/dockerguide/800/400',
-    categoryId: 3, categoryName: '工具效率', status: 1, viewCount: 1120,
+    categoryId: 3, categoryName: '工具效率', status: 1, viewCount: 1120, commentCount: 1, isTop: 0,
     createTime: dateStr(20),
     tags: [{ id: 5, name: 'Docker' }]
   },
@@ -84,7 +84,7 @@ export var articleList = [
     title: 'Git 工作流与团队协作规范',
     summary: '介绍 Git Flow、GitHub Flow 等常见工作流模型，以及 Conventional Commits 提交规范、代码审查流程，帮助团队建立高效的协作机制，减少合并冲突。',
     coverUrl: 'https://picsum.photos/seed/gitflow/800/400',
-    categoryId: 3, categoryName: '工具效率', status: 1, viewCount: 876,
+    categoryId: 3, categoryName: '工具效率', status: 1, viewCount: 876, commentCount: 1, isTop: 0,
     createTime: dateStr(25),
     tags: [{ id: 6, name: 'Git' }]
   }

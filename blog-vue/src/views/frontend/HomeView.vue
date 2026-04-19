@@ -80,6 +80,31 @@
         <v-row>
           <!-- 主内容区 -->
           <v-col cols="12" md="8">
+            <!-- 排序切换 -->
+            <div class="d-flex align-center justify-space-between mb-4" style="gap: 8px;">
+              <div style="font-size: 14px; color: #5f6368;">
+                共 <strong style="color: #202124;">{{ total }}</strong> 篇文章
+              </div>
+              <div class="d-flex" style="gap: 4px;">
+                <v-btn
+                  :variant="sortBy === 'latest' ? 'flat' : 'text'"
+                  :color="sortBy === 'latest' ? 'primary' : 'default'"
+                  size="small"
+                  prepend-icon="mdi-clock-outline"
+                  @click="setSort('latest')"
+                  style="font-size: 12px;"
+                >最新</v-btn>
+                <v-btn
+                  :variant="sortBy === 'hot' ? 'flat' : 'text'"
+                  :color="sortBy === 'hot' ? 'primary' : 'default'"
+                  size="small"
+                  prepend-icon="mdi-fire"
+                  @click="setSort('hot')"
+                  style="font-size: 12px;"
+                >最热</v-btn>
+              </div>
+            </div>
+
             <!-- 骨架屏 -->
             <ArticleSkeleton v-if="loading" :count="3" />
 
@@ -151,6 +176,7 @@ export default {
       pages: 1,
       pageNum: 1,
       pageSize: 10,
+      sortBy: 'latest',
       loading: false,
       mobileMenu: false,
       navItems: [
@@ -170,7 +196,9 @@ export default {
     loadArticles: function() {
       var self = this
       self.loading = true
-      getArticles({ pageNum: self.pageNum, pageSize: self.pageSize })
+      var params = { pageNum: self.pageNum, pageSize: self.pageSize }
+      if (self.sortBy === 'hot') params.orderBy = 'view_count'
+      getArticles(params)
         .then(function(data) {
           self.articles = data.list || []
           self.total = data.total || 0
@@ -182,6 +210,11 @@ export default {
         .finally(function() {
           self.loading = false
         })
+    },
+    setSort: function(sort) {
+      this.sortBy = sort
+      this.pageNum = 1
+      this.loadArticles()
     },
     onPageChange: function(page) {
       this.pageNum = page

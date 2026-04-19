@@ -83,9 +83,27 @@
 
     <!-- 文章列表表格 -->
     <v-card>
+      <!-- 批量操作栏 -->
+      <div v-if="selectedIds.length > 0" class="d-flex align-center pa-3" style="background: #e8f0fe; gap: 12px; border-bottom: 1px solid #c5d8f8;">
+        <span style="font-size: 13px; color: #1a73e8; font-weight: 500;">已选 {{ selectedIds.length }} 篇</span>
+        <v-btn size="small" color="success" variant="tonal" prepend-icon="mdi-check-circle-outline" @click="batchPublish" :loading="batchLoading">批量发布</v-btn>
+        <v-btn size="small" color="warning" variant="tonal" prepend-icon="mdi-file-outline" @click="batchDraft" :loading="batchLoading">批量转草稿</v-btn>
+        <v-btn size="small" color="error" variant="tonal" prepend-icon="mdi-delete-outline" @click="batchDeleteConfirm" :loading="batchLoading">批量删除</v-btn>
+        <v-btn size="small" variant="text" @click="selectedIds = []">取消选择</v-btn>
+      </div>
+
       <v-table>
         <thead>
           <tr>
+            <th style="width: 40px;">
+              <v-checkbox
+                :model-value="allSelected"
+                :indeterminate="someSelected"
+                hide-details
+                density="compact"
+                @update:model-value="toggleSelectAll"
+              />
+            </th>
             <th>ID</th>
             <th>标题</th>
             <th>分类</th>
@@ -96,46 +114,40 @@
         </thead>
         <tbody>
           <tr v-if="loading">
-            <td colspan="6" class="text-center pa-4">
+            <td colspan="7" class="text-center pa-4">
               <v-progress-circular indeterminate color="primary" />
             </td>
           </tr>
           <tr v-else-if="articles.length === 0">
-            <td colspan="6" class="text-center pa-4 text-grey">暂无数据</td>
+            <td colspan="7" class="text-center pa-4 text-grey">暂无数据</td>
           </tr>
           <tr v-for="article in articles" :key="article.id" v-else>
+            <td>
+              <v-checkbox
+                :model-value="selectedIds.includes(article.id)"
+                hide-details
+                density="compact"
+                @update:model-value="toggleSelect(article.id)"
+              />
+            </td>
             <td>{{ article.id }}</td>
-            <td>{{ article.title }}</td>
+            <td>
+              <div class="d-flex align-center" style="gap: 6px;">
+                <v-icon v-if="article.isTop === 1" size="14" color="warning" title="置顶">mdi-pin</v-icon>
+                {{ article.title }}
+              </div>
+            </td>
             <td>{{ article.categoryName || '-' }}</td>
             <td>
-              <v-chip
-                :color="article.status === 1 ? 'success' : 'default'"
-                size="small"
-              >
+              <v-chip :color="article.status === 1 ? 'success' : 'default'" size="small">
                 {{ article.status === 1 ? '已发布' : '草稿' }}
               </v-chip>
             </td>
             <td>{{ formatDate(article.createTime) }}</td>
             <td>
-              <v-btn
-                size="small"
-                variant="text"
-                color="primary"
-                :to="'/admin/articles/edit/' + article.id"
-              >编辑</v-btn>
-              <v-btn
-                size="small"
-                variant="text"
-                :color="article.isTop === 1 ? 'warning' : 'default'"
-                @click="toggleTop(article)"
-                :title="article.isTop === 1 ? '取消置顶' : '置顶'"
-              >{{ article.isTop === 1 ? '取消置顶' : '置顶' }}</v-btn>
-              <v-btn
-                size="small"
-                variant="text"
-                color="error"
-                @click="confirmDelete(article)"
-              >删除</v-btn>
+              <v-btn size="small" variant="text" color="primary" :to="'/admin/articles/edit/' + article.id">编辑</v-btn>
+              <v-btn size="small" variant="text" :color="article.isTop === 1 ? 'warning' : 'default'" @click="toggleTop(article)" :title="article.isTop === 1 ? '取消置顶' : '置顶'">{{ article.isTop === 1 ? '取消置顶' : '置顶' }}</v-btn>
+              <v-btn size="small" variant="text" color="error" @click="confirmDelete(article)">删除</v-btn>
             </td>
           </tr>
         </tbody>
@@ -143,14 +155,22 @@
 
       <!-- 分页 -->
       <div class="d-flex justify-center pa-4">
-        <v-pagination
-          v-model="pagination.page"
-          :length="pagination.totalPages"
-          :total-visible="7"
-          @update:model-value="loadArticles"
-        />
+        <v-pagination v-model="pagination.page" :length="pagination.totalPages" :total-visible="7" @update:model-value="loadArticles" />
       </div>
     </v-card>
+
+    <!-- 批量删除确认 -->
+    <v-dialog v-model="batchDeleteDialog" max-width="400">
+      <v-card>
+        <v-card-title>批量删除确认</v-card-title>
+        <v-card-text>确定删除选中的 {{ selectedIds.length }} 篇文章？此操作不可撤销。</v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn variant="text" @click="batchDeleteDialog = false">取消</v-btn>
+          <v-btn color="error" :loading="batchLoading" @click="doBatchDelete">确认删除</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
     <!-- 删除确认对话框 -->
     <v-dialog v-model="deleteDialog" max-width="400">
@@ -202,12 +222,23 @@ export default {
       deleteDialog: false,
       deleteLoading: false,
       deleteTarget: null,
+      // 批量操作
+      selectedIds: [],
+      batchLoading: false,
+      batchDeleteDialog: false,
       // 导入导出
       importing: false,
       importSnackbar: { show: false, text: '', color: 'success' }
     }
   },
-  mounted: function() {
+  computed: {
+    allSelected: function() {
+      return this.articles.length > 0 && this.selectedIds.length === this.articles.length
+    },
+    someSelected: function() {
+      return this.selectedIds.length > 0 && this.selectedIds.length < this.articles.length
+    }
+  },
     this.loadCategories()
     this.loadArticles()
   },
@@ -227,6 +258,7 @@ export default {
     loadArticles: function() {
       var self = this
       self.loading = true
+      self.selectedIds = []
       var params = {
         pageNum: self.pagination.page,
         pageSize: self.pagination.pageSize
@@ -292,6 +324,47 @@ export default {
       request({ method: 'put', url: '/api/admin/articles/' + article.id + '/top' })
         .then(function() { self.loadArticles() })
         .catch(function(err) { console.error('置顶操作失败:', err) })
+    },
+    // 批量选择
+    toggleSelect: function(id) {
+      var idx = this.selectedIds.indexOf(id)
+      if (idx >= 0) this.selectedIds.splice(idx, 1)
+      else this.selectedIds.push(id)
+    },
+    toggleSelectAll: function(val) {
+      if (val) this.selectedIds = this.articles.map(function(a) { return a.id })
+      else this.selectedIds = []
+    },
+    // 批量发布
+    batchPublish: function() {
+      var self = this
+      self.batchLoading = true
+      request({ method: 'put', url: '/api/admin/articles/batch-status', data: { ids: self.selectedIds, status: 1 } })
+        .then(function() { self.selectedIds = []; self.loadArticles() })
+        .catch(function() {})
+        .finally(function() { self.batchLoading = false })
+    },
+    // 批量转草稿
+    batchDraft: function() {
+      var self = this
+      self.batchLoading = true
+      request({ method: 'put', url: '/api/admin/articles/batch-status', data: { ids: self.selectedIds, status: 0 } })
+        .then(function() { self.selectedIds = []; self.loadArticles() })
+        .catch(function() {})
+        .finally(function() { self.batchLoading = false })
+    },
+    // 批量删除确认
+    batchDeleteConfirm: function() {
+      this.batchDeleteDialog = true
+    },
+    // 执行批量删除
+    doBatchDelete: function() {
+      var self = this
+      self.batchLoading = true
+      request({ method: 'delete', url: '/api/admin/articles/batch', data: { ids: self.selectedIds } })
+        .then(function() { self.batchDeleteDialog = false; self.selectedIds = []; self.loadArticles() })
+        .catch(function() {})
+        .finally(function() { self.batchLoading = false })
     },
     // 触发导入文件选择
     triggerImport: function() {

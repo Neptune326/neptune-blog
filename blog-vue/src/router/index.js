@@ -1,6 +1,7 @@
 // 路由配置
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../store/auth.js'
+import { isMockMode } from '../api/request.js'
 
 // 前台视图
 import LandingView from '../views/frontend/LandingView.vue'
@@ -32,6 +33,7 @@ import AboutEditView from '../views/admin/AboutEditView.vue'
 import MessageAdminView from '../views/admin/MessageAdminView.vue'
 import AdminUserView from '../views/admin/AdminUserView.vue'
 import SeriesView from '../views/admin/SeriesView.vue'
+import FriendLinkView from '../views/admin/FriendLinkView.vue'
 
 var routes = [
   // ===== 前台路由（无需登录）=====
@@ -154,6 +156,11 @@ var routes = [
         meta: { requiresAuth: true }
       },
       {
+        path: 'friend-links',
+        component: FriendLinkView,
+        meta: { requiresAuth: true }
+      },
+      {
         path: 'logs/operation',
         component: OperationLogView,
         meta: { requiresAuth: true }
@@ -176,6 +183,10 @@ var router = createRouter({
 router.beforeEach(function(to, from, next) {
   if (to.meta.requiresAuth) {
     var authStore = useAuthStore()
+    // mock 模式下（后端未启动），自动注入 mock token，无需登录
+    if (isMockMode() && !authStore.isLoggedIn) {
+      authStore.setAuth('mock-token-auto')
+    }
     if (!authStore.isLoggedIn) {
       // 未登录，跳转到登录页
       next('/admin/login')

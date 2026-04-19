@@ -58,6 +58,48 @@
               </v-btn>
             </div>
           </v-card>
+
+          <!-- 搜索历史 -->
+          <div v-if="!searched && searchHistory.length > 0" class="mt-4">
+            <div class="d-flex align-center justify-space-between mb-2">
+              <span style="font-size: 13px; color: #80868b; font-weight: 500;">搜索历史</span>
+              <v-btn size="x-small" variant="text" color="grey" @click="clearHistory">清除</v-btn>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+              <v-chip
+                v-for="h in searchHistory"
+                :key="h"
+                size="small"
+                variant="outlined"
+                color="primary"
+                closable
+                @click="useHistory(h)"
+                @click:close="removeHistory(h)"
+                style="cursor: pointer;"
+              >
+                {{ h }}
+              </v-chip>
+            </div>
+          </div>
+
+          <!-- 热门搜索 -->
+          <div v-if="!searched" class="mt-4">
+            <div class="mb-2" style="font-size: 13px; color: #80868b; font-weight: 500;">热门搜索</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+              <v-chip
+                v-for="hot in hotKeywords"
+                :key="hot"
+                size="small"
+                variant="tonal"
+                color="primary"
+                prepend-icon="mdi-fire"
+                @click="useHistory(hot)"
+                style="cursor: pointer;"
+              >
+                {{ hot }}
+              </v-chip>
+            </div>
+          </div>
         </div>
 
         <!-- 搜索结果提示 -->
@@ -127,10 +169,18 @@ export default {
       pageNum: 1,
       pageSize: 10,
       loading: false,
-      searched: false
+      searched: false,
+      searchHistory: [],
+      hotKeywords: ['Vue 3', 'Spring Boot', 'MySQL', 'Docker', 'TypeScript', 'Git']
     }
   },
   mounted: function() {
+    // 读取搜索历史
+    try {
+      var h = localStorage.getItem('blog_search_history')
+      this.searchHistory = h ? JSON.parse(h) : []
+    } catch (e) { this.searchHistory = [] }
+
     var q = this.$route.query.keyword
     if (q) {
       this.keyword = q
@@ -143,7 +193,26 @@ export default {
       if (!self.keyword || !self.keyword.trim()) return
       self.pageNum = 1
       self.lastKeyword = self.keyword.trim()
+      // 保存搜索历史
+      var kw = self.lastKeyword
+      var history = self.searchHistory.filter(function(h) { return h !== kw })
+      history.unshift(kw)
+      if (history.length > 10) history = history.slice(0, 10)
+      self.searchHistory = history
+      try { localStorage.setItem('blog_search_history', JSON.stringify(history)) } catch (e) {}
       self.loadResults()
+    },
+    useHistory: function(kw) {
+      this.keyword = kw
+      this.doSearch()
+    },
+    removeHistory: function(kw) {
+      this.searchHistory = this.searchHistory.filter(function(h) { return h !== kw })
+      try { localStorage.setItem('blog_search_history', JSON.stringify(this.searchHistory)) } catch (e) {}
+    },
+    clearHistory: function() {
+      this.searchHistory = []
+      try { localStorage.removeItem('blog_search_history') } catch (e) {}
     },
     loadResults: function() {
       var self = this

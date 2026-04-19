@@ -15,9 +15,9 @@
       cover
       class="rounded-t-lg"
     >
-      <!-- 分类标签浮层 -->
+      <!-- 分类标签 + 置顶标识 浮层 -->
       <template #default>
-        <div class="pa-3">
+        <div class="pa-3 d-flex align-center justify-space-between">
           <v-chip
             v-if="article.categoryName"
             size="small"
@@ -26,15 +26,27 @@
           >
             {{ article.categoryName }}
           </v-chip>
+          <v-chip
+            v-if="article.isTop === 1"
+            size="small"
+            color="warning"
+            style="background: rgba(242,153,0,0.9); backdrop-filter: blur(4px);"
+            prepend-icon="mdi-pin"
+          >
+            置顶
+          </v-chip>
         </div>
       </template>
     </v-img>
 
     <v-card-text class="pa-5">
-      <!-- 无封面时显示分类 -->
-      <div v-if="!article.coverUrl && article.categoryName" class="mb-2">
-        <v-chip size="small" color="primary" variant="tonal">
+      <!-- 无封面时显示分类 + 置顶 -->
+      <div v-if="!article.coverUrl" class="mb-2 d-flex align-center justify-space-between">
+        <v-chip v-if="article.categoryName" size="small" color="primary" variant="tonal">
           {{ article.categoryName }}
+        </v-chip>
+        <v-chip v-if="article.isTop === 1" size="small" color="warning" variant="tonal" prepend-icon="mdi-pin">
+          置顶
         </v-chip>
       </div>
 
@@ -55,17 +67,29 @@
         {{ article.summary }}
       </p>
 
-      <!-- 底部：时间 + 阅读数 + 标签 -->
+      <!-- 底部：时间 + 阅读数 + 评论数 + 字数 + 标签 -->
       <div class="d-flex align-center justify-space-between flex-wrap" style="gap: 8px;">
-        <!-- 左侧：时间和阅读数 -->
-        <div class="d-flex align-center" style="gap: 12px; color: #80868b; font-size: 13px;">
-          <span class="d-flex align-center" style="gap: 4px;">
-            <v-icon size="14" color="grey">mdi-calendar-outline</v-icon>
+        <!-- 左侧：元信息 -->
+        <div class="d-flex align-center flex-wrap" style="gap: 10px; color: #80868b; font-size: 12px;">
+          <span class="d-flex align-center" style="gap: 3px;">
+            <v-icon size="13" color="grey">mdi-calendar-outline</v-icon>
             {{ formatDate(article.createTime) }}
           </span>
-          <span v-if="article.viewCount !== undefined" class="d-flex align-center" style="gap: 4px;">
-            <v-icon size="14" color="grey">mdi-eye-outline</v-icon>
+          <span v-if="article.viewCount !== undefined" class="d-flex align-center" style="gap: 3px;">
+            <v-icon size="13" color="grey">mdi-eye-outline</v-icon>
             {{ article.viewCount }}
+          </span>
+          <span v-if="article.commentCount !== undefined" class="d-flex align-center" style="gap: 3px;">
+            <v-icon size="13" color="grey">mdi-comment-outline</v-icon>
+            {{ article.commentCount }}
+          </span>
+          <span v-if="wordCount > 0" class="d-flex align-center" style="gap: 3px;">
+            <v-icon size="13" color="grey">mdi-text</v-icon>
+            {{ wordCount }} 字
+          </span>
+          <span v-if="readingTime > 0" class="d-flex align-center" style="gap: 3px;">
+            <v-icon size="13" color="grey">mdi-clock-outline</v-icon>
+            {{ readingTime }} 分钟
           </span>
         </div>
 
@@ -94,6 +118,16 @@ export default {
   name: 'ArticleCard',
   props: {
     article: { type: Object, required: true }
+  },
+  computed: {
+    wordCount: function() {
+      var content = this.article.summary || ''
+      return content.replace(/\s/g, '').length
+    },
+    readingTime: function() {
+      var wc = this.wordCount
+      return wc > 0 ? Math.max(1, Math.ceil(wc / 300)) : 0
+    }
   },
   setup: function(props) {
     var router = useRouter()

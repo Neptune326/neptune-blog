@@ -109,6 +109,7 @@
 import { login } from '../../api/auth.js'
 import { useAuthStore } from '../../store/auth.js'
 import { useRouter } from 'vue-router'
+import { isMockMode } from '../../api/request.js'
 
 export default {
   name: 'LoginView',
@@ -123,6 +124,14 @@ export default {
       loading: false,
       errorMsg: '',
       showPassword: false
+    }
+  },
+  mounted: function() {
+    // mock 模式下（后端未启动），自动登录直接进入后台
+    if (isMockMode()) {
+      var self = this
+      self.authStore.setAuth('mock-token-auto')
+      self.router.replace('/admin/dashboard')
     }
   },
   methods: {

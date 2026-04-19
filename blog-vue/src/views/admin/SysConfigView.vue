@@ -129,7 +129,82 @@
                 false-value="false"
               />
             </div>
+
+            <!-- 动漫主题首页开关 -->
+            <div class="d-flex align-center justify-space-between" style="padding: 12px 16px; background: #f8f9fa; border-radius: 10px;">
+              <div>
+                <div style="font-size: 14px; font-weight: 500; color: #202124;">动漫主题首页</div>
+                <div style="font-size: 12px; color: #80868b; margin-top: 2px;">开启后首页切换为暗色动漫风格，背景图从画廊轮播</div>
+              </div>
+              <v-switch
+                v-model="form.anime_theme_enabled"
+                color="deep-purple"
+                hide-details
+                true-value="true"
+                false-value="false"
+              />
+            </div>
           </div>
+        </div>
+      </v-card>
+
+      <!-- 画廊管理 -->
+      <v-card elevation="0" rounded="xl" style="border: 1px solid #e8eaed; margin-bottom: 20px;">
+        <div class="pa-5">
+          <div class="d-flex align-center mb-1" style="gap: 8px;">
+            <v-icon color="deep-purple" size="20">mdi-image-multiple-outline</v-icon>
+            <span style="font-size: 15px; font-weight: 600; color: #202124;">首页背景画廊</span>
+          </div>
+          <p style="font-size: 12px; color: #80868b; margin: 0 0 16px;">上传图片作为动漫主题首页的背景轮播图，建议尺寸 1920×1080</p>
+
+          <!-- 图片网格 -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 16px;">
+            <!-- 已有图片 -->
+            <div
+              v-for="(img, idx) in galleryImages"
+              :key="idx"
+              style="position: relative; border-radius: 8px; overflow: hidden; aspect-ratio: 16/9; background: #f1f3f4;"
+            >
+              <img :src="img" style="width: 100%; height: 100%; object-fit: cover;" />
+              <button
+                @click="removeGalleryImage(idx)"
+                style="
+                  position: absolute; top: 4px; right: 4px;
+                  width: 22px; height: 22px;
+                  background: rgba(0,0,0,0.55);
+                  border: none; border-radius: 50%;
+                  cursor: pointer;
+                  display: flex; align-items: center; justify-content: center;
+                  color: white;
+                "
+              >
+                <v-icon size="13" color="white">mdi-close</v-icon>
+              </button>
+            </div>
+
+            <!-- 上传按钮 -->
+            <label
+              style="
+                aspect-ratio: 16/9;
+                border: 2px dashed #e8eaed;
+                border-radius: 8px;
+                display: flex; flex-direction: column; align-items: center; justify-content: center;
+                cursor: pointer;
+                transition: all 0.2s;
+                background: #fafafa;
+                gap: 4px;
+              "
+              class="upload-zone"
+            >
+              <input type="file" accept="image/*" multiple style="display: none;" @change="handleGalleryUpload" :disabled="uploading" />
+              <v-icon :color="uploading ? 'grey' : 'primary'" size="22">{{ uploading ? 'mdi-loading' : 'mdi-plus' }}</v-icon>
+              <span style="font-size: 11px; color: #9aa0a6;">{{ uploading ? '上传中...' : '添加图片' }}</span>
+            </label>
+          </div>
+
+          <p style="font-size: 11px; color: #bdc1c6; margin: 0;">
+            共 {{ galleryImages.length }} 张图片。未上传图片时将使用默认背景图。
+          </p>
         </div>
       </v-card>
 
@@ -156,6 +231,7 @@
 
 <script>
 import { getSysConfig, updateSysConfig } from '../../api/sysConfig.js'
+import { uploadImage } from '../../api/upload.js'
 
 export default {
   name: 'SysConfigView',
@@ -163,7 +239,9 @@ export default {
     return {
       loading: false,
       saving: false,
+      uploading: false,
       snackbar: false,
+      galleryImages: [],
       form: {
         blog_name: '',
         blog_author: '',
@@ -171,7 +249,9 @@ export default {
         login_max_fail_count: '5',
         login_lock_duration: '10',
         live2d_enabled: 'true',
-        comment_audit_enabled: 'true'
+        comment_audit_enabled: 'true',
+        anime_theme_enabled: 'false',
+        gallery_images: '[]'
       }
     }
   },
@@ -190,6 +270,13 @@ export default {
                 self.form[key] = data[key]
               }
             })
+            // 解析画廊图片
+            try {
+              var imgs = JSON.parse(self.form.gallery_images || '[]')
+              self.galleryImages = Array.isArray(imgs) ? imgs : []
+            } catch (e) {
+              self.galleryImages = []
+            }
           }
         })
         .catch(function(err) {
@@ -201,6 +288,8 @@ export default {
     },
     saveConfig: function() {
       var self = this
+      // 将画廊图片同步到 form
+      self.form.gallery_images = JSON.stringify(self.galleryImages)
       self.saving = true
       updateSysConfig(self.form)
         .then(function() {
@@ -212,7 +301,38 @@ export default {
         .finally(function() {
           self.saving = false
         })
+    },
+    handleGalleryUpload: function(event) {
+      var self = this
+      var files = Array.from(event.target.files || [])
+      if (!files.length) return
+      self.uploading = true
+      // 逐个上传
+      var promises = files.map(function(file) {
+        return uploadImage(file).then(function(url) {
+          self.galleryImages.push(url)
+        })
+      })
+      Promise.all(promises)
+        .catch(function(err) {
+          console.error('上传图片失败:', err)
+        })
+        .finally(function() {
+          self.uploading = false
+          // 清空 input，允许重复选同一文件
+          event.target.value = ''
+        })
+    },
+    removeGalleryImage: function(idx) {
+      this.galleryImages.splice(idx, 1)
     }
   }
 }
 </script>
+
+<style scoped>
+.upload-zone:hover {
+  border-color: #1a73e8 !important;
+  background: #f0f7ff !important;
+}
+</style>
