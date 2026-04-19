@@ -68,11 +68,22 @@ public class SysConfigServiceImpl implements SysConfigService {
                     new LambdaQueryWrapper<SysConfig>().eq(SysConfig::getConfigKey, entry.getKey())
             );
             if (config != null) {
+                // 已存在：更新
                 config.setConfigValue(entry.getValue());
                 config.setUpdateTime(LocalDateTime.now());
                 sysConfigMapper.updateById(config);
-                log.info("系统配置更新：{} = {}", entry.getKey(), entry.getValue());
+            } else {
+                // 不存在：插入（前端新增的配置项）
+                SysConfig newConfig = new SysConfig();
+                newConfig.setConfigKey(entry.getKey());
+                newConfig.setConfigValue(entry.getValue());
+                newConfig.setCreateTime(LocalDateTime.now());
+                newConfig.setUpdateTime(LocalDateTime.now());
+                sysConfigMapper.insert(newConfig);
             }
+            log.info("系统配置更新：{} = {}", entry.getKey(),
+                    entry.getValue() != null && entry.getValue().length() > 100
+                            ? entry.getValue().substring(0, 100) + "..." : entry.getValue());
         }
     }
 }
