@@ -45,6 +45,7 @@
           </tr>
         </tbody>
       </v-table>
+      <TablePagination :total="allAdmins.length" :page="page" :page-size="pageSize" @change="page = $event" />
     </v-card>
 
     <!-- 新建管理员弹窗 -->
@@ -100,13 +101,17 @@
 
 <script>
 import request from '../../api/request.js'
+import TablePagination from '../../components/admin/TablePagination.vue'
 
 export default {
   name: 'AdminUserView',
+  components: { TablePagination },
   data: function() {
     return {
       loading: false,
-      admins: [],
+      allAdmins: [],
+      page: 1,
+      pageSize: 10,
       createDialog: false,
       createLoading: false,
       createError: '',
@@ -121,12 +126,18 @@ export default {
     }
   },
   mounted: function() { this.loadAdmins() },
+  computed: {
+    admins: function() {
+      var start = (this.page - 1) * this.pageSize
+      return this.allAdmins.slice(start, start + this.pageSize)
+    }
+  },
   methods: {
     loadAdmins: function() {
       var self = this
       self.loading = true
       request({ method: 'get', url: '/api/admin/users' })
-        .then(function(data) { self.admins = data || [] })
+        .then(function(data) { self.allAdmins = data || [] })
         .catch(function(err) {
           if (err.message && err.message.includes('403')) {
             self.$toast.warning('仅超级管理员可访问此页面')

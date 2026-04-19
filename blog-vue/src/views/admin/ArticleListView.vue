@@ -168,9 +168,12 @@
       </v-table>
 
       <!-- 分页 -->
-      <div class="d-flex justify-center pa-4">
-        <v-pagination v-model="pagination.page" :length="pagination.totalPages" :total-visible="7" @update:model-value="loadArticles" />
-      </div>
+      <TablePagination
+        :total="pagination.total"
+        :page="pagination.page"
+        :page-size="pagination.pageSize"
+        @change="pagination.page = $event; loadArticles()"
+      />
     </v-card>
 
     <!-- 批量删除确认 -->
@@ -208,11 +211,13 @@ import { adminGetArticles, deleteArticle } from '../../api/article.js'
 import { adminGetCategories } from '../../api/category.js'
 import request from '../../api/request.js'
 import { useRouter } from 'vue-router'
+import TablePagination from '../../components/admin/TablePagination.vue'
 
 var DRAFT_KEY = 'article_new_draft'
 
 export default {
   name: 'ArticleListView',
+  components: { TablePagination },
   setup: function() {
     var router = useRouter()
     return { router }
@@ -240,7 +245,8 @@ export default {
       pagination: {
         page: 1,
         pageSize: 10,
-        totalPages: 1
+        totalPages: 1,
+        total: 0
       },
       // 删除相关
       deleteDialog: false,
@@ -318,6 +324,7 @@ export default {
       adminGetArticles(params)
         .then(function(data) {
           self.articles = data.list || data.records || []
+          self.pagination.total = data.total || 0
           self.pagination.totalPages = data.totalPages || Math.ceil((data.total || 0) / self.pagination.pageSize) || 1
         })
         .catch(function(err) {

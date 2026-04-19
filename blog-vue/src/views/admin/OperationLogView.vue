@@ -102,14 +102,12 @@
       </v-table>
 
       <!-- 分页 -->
-      <div class="d-flex justify-center pa-4">
-        <v-pagination
-          v-model="pagination.page"
-          :length="pagination.totalPages"
-          :total-visible="7"
-          @update:model-value="loadLogs"
-        />
-      </div>
+      <TablePagination
+        :total="pagination.total"
+        :page="pagination.page"
+        :page-size="pagination.pageSize"
+        @change="pagination.page = $event; loadLogs()"
+      />
     </v-card>
 
     <!-- 清空确认 -->
@@ -130,9 +128,11 @@
 
 <script>
 import { getOperationLogs, clearOperationLogs } from '../../api/sysConfig.js'
+import TablePagination from '../../components/admin/TablePagination.vue'
 
 export default {
   name: 'OperationLogView',
+  components: { TablePagination },
   data: function() {
     return {
       loading: false,
@@ -140,7 +140,7 @@ export default {
       clearDialog: false,
       logs: [],
       filters: { operator: '', module: '' },
-      pagination: { page: 1, pageSize: 20, totalPages: 1 }
+      pagination: { page: 1, pageSize: 10, totalPages: 1, total: 0 }
     }
   },
   mounted: function() {
@@ -160,6 +160,7 @@ export default {
       getOperationLogs(params)
         .then(function(data) {
           self.logs = data.list || []
+          self.pagination.total = data.total || 0
           self.pagination.totalPages = data.pages || 1
         })
         .catch(function(err) { console.error('加载操作日志失败:', err) })

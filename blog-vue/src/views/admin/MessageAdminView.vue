@@ -63,9 +63,12 @@
           </tr>
         </tbody>
       </v-table>
-      <div class="d-flex justify-center pa-4">
-        <v-pagination v-model="pagination.page" :length="pagination.totalPages" :total-visible="7" @update:model-value="loadMessages" />
-      </div>
+      <TablePagination
+        :total="pagination.total"
+        :page="pagination.page"
+        :page-size="pagination.pageSize"
+        @change="pagination.page = $event; loadMessages()"
+      />
     </v-card>
 
     <!-- 删除确认对话框 -->
@@ -85,9 +88,11 @@
 
 <script>
 import request from '../../api/request.js'
+import TablePagination from '../../components/admin/TablePagination.vue'
 
 export default {
   name: 'MessageAdminView',
+  components: { TablePagination },
   data: function() {
     return {
       loading: false,
@@ -99,7 +104,7 @@ export default {
         { label: '已通过', value: 1 },
         { label: '已拒绝', value: 2 }
       ],
-      pagination: { page: 1, pageSize: 20, totalPages: 1 },
+      pagination: { page: 1, pageSize: 10, totalPages: 1, total: 0 },
       actionLoading: '',
       deleteDialog: false,
       deleteLoading: false,
@@ -116,6 +121,7 @@ export default {
       request({ method: 'get', url: '/api/admin/messages', params: params })
         .then(function(data) {
           self.messages = data.list || []
+          self.pagination.total = data.total || 0
           self.pagination.totalPages = data.pages || 1
         })
         .catch(function() {})

@@ -87,14 +87,12 @@
       </v-table>
 
       <!-- 分页 -->
-      <div class="d-flex justify-center pa-4">
-        <v-pagination
-          v-model="pagination.page"
-          :length="pagination.totalPages"
-          :total-visible="7"
-          @update:model-value="loadComments"
-        />
-      </div>
+      <TablePagination
+        :total="pagination.total"
+        :page="pagination.page"
+        :page-size="pagination.pageSize"
+        @change="pagination.page = $event; loadComments()"
+      />
     </v-card>
 
     <!-- 删除确认对话框 -->
@@ -119,9 +117,11 @@ import {
   rejectComment,
   deleteComment
 } from '../../api/comment.js'
+import TablePagination from '../../components/admin/TablePagination.vue'
 
 export default {
   name: 'CommentView',
+  components: { TablePagination },
   data: function() {
     return {
       loading: false,
@@ -138,8 +138,9 @@ export default {
       // 分页信息
       pagination: {
         page: 1,
-        pageSize: 15,
-        totalPages: 1
+        pageSize: 10,
+        totalPages: 1,
+        total: 0
       },
       // 操作 loading 标识（格式：id_action）
       actionLoading: '',
@@ -168,6 +169,7 @@ export default {
       adminGetComments(params)
         .then(function(data) {
           self.comments = data.list || data.records || []
+          self.pagination.total = data.total || 0
           self.pagination.totalPages = data.totalPages || Math.ceil((data.total || 0) / self.pagination.pageSize) || 1
         })
         .catch(function(err) {
