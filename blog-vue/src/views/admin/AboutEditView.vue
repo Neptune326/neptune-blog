@@ -66,7 +66,7 @@ export default {
       var self = this
       self.saving = true
       updateSysConfig({ about_content: self.content })
-        .then(function() {})
+        .then(function() { self.$toast.success('保存成功') })
         .catch(function(err) { console.error('保存失败:', err) })
         .finally(function() { self.saving = false })
     }

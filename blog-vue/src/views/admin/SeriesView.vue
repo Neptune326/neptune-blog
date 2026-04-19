@@ -129,7 +129,7 @@ export default {
       promise
         .then(function() {
           self.formDialog = false
-          // handled by interceptor
+          self.$toast.success('保存成功')
           self.loadSeries()
         })
         .catch(function(err) {
@@ -142,7 +142,7 @@ export default {
       if (!confirm('确认删除系列「' + item.name + '」？关联文章不会被删除。')) return
       request({ method: 'delete', url: '/api/admin/series/' + item.id })
         .then(function() {
-          // handled by interceptor
+          self.$toast.success('删除成功')
           self.loadSeries()
         })
         .catch(function(err) {

@@ -107,16 +107,19 @@ export default {
     resetFilters: function() { this.filters.status = null; this.pagination.page = 1; this.loadMessages() },
     approve: function(id) {
       var self = this
-      request({ method: 'put', url: '/api/admin/messages/' + id + '/approve' }).then(function() { self.loadMessages() })
+      request({ method: 'put', url: '/api/admin/messages/' + id + '/approve' })
+        .then(function() { self.$toast.success('审核通过'); self.loadMessages() })
     },
     reject: function(id) {
       var self = this
-      request({ method: 'put', url: '/api/admin/messages/' + id + '/reject' }).then(function() { self.loadMessages() })
+      request({ method: 'put', url: '/api/admin/messages/' + id + '/reject' })
+        .then(function() { self.$toast.success('已拒绝'); self.loadMessages() })
     },
     deleteMsg: function(id) {
       var self = this
       if (!confirm('确认删除？')) return
-      request({ method: 'delete', url: '/api/admin/messages/' + id }).then(function() { self.loadMessages() })
+      request({ method: 'delete', url: '/api/admin/messages/' + id })
+        .then(function() { self.$toast.success('留言已删除'); self.loadMessages() })
     },
     formatDate: function(t) { return t ? String(t).substring(0, 10) : '-' }
   }

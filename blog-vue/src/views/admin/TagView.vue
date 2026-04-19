@@ -140,12 +140,14 @@ export default {
       var self = this
       if (!self.formData.name) return
       self.formLoading = true
-      var promise = self.editTarget
+      var isEdit = !!self.editTarget
+      var promise = isEdit
         ? adminUpdateTag(self.editTarget.id, self.formData)
         : adminCreateTag(self.formData)
       promise
         .then(function() {
           self.formDialog = false
+          self.$toast.success(isEdit ? '标签已更新' : '标签创建成功')
           self.loadTags()
         })
         .catch(function(err) {
@@ -169,6 +171,7 @@ export default {
         .then(function() {
           self.deleteDialog = false
           self.deleteTarget = null
+          self.$toast.success('标签已删除')
           self.loadTags()
         })
         .catch(function(err) {

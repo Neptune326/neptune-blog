@@ -147,12 +147,14 @@ export default {
       var self = this
       if (!self.formData.name) return
       self.formLoading = true
-      var promise = self.editTarget
+      var isEdit = !!self.editTarget
+      var promise = isEdit
         ? adminUpdateCategory(self.editTarget.id, self.formData)
         : adminCreateCategory(self.formData)
       promise
         .then(function() {
           self.formDialog = false
+          self.$toast.success(isEdit ? '分类已更新' : '分类创建成功')
           self.loadCategories()
         })
         .catch(function(err) {
@@ -176,6 +178,7 @@ export default {
         .then(function() {
           self.deleteDialog = false
           self.deleteTarget = null
+          self.$toast.success('分类已删除')
           self.loadCategories()
         })
         .catch(function(err) {

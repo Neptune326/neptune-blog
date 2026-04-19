@@ -316,6 +316,7 @@ export default {
         .then(function() {
           // 发布成功后清除草稿
           try { localStorage.removeItem(DRAFT_KEY) } catch (e) {}
+          self.$toast.success(self.isEdit ? '文章已更新' : '文章发布成功')
           self.router.push('/admin/articles')
         })
         .catch(function(err) {

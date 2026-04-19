@@ -370,7 +370,10 @@ export default {
     toggleTop: function(article) {
       var self = this
       request({ method: 'put', url: '/api/admin/articles/' + article.id + '/top' })
-        .then(function() { self.loadArticles() })
+        .then(function() {
+          self.$toast.success(article.isTop === 1 ? '已取消置顶' : '置顶成功')
+          self.loadArticles()
+        })
         .catch(function(err) { console.error('置顶操作失败:', err) })
     },
     // 批量选择
@@ -388,7 +391,7 @@ export default {
       var self = this
       self.batchLoading = true
       request({ method: 'put', url: '/api/admin/articles/batch-status', data: { ids: self.selectedIds, status: 1 } })
-        .then(function() { self.selectedIds = []; self.loadArticles() })
+        .then(function() { self.$toast.success('批量发布成功'); self.selectedIds = []; self.loadArticles() })
         .catch(function() {})
         .finally(function() { self.batchLoading = false })
     },
@@ -397,7 +400,7 @@ export default {
       var self = this
       self.batchLoading = true
       request({ method: 'put', url: '/api/admin/articles/batch-status', data: { ids: self.selectedIds, status: 0 } })
-        .then(function() { self.selectedIds = []; self.loadArticles() })
+        .then(function() { self.$toast.success('已转为草稿'); self.selectedIds = []; self.loadArticles() })
         .catch(function() {})
         .finally(function() { self.batchLoading = false })
     },
@@ -410,7 +413,7 @@ export default {
       var self = this
       self.batchLoading = true
       request({ method: 'delete', url: '/api/admin/articles/batch', data: { ids: self.selectedIds } })
-        .then(function() { self.batchDeleteDialog = false; self.selectedIds = []; self.loadArticles() })
+        .then(function() { self.$toast.success('批量删除成功'); self.batchDeleteDialog = false; self.selectedIds = []; self.loadArticles() })
         .catch(function() {})
         .finally(function() { self.batchLoading = false })
     },

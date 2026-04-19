@@ -183,14 +183,11 @@ export default {
       self.actionLoading = comment.id + '_approve'
       approveComment(comment.id)
         .then(function() {
+          self.$toast.success('审核通过')
           self.loadComments()
         })
-        .catch(function(err) {
-          console.error('审核通过失败:', err)
-        })
-        .finally(function() {
-          self.actionLoading = ''
-        })
+        .catch(function(err) { console.error('审核通过失败:', err) })
+        .finally(function() { self.actionLoading = '' })
     },
     // 拒绝评论
     handleReject: function(comment) {
@@ -198,14 +195,11 @@ export default {
       self.actionLoading = comment.id + '_reject'
       rejectComment(comment.id)
         .then(function() {
+          self.$toast.success('已拒绝')
           self.loadComments()
         })
-        .catch(function(err) {
-          console.error('拒绝评论失败:', err)
-        })
-        .finally(function() {
-          self.actionLoading = ''
-        })
+        .catch(function(err) { console.error('拒绝评论失败:', err) })
+        .finally(function() { self.actionLoading = '' })
     },
     // 弹出删除确认框
     confirmDelete: function(comment) {
@@ -221,6 +215,7 @@ export default {
         .then(function() {
           self.deleteDialog = false
           self.deleteTarget = null
+          self.$toast.success('评论已删除')
           self.loadComments()
         })
         .catch(function(err) {
