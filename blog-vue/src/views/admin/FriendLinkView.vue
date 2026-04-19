@@ -133,7 +133,7 @@ export default {
     save: function() {
       var self = this
       if (!self.form.name || !self.form.url) {
-        self.\$toast.error('名称和链接地址不能为空')
+        self.$toast.error('名称和链接地址不能为空')
         return
       }
       self.saving = true
@@ -142,7 +142,7 @@ export default {
         : request({ method: 'post', url: '/api/admin/friend-links', data: self.form })
       req.then(function() {
           self.dialog = false
-          self.\$toast.success('保存成功')
+          self.$toast.success('保存成功')
           self.loadLinks()
         })
         .catch(function() { self.$toast.error('保存失败') })
@@ -158,7 +158,7 @@ export default {
       request({ method: 'delete', url: '/api/admin/friend-links/' + self.deleteTarget.id })
         .then(function() {
           self.deleteDialog = false
-          self.\$toast.success('删除成功')
+          self.$toast.success('删除成功')
           self.loadLinks()
         })
         .catch(function() { self.$toast.error('删除失败') })
