@@ -239,6 +239,7 @@ export default {
       return this.selectedIds.length > 0 && this.selectedIds.length < this.articles.length
     }
   },
+  mounted: function() {
     this.loadCategories()
     this.loadArticles()
   },
