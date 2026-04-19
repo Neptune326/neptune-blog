@@ -365,6 +365,9 @@ export default {
         if (data.status !== undefined) this.form.status = data.status
         this.draftSavedAt = data.savedAt || ''
         this.draftRestored = true
+        // 恢复后立即删除，避免下次点新建还显示旧内容
+        // 后续编辑会重新触发 watch 保存新草稿
+        localStorage.removeItem(DRAFT_KEY)
       } catch (e) {}
     },
     clearDraftBanner: function() {
