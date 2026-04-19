@@ -66,7 +66,7 @@
           rounded="lg"
           class="mb-1"
           style="min-height: 44px;"
-          active-color="primary"
+          color="primary"
         >
           <template #prepend>
             <v-icon :size="20" style="margin-right: 12px;">{{ item.icon }}</v-icon>

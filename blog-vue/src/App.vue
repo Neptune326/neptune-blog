@@ -20,9 +20,9 @@
       "
     >
       <span>⚡ Mock 模式</span>
-      <span style="opacity: 0.85; font-weight: 400;">后端服务未启动，当前展示模拟数据。启动后端后刷新页面即可切换到真实数据。</span>
+      <span style="opacity: 0.85; font-weight: 400;">后端服务未启动，当前展示模拟数据。</span>
       <button
-        @click="dismissBanner"
+        @click="retryConnect"
         style="
           background: rgba(255,255,255,0.25);
           border: none;
@@ -31,7 +31,21 @@
           padding: 2px 8px;
           border-radius: 4px;
           font-size: 12px;
-          margin-left: 8px;
+          margin-left: 4px;
+        "
+      >
+        重新连接
+      </button>
+      <button
+        @click="dismissBanner"
+        style="
+          background: rgba(255,255,255,0.15);
+          border: none;
+          color: white;
+          cursor: pointer;
+          padding: 2px 8px;
+          border-radius: 4px;
+          font-size: 12px;
         "
       >
         知道了
@@ -142,6 +156,19 @@ export default {
   methods: {
     dismissBanner: function() {
       this.bannerDismissed = true
+    },
+    // 重新检测后端，后端已启动则刷新页面
+    retryConnect: function() {
+      var self = this
+      import('./api/request.js').then(function(m) {
+        m.detectBackend().then(function(ok) {
+          if (ok) {
+            window.location.reload()
+          } else {
+            self.$toast && self.$toast.warning('后端仍未启动，请稍后再试')
+          }
+        })
+      })
     },
     loadEffectConfig: function() {
       var self = this
