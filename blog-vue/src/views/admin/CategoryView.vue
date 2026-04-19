@@ -40,6 +40,7 @@
           </tr>
         </tbody>
       </v-table>
+      <TablePagination :total="allCategories.length" :page="page" :page-size="pageSize" @change="page = $event" />
     </v-card>
 
     <!-- 新建/编辑弹窗 -->
@@ -93,56 +94,54 @@ import {
   adminUpdateCategory,
   adminDeleteCategory
 } from '../../api/category.js'
+import TablePagination from '../../components/admin/TablePagination.vue'
 
 export default {
   name: 'AdminCategoryView',
+  components: { TablePagination },
   data: function() {
     return {
       loading: false,
-      categories: [],
-      // 表单弹窗
+      allCategories: [],
+      page: 1,
+      pageSize: 10,
       formDialog: false,
       formLoading: false,
       editTarget: null,
       formData: { name: '', description: '' },
-      // 删除弹窗
       deleteDialog: false,
       deleteLoading: false,
       deleteTarget: null
+    }
+  },
+  computed: {
+    categories: function() {
+      var start = (this.page - 1) * this.pageSize
+      return this.allCategories.slice(start, start + this.pageSize)
     }
   },
   mounted: function() {
     this.loadCategories()
   },
   methods: {
-    // 加载分类列表
     loadCategories: function() {
       var self = this
       self.loading = true
       adminGetCategories()
-        .then(function(data) {
-          self.categories = data || []
-        })
-        .catch(function(err) {
-          console.error('加载分类失败:', err)
-        })
-        .finally(function() {
-          self.loading = false
-        })
+        .then(function(data) { self.allCategories = data || [] })
+        .catch(function(err) { console.error('加载分类失败:', err) })
+        .finally(function() { self.loading = false })
     },
-    // 打开新建弹窗
     openCreateDialog: function() {
       this.editTarget = null
       this.formData = { name: '', description: '' }
       this.formDialog = true
     },
-    // 打开编辑弹窗，回填数据
     openEditDialog: function(cat) {
       this.editTarget = cat
       this.formData = { name: cat.name, description: cat.description || '' }
       this.formDialog = true
     },
-    // 提交新建或编辑
     submitForm: function() {
       var self = this
       if (!self.formData.name) return
@@ -157,19 +156,13 @@ export default {
           self.$toast.success(isEdit ? '分类已更新' : '分类创建成功')
           self.loadCategories()
         })
-        .catch(function(err) {
-          console.error('保存分类失败:', err)
-        })
-        .finally(function() {
-          self.formLoading = false
-        })
+        .catch(function(err) { console.error('保存分类失败:', err) })
+        .finally(function() { self.formLoading = false })
     },
-    // 弹出删除确认框
     confirmDelete: function(cat) {
       this.deleteTarget = cat
       this.deleteDialog = true
     },
-    // 执行删除
     doDelete: function() {
       var self = this
       if (!self.deleteTarget) return
@@ -181,20 +174,13 @@ export default {
           self.$toast.success('分类已删除')
           self.loadCategories()
         })
-        .catch(function(err) {
-          console.error('删除分类失败:', err)
-        })
-        .finally(function() {
-          self.deleteLoading = false
-        })
+        .catch(function(err) { console.error('删除分类失败:', err) })
+        .finally(function() { self.deleteLoading = false })
     },
-    // 格式化日期
     formatDate: function(dateStr) {
       if (!dateStr) return '-'
       var d = new Date(dateStr)
-      return d.getFullYear() + '-' +
-        String(d.getMonth() + 1).padStart(2, '0') + '-' +
-        String(d.getDate()).padStart(2, '0')
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0')
     }
   }
 }

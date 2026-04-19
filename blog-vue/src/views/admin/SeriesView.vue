@@ -20,8 +20,8 @@
         </thead>
         <tbody>
           <tr v-if="loading"><td colspan="4" class="text-center pa-6"><v-progress-circular indeterminate color="primary" size="28" /></td></tr>
-          <tr v-else-if="series.length === 0"><td colspan="4" class="text-center pa-6" style="color: #80868b;">暂无系列，点击右上角新建</td></tr>
-          <tr v-for="item in series" :key="item.id" style="border-bottom: 1px solid #f1f3f4;">
+          <tr v-else-if="pagedSeries.length === 0"><td colspan="4" class="text-center pa-6" style="color: #80868b;">暂无系列，点击右上角新建</td></tr>
+          <tr v-for="item in pagedSeries" :key="item.id" style="border-bottom: 1px solid #f1f3f4;">
             <td style="font-size: 14px; font-weight: 500; color: #202124;">
               <v-icon size="16" color="primary" class="mr-1">mdi-book-open-variant</v-icon>
               {{ item.name }}
@@ -37,6 +37,7 @@
           </tr>
         </tbody>
       </v-table>
+      <TablePagination :total="series.length" :page="page" :page-size="pageSize" @change="page = $event" />
     </v-card>
 
     <!-- 新建/编辑弹窗 -->
@@ -98,13 +99,17 @@
 
 <script>
 import request from '../../api/request.js'
+import TablePagination from '../../components/admin/TablePagination.vue'
 
 export default {
   name: 'SeriesView',
+  components: { TablePagination },
   data: function() {
     return {
       loading: false,
       series: [],
+      page: 1,
+      pageSize: 10,
       formDialog: false,
       formLoading: false,
       editTarget: null,
@@ -115,6 +120,12 @@ export default {
     }
   },
   mounted: function() { this.loadSeries() },
+  computed: {
+    pagedSeries: function() {
+      var start = (this.page - 1) * this.pageSize
+      return this.series.slice(start, start + this.pageSize)
+    }
+  },
   methods: {
     loadSeries: function() {
       var self = this

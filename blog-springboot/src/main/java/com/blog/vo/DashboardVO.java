@@ -23,4 +23,7 @@ public class DashboardVO {
 
     /** 待审核评论数 */
     private Long pendingCommentCount;
+
+    /** 留言总数 */
+    private Long messageCount;
 }

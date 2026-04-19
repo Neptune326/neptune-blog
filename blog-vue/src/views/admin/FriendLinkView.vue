@@ -28,7 +28,7 @@
           <tr v-else-if="links.length === 0">
             <td colspan="5" class="text-center pa-6" style="color: #9aa0a6;">暂无友情链接</td>
           </tr>
-          <tr v-for="link in links" :key="link.id" v-else>
+          <tr v-for="link in pagedLinks" :key="link.id" v-else>
             <td>
               <div class="d-flex align-center" style="gap: 8px;">
                 <img v-if="link.iconUrl" :src="link.iconUrl" style="width: 16px; height: 16px; border-radius: 3px;" />
@@ -50,6 +50,7 @@
           </tr>
         </tbody>
       </v-table>
+      <TablePagination :total="links.length" :page="page" :page-size="pageSize" @change="page = $event" />
     </v-card>
 
     <!-- 新增/编辑对话框 -->
@@ -92,14 +93,18 @@
 
 <script>
 import request from '../../api/request.js'
+import TablePagination from '../../components/admin/TablePagination.vue'
 
 export default {
   name: 'FriendLinkView',
+  components: { TablePagination },
   data: function() {
     return {
       loading: false,
       saving: false,
       links: [],
+      page: 1,
+      pageSize: 10,
       dialog: false,
       editTarget: null,
       form: { name: '', url: '', description: '', iconUrl: '', sort: 0 },
@@ -111,6 +116,12 @@ export default {
   },
   mounted: function() {
     this.loadLinks()
+  },
+  computed: {
+    pagedLinks: function() {
+      var start = (this.page - 1) * this.pageSize
+      return this.links.slice(start, start + this.pageSize)
+    }
   },
   methods: {
     loadLinks: function() {
