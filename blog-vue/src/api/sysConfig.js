@@ -8,7 +8,7 @@ export function getSysConfig() {
 
 /** 批量更新系统配置 */
 export function updateSysConfig(data) {
-  return request({ method: 'put', url: '/api/admin/sys-config', data: data, _silent: true })
+  return request({ method: 'put', url: '/api/admin/sys-config', data: data })
 }
 
 /** 获取操作日志列表 */

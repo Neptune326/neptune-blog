@@ -332,6 +332,8 @@ export default {
       updateSysConfig(self.form)
         .then(function() {
           self.$toast.success('设置已保存')
+          // 重新加载配置，确保页面显示最新值
+          self.loadConfig()
         })
         .catch(function(err) {
           console.error('保存系统配置失败:', err)

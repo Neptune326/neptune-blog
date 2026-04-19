@@ -83,7 +83,18 @@
       </v-card>
     </v-dialog>
 
-    
+    <!-- 删除确认对话框 -->
+    <v-dialog v-model="deleteDialog" max-width="380">
+      <v-card rounded="xl">
+        <v-card-title class="pa-5 pb-2">确认删除</v-card-title>
+        <v-card-text class="pa-5 pt-0">确定删除管理员「{{ deleteTarget && deleteTarget.username }}」？</v-card-text>
+        <v-card-actions class="pa-5 pt-0">
+          <v-spacer />
+          <v-btn variant="text" @click="deleteDialog = false">取消</v-btn>
+          <v-btn color="error" :loading="deleteLoading" @click="doDeleteAdmin">确认删除</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -104,7 +115,9 @@ export default {
       resetLoading: false,
       resetTarget: null,
       newPassword: '',
-      
+      deleteDialog: false,
+      deleteLoading: false,
+      deleteTarget: null
     }
   },
   mounted: function() { this.loadAdmins() },
@@ -158,14 +171,21 @@ export default {
         .finally(function() { self.resetLoading = false })
     },
     deleteAdmin: function(admin) {
+      this.deleteTarget = admin
+      this.deleteDialog = true
+    },
+    doDeleteAdmin: function() {
       var self = this
-      if (!confirm('确认删除管理员 ' + admin.username + '？')) return
-      request({ method: 'delete', url: '/api/admin/users/' + admin.id })
+      self.deleteLoading = true
+      request({ method: 'delete', url: '/api/admin/users/' + self.deleteTarget.id })
         .then(function() {
+          self.deleteDialog = false
+          self.deleteTarget = null
           self.$toast.success('删除成功')
           self.loadAdmins()
         })
         .catch(function(err) { self.$toast.error(err.message || '删除失败') })
+        .finally(function() { self.deleteLoading = false })
     },
     formatDate: function(t) { return t ? String(t).substring(0, 10) : '-' }
   }

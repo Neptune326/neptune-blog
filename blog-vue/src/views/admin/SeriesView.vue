@@ -79,7 +79,20 @@
       </v-card>
     </v-dialog>
 
-    
+    <!-- 删除确认对话框 -->
+    <v-dialog v-model="deleteDialog" max-width="400">
+      <v-card rounded="xl">
+        <v-card-title class="pa-5 pb-2">确认删除</v-card-title>
+        <v-card-text class="pa-5 pt-0">
+          确定删除系列「{{ deleteTarget && deleteTarget.name }}」？关联文章不会被删除。
+        </v-card-text>
+        <v-card-actions class="pa-5 pt-0">
+          <v-spacer />
+          <v-btn variant="text" @click="deleteDialog = false">取消</v-btn>
+          <v-btn color="error" :loading="deleteLoading" @click="doDelete">确认删除</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -96,7 +109,9 @@ export default {
       formLoading: false,
       editTarget: null,
       form: { name: '', description: '', sort: 0 },
-      
+      deleteDialog: false,
+      deleteLoading: false,
+      deleteTarget: null
     }
   },
   mounted: function() { this.loadSeries() },
@@ -138,16 +153,23 @@ export default {
         .finally(function() { self.formLoading = false })
     },
     deleteSeries: function(item) {
+      this.deleteTarget = item
+      this.deleteDialog = true
+    },
+    doDelete: function() {
       var self = this
-      if (!confirm('确认删除系列「' + item.name + '」？关联文章不会被删除。')) return
-      request({ method: 'delete', url: '/api/admin/series/' + item.id })
+      self.deleteLoading = true
+      request({ method: 'delete', url: '/api/admin/series/' + self.deleteTarget.id })
         .then(function() {
+          self.deleteDialog = false
+          self.deleteTarget = null
           self.$toast.success('删除成功')
           self.loadSeries()
         })
         .catch(function(err) {
           self.$toast.error(err.message || '删除失败')
         })
+        .finally(function() { self.deleteLoading = false })
     }
   }
 }

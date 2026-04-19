@@ -56,9 +56,9 @@
             </td>
             <td style="font-size: 12px; color: #80868b;">{{ formatDate(msg.createTime) }}</td>
             <td>
-              <v-btn v-if="msg.status === 0" size="small" variant="text" color="success" @click="approve(msg.id)">通过</v-btn>
-              <v-btn v-if="msg.status === 0" size="small" variant="text" color="warning" @click="reject(msg.id)">拒绝</v-btn>
-              <v-btn size="small" variant="text" color="error" @click="deleteMsg(msg.id)">删除</v-btn>
+              <v-btn v-if="msg.status === 0" size="small" variant="text" color="success" :loading="actionLoading === msg.id + '_approve'" @click="approve(msg.id)">通过</v-btn>
+              <v-btn v-if="msg.status === 0" size="small" variant="text" color="warning" :loading="actionLoading === msg.id + '_reject'" @click="reject(msg.id)">拒绝</v-btn>
+              <v-btn size="small" variant="text" color="error" @click="confirmDelete(msg.id)">删除</v-btn>
             </td>
           </tr>
         </tbody>
@@ -67,6 +67,19 @@
         <v-pagination v-model="pagination.page" :length="pagination.totalPages" :total-visible="7" @update:model-value="loadMessages" />
       </div>
     </v-card>
+
+    <!-- 删除确认对话框 -->
+    <v-dialog v-model="deleteDialog" max-width="360">
+      <v-card rounded="xl">
+        <v-card-title class="pa-5 pb-2">确认删除</v-card-title>
+        <v-card-text class="pa-5 pt-0">确定删除该留言？此操作不可撤销。</v-card-text>
+        <v-card-actions class="pa-5 pt-0">
+          <v-spacer />
+          <v-btn variant="text" @click="deleteDialog = false">取消</v-btn>
+          <v-btn color="error" :loading="deleteLoading" @click="doDelete">确认删除</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -86,7 +99,11 @@ export default {
         { label: '已通过', value: 1 },
         { label: '已拒绝', value: 2 }
       ],
-      pagination: { page: 1, pageSize: 20, totalPages: 1 }
+      pagination: { page: 1, pageSize: 20, totalPages: 1 },
+      actionLoading: '',
+      deleteDialog: false,
+      deleteLoading: false,
+      deleteTargetId: null
     }
   },
   mounted: function() { this.loadMessages() },
@@ -107,19 +124,36 @@ export default {
     resetFilters: function() { this.filters.status = null; this.pagination.page = 1; this.loadMessages() },
     approve: function(id) {
       var self = this
+      self.actionLoading = id + '_approve'
       request({ method: 'put', url: '/api/admin/messages/' + id + '/approve' })
         .then(function() { self.$toast.success('审核通过'); self.loadMessages() })
+        .catch(function() {})
+        .finally(function() { self.actionLoading = '' })
     },
     reject: function(id) {
       var self = this
+      self.actionLoading = id + '_reject'
       request({ method: 'put', url: '/api/admin/messages/' + id + '/reject' })
         .then(function() { self.$toast.success('已拒绝'); self.loadMessages() })
+        .catch(function() {})
+        .finally(function() { self.actionLoading = '' })
     },
-    deleteMsg: function(id) {
+    confirmDelete: function(id) {
+      this.deleteTargetId = id
+      this.deleteDialog = true
+    },
+    doDelete: function() {
       var self = this
-      if (!confirm('确认删除？')) return
-      request({ method: 'delete', url: '/api/admin/messages/' + id })
-        .then(function() { self.$toast.success('留言已删除'); self.loadMessages() })
+      self.deleteLoading = true
+      request({ method: 'delete', url: '/api/admin/messages/' + self.deleteTargetId })
+        .then(function() {
+          self.deleteDialog = false
+          self.deleteTargetId = null
+          self.$toast.success('留言已删除')
+          self.loadMessages()
+        })
+        .catch(function() {})
+        .finally(function() { self.deleteLoading = false })
     },
     formatDate: function(t) { return t ? String(t).substring(0, 10) : '-' }
   }
