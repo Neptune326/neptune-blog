@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div>
     <!-- 筛选工具栏 -->
     <v-card class="mb-4 pa-4">
@@ -77,9 +77,7 @@
     </div>
 
     <!-- 导入结果提示 -->
-    <v-snackbar v-model="importSnackbar.show" :color="importSnackbar.color" timeout="4000" location="top" rounded="lg">
-      {{ importSnackbar.text }}
-    </v-snackbar>
+    
 
     <!-- 文章列表表格 -->
     <v-card>
@@ -228,7 +226,7 @@ export default {
       batchDeleteDialog: false,
       // 导入导出
       importing: false,
-      importSnackbar: { show: false, text: '', color: 'success' }
+      
     }
   },
   computed: {
@@ -386,11 +384,11 @@ export default {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
         .then(function(msg) {
-          self.importSnackbar = { show: true, text: msg || '导入成功', color: 'success' }
+          self.$toast.success(msg || '导入成功')
           self.loadArticles()
         })
         .catch(function(err) {
-          self.importSnackbar = { show: true, text: '导入失败：' + (err.message || '请检查文件格式'), color: 'error' }
+          self.$toast.error('导入失败：' + (err.message || '请检查文件格式'))
         })
         .finally(function() {
           self.importing = false
@@ -422,3 +420,4 @@ export default {
   }
 }
 </script>
+

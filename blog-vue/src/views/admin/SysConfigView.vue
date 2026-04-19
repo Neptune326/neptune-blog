@@ -261,11 +261,6 @@
           保存设置
         </v-btn>
       </div>
-
-      <!-- 保存成功提示 -->
-      <v-snackbar v-model="snackbar" color="success" timeout="2000" location="top" rounded="lg">
-        设置已保存
-      </v-snackbar>
     </template>
   </div>
 </template>
@@ -281,7 +276,6 @@ export default {
       loading: false,
       saving: false,
       uploading: false,
-      snackbar: false,
       galleryImages: [],
       form: {
         blog_name: '',
@@ -337,7 +331,7 @@ export default {
       self.saving = true
       updateSysConfig(self.form)
         .then(function() {
-          self.snackbar = true
+          self.$toast.success('设置已保存')
         })
         .catch(function(err) {
           console.error('保存系统配置失败:', err)

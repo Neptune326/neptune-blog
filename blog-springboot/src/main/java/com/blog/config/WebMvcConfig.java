@@ -34,7 +34,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // 规范化为绝对路径，兼容 Windows 和 Linux
+        java.io.File uploadDir = new java.io.File(uploadPath).getAbsoluteFile();
+        String absolutePath = uploadDir.getAbsolutePath();
+        if (!absolutePath.endsWith(java.io.File.separator)) {
+            absolutePath = absolutePath + java.io.File.separator;
+        }
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:" + uploadPath);
+                .addResourceLocations("file:" + absolutePath);
     }
 }

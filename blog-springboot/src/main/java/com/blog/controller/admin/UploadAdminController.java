@@ -56,10 +56,13 @@ public class UploadAdminController {
 
         // 按日期分目录存储
         String dateDir = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM"));
-        String dirPath = uploadPath + dateDir + "/";
-        File dir = new File(dirPath);
+        // 规范化路径：将相对路径转为绝对路径，避免 Windows 下 transferTo 路径问题
+        String basePath = uploadPath.endsWith("/") || uploadPath.endsWith("\\")
+                ? uploadPath : uploadPath + "/";
+        File baseDir = new File(basePath).getAbsoluteFile();
+        File dir = new File(baseDir, dateDir);
         if (!dir.exists() && !dir.mkdirs()) {
-            log.error("创建上传目录失败: {}", dirPath);
+            log.error("创建上传目录失败: {}", dir.getAbsolutePath());
             return Result.error(com.blog.common.result.ResultCode.INTERNAL_ERROR, "上传目录创建失败");
         }
 
@@ -69,12 +72,12 @@ public class UploadAdminController {
                 ? originalName.substring(originalName.lastIndexOf("."))
                 : ".jpg";
         String fileName = UUID.randomUUID().toString().replace("-", "") + ext;
-        String filePath = dirPath + fileName;
+        File destFile = new File(dir, fileName);
 
         try {
-            file.transferTo(new File(filePath));
+            file.transferTo(destFile);
             String url = urlPrefix + dateDir + "/" + fileName;
-            log.info("文件上传成功: {}", url);
+            log.info("文件上传成功: {} -> {}", destFile.getAbsolutePath(), url);
             return Result.success(url);
         } catch (IOException e) {
             log.error("文件上传失败", e);

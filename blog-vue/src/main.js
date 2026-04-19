@@ -4,10 +4,10 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router/index.js'
 import vuetify from './plugins/vuetify.js'
+import toastPlugin from './plugins/toast.js'
 import { setupMock, detectBackend } from './api/request.js'
 
 function bootstrap(mockPlugin) {
-  // 注册 mock 插件（生产环境传 null，不注册）
   if (mockPlugin) {
     setupMock(mockPlugin)
   }
@@ -16,6 +16,7 @@ function bootstrap(mockPlugin) {
   app.use(createPinia())
   app.use(router)
   app.use(vuetify)
+  app.use(toastPlugin)
   app.mount('#app')
 }
 

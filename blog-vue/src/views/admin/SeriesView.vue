@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div>
     <div class="mb-6 d-flex align-center justify-space-between">
       <div>
@@ -79,9 +79,7 @@
       </v-card>
     </v-dialog>
 
-    <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="2500" location="top" rounded="lg">
-      {{ snackbar.text }}
-    </v-snackbar>
+    
   </div>
 </template>
 
@@ -98,7 +96,7 @@ export default {
       formLoading: false,
       editTarget: null,
       form: { name: '', description: '', sort: 0 },
-      snackbar: { show: false, text: '', color: 'success' }
+      
     }
   },
   mounted: function() { this.loadSeries() },
@@ -131,11 +129,11 @@ export default {
       promise
         .then(function() {
           self.formDialog = false
-          self.snackbar = { show: true, text: '保存成功', color: 'success' }
+          self.$toast.success('保存成功')
           self.loadSeries()
         })
         .catch(function(err) {
-          self.snackbar = { show: true, text: err.message || '保存失败', color: 'error' }
+          self.$toast.error(err.message || '保存失败')
         })
         .finally(function() { self.formLoading = false })
     },
@@ -144,13 +142,14 @@ export default {
       if (!confirm('确认删除系列「' + item.name + '」？关联文章不会被删除。')) return
       request({ method: 'delete', url: '/api/admin/series/' + item.id })
         .then(function() {
-          self.snackbar = { show: true, text: '删除成功', color: 'success' }
+          self.$toast.success('删除成功')
           self.loadSeries()
         })
         .catch(function(err) {
-          self.snackbar = { show: true, text: err.message || '删除失败', color: 'error' }
+          self.$toast.error(err.message || '删除失败')
         })
     }
   }
 }
 </script>
+

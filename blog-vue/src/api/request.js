@@ -2,6 +2,7 @@
 // mock 功能通过 setupMock() 插件接口注入，完全解耦
 import axios from 'axios'
 import { useAuthStore } from '../store/auth.js'
+import { toast } from '../plugins/toast.js'
 
 // ===== 插件接口 =====
 // mock 插件需实现的接口：
@@ -71,7 +72,8 @@ request.interceptors.response.use(
           window.location.href = '/admin/login'
         }
       } else {
-        console.error('接口错误 [' + data.code + ']:', data.message || '未知错误')
+        // 业务错误用 toast 提示
+        toast.error(data.message || '请求失败')
       }
       return Promise.reject(new Error(data.message || '请求失败'))
     }

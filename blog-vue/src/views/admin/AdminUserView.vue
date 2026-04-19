@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div>
     <div class="mb-6 d-flex align-center justify-space-between">
       <div>
@@ -83,9 +83,7 @@
       </v-card>
     </v-dialog>
 
-    <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="2500" location="top" rounded="lg">
-      {{ snackbar.text }}
-    </v-snackbar>
+    
   </div>
 </template>
 
@@ -106,7 +104,7 @@ export default {
       resetLoading: false,
       resetTarget: null,
       newPassword: '',
-      snackbar: { show: false, text: '', color: 'success' }
+      
     }
   },
   mounted: function() { this.loadAdmins() },
@@ -118,7 +116,7 @@ export default {
         .then(function(data) { self.admins = data || [] })
         .catch(function(err) {
           if (err.message && err.message.includes('403')) {
-            self.snackbar = { show: true, text: '仅超级管理员可访问此页面', color: 'warning' }
+            self.$toast.warning('仅超级管理员可访问此页面')
           }
         })
         .finally(function() { self.loading = false })
@@ -136,7 +134,7 @@ export default {
       request({ method: 'post', url: '/api/admin/users', data: self.createForm })
         .then(function() {
           self.createDialog = false
-          self.snackbar = { show: true, text: '管理员创建成功', color: 'success' }
+          self.$toast.success('管理员创建成功')
           self.loadAdmins()
         })
         .catch(function(err) { self.createError = err.message || '创建失败' })
@@ -154,9 +152,9 @@ export default {
       request({ method: 'put', url: '/api/admin/users/' + self.resetTarget.id + '/reset-password', data: { newPassword: self.newPassword } })
         .then(function() {
           self.resetPwdDialog = false
-          self.snackbar = { show: true, text: '密码重置成功', color: 'success' }
+          self.$toast.success('密码重置成功')
         })
-        .catch(function(err) { self.snackbar = { show: true, text: err.message || '重置失败', color: 'error' } })
+        .catch(function(err) { self.$toast.error(err.message || '重置失败') })
         .finally(function() { self.resetLoading = false })
     },
     deleteAdmin: function(admin) {
@@ -164,12 +162,13 @@ export default {
       if (!confirm('确认删除管理员 ' + admin.username + '？')) return
       request({ method: 'delete', url: '/api/admin/users/' + admin.id })
         .then(function() {
-          self.snackbar = { show: true, text: '删除成功', color: 'success' }
+          self.$toast.success('删除成功')
           self.loadAdmins()
         })
-        .catch(function(err) { self.snackbar = { show: true, text: err.message || '删除失败', color: 'error' } })
+        .catch(function(err) { self.$toast.error(err.message || '删除失败') })
     },
     formatDate: function(t) { return t ? String(t).substring(0, 10) : '-' }
   }
 }
 </script>
+

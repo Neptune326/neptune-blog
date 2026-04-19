@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div>
     <div class="mb-6">
       <h1 style="font-size: 20px; font-weight: 700; color: #202124; margin: 0 0 4px;">关于我</h1>
@@ -27,9 +27,7 @@
         </v-btn>
       </div>
 
-      <v-snackbar v-model="snackbar" color="success" timeout="2000" location="top" rounded="lg">
-        保存成功
-      </v-snackbar>
+      
     </template>
   </div>
 </template>
@@ -46,7 +44,7 @@ export default {
     return {
       loading: false,
       saving: false,
-      snackbar: false,
+      
       content: ''
     }
   },
@@ -68,10 +66,11 @@ export default {
       var self = this
       self.saving = true
       updateSysConfig({ about_content: self.content })
-        .then(function() { self.snackbar = true })
+        .then(function() { self.$toast.success('保存成功') })
         .catch(function(err) { console.error('保存失败:', err) })
         .finally(function() { self.saving = false })
     }
   }
 }
 </script>
+

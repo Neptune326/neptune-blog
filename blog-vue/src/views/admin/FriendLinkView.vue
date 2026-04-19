@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div>
     <div class="d-flex align-center justify-space-between mb-6">
       <div>
@@ -86,9 +86,7 @@
       </v-card>
     </v-dialog>
 
-    <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="2500" location="top" rounded="lg">
-      {{ snackbar.text }}
-    </v-snackbar>
+    
   </div>
 </template>
 
@@ -108,7 +106,7 @@ export default {
       deleteDialog: false,
       deleteTarget: null,
       deleteLoading: false,
-      snackbar: { show: false, text: '', color: 'success' }
+      
     }
   },
   mounted: function() {
@@ -135,7 +133,7 @@ export default {
     save: function() {
       var self = this
       if (!self.form.name || !self.form.url) {
-        self.snackbar = { show: true, text: '名称和链接地址不能为空', color: 'error' }
+        self.\$toast.error('名称和链接地址不能为空')
         return
       }
       self.saving = true
@@ -144,10 +142,10 @@ export default {
         : request({ method: 'post', url: '/api/admin/friend-links', data: self.form })
       req.then(function() {
           self.dialog = false
-          self.snackbar = { show: true, text: '保存成功', color: 'success' }
+          self.\$toast.success('保存成功')
           self.loadLinks()
         })
-        .catch(function() { self.snackbar = { show: true, text: '保存失败', color: 'error' } })
+        .catch(function() { self.$toast.error('保存失败') })
         .finally(function() { self.saving = false })
     },
     confirmDelete: function(link) {
@@ -160,12 +158,13 @@ export default {
       request({ method: 'delete', url: '/api/admin/friend-links/' + self.deleteTarget.id })
         .then(function() {
           self.deleteDialog = false
-          self.snackbar = { show: true, text: '删除成功', color: 'success' }
+          self.\$toast.success('删除成功')
           self.loadLinks()
         })
-        .catch(function() { self.snackbar = { show: true, text: '删除失败', color: 'error' } })
+        .catch(function() { self.$toast.error('删除失败') })
         .finally(function() { self.deleteLoading = false })
     }
   }
 }
 </script>
+
