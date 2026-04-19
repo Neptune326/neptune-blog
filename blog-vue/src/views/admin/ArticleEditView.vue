@@ -150,6 +150,7 @@
           <MdEditor
             v-model="form.content"
             :theme="'light'"
+            :id="'article-editor'"
             style="height: 500px"
           />
         </div>

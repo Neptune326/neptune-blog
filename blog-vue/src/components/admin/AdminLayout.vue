@@ -1,12 +1,12 @@
 <template>
-  <v-app style="background: #f8f9fa;">
-    <!-- 左侧导航栏 —— Google 风格 -->
+  <v-app style="background: #f8f9fa; height: 100vh; overflow: hidden;">
+    <!-- 左侧导航栏 —— 固定，不随内容滚动 -->
     <v-navigation-drawer
       v-model="drawer"
       :rail="rail"
       permanent
       color="white"
-      style="border-right: 1px solid #e8eaed;"
+      style="border-right: 1px solid #e8eaed; position: fixed; top: 0; left: 0; height: 100vh; z-index: 1000; overflow-y: auto;"
     >
       <!-- Logo 区域 -->
       <div
@@ -80,11 +80,11 @@
       </v-list>
     </v-navigation-drawer>
 
-    <!-- 顶部工具栏 -->
+    <!-- 顶部工具栏 —— 固定，不随内容滚动 -->
     <v-app-bar
       color="white"
       elevation="0"
-      style="border-bottom: 1px solid #e8eaed;"
+      style="border-bottom: 1px solid #e8eaed; position: fixed; top: 0; right: 0; z-index: 999;"
     >
       <v-app-bar-title>
         <span style="font-size: 16px; font-weight: 600; color: #202124;">
@@ -172,8 +172,8 @@
       </v-card>
     </v-dialog>
 
-    <!-- 内容区 -->
-    <v-main style="background: #f8f9fa;">
+    <!-- 内容区 —— 独立滚动 -->
+    <v-main style="background: #f8f9fa; height: 100vh; overflow-y: auto;">
       <v-container fluid style="padding: 24px;">
         <router-view />
       </v-container>
