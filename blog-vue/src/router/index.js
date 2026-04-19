@@ -1,7 +1,6 @@
 // 路由配置
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../store/auth.js'
-import { isMockMode } from '../api/request.js'
 
 // 前台视图
 import LandingView from '../views/frontend/LandingView.vue'
@@ -37,139 +36,42 @@ import FriendLinkView from '../views/admin/FriendLinkView.vue'
 
 var routes = [
   // ===== 前台路由（无需登录）=====
-  {
-    path: '/',
-    component: LandingView
-  },
-  {
-    path: '/articles',
-    component: HomeView
-  },
-  {
-    path: '/article/:id',
-    component: ArticleDetailView
-  },
-  {
-    path: '/category/:id',
-    component: FrontCategoryView
-  },
-  {
-    path: '/tag/:id',
-    component: FrontTagView
-  },
-  {
-    path: '/archive',
-    component: ArchiveView
-  },
-  {
-    path: '/about',
-    component: AboutView
-  },
-  {
-    path: '/message',
-    component: MessageView
-  },
-  {
-    path: '/search',
-    component: SearchView
-  },
+  { path: '/', component: LandingView },
+  { path: '/articles', component: HomeView },
+  { path: '/article/:id', component: ArticleDetailView },
+  { path: '/category/:id', component: FrontCategoryView },
+  { path: '/tag/:id', component: FrontTagView },
+  { path: '/archive', component: ArchiveView },
+  { path: '/about', component: AboutView },
+  { path: '/message', component: MessageView },
+  { path: '/search', component: SearchView },
+  { path: '/:pathMatch(.*)*', component: NotFoundView },
 
-  // 404 页面
-  {
-    path: '/:pathMatch(.*)*',
-    component: NotFoundView
-  },
+  // ===== 后台登录页 =====
+  { path: '/admin/login', component: LoginView },
 
-  // ===== 后台登录页（独立，不使用 AdminLayout）=====
-  {
-    path: '/admin/login',
-    component: LoginView
-  },
-
-  // ===== 后台路由（嵌套在 AdminLayout 下）=====
+  // ===== 后台路由（需要登录）=====
   {
     path: '/admin',
     component: AdminLayout,
     redirect: '/admin/dashboard',
     meta: { requiresAuth: true },
     children: [
-      {
-        path: 'dashboard',
-        component: DashboardView,
-        meta: { requiresAuth: true }
-      },
-      {
-        path: 'articles',
-        component: ArticleListView,
-        meta: { requiresAuth: true }
-      },
-      {
-        // 新建文章
-        path: 'articles/edit',
-        component: ArticleEditView,
-        meta: { requiresAuth: true }
-      },
-      {
-        // 编辑文章
-        path: 'articles/edit/:id',
-        component: ArticleEditView,
-        meta: { requiresAuth: true }
-      },
-      {
-        path: 'categories',
-        component: AdminCategoryView,
-        meta: { requiresAuth: true }
-      },
-      {
-        path: 'tags',
-        component: AdminTagView,
-        meta: { requiresAuth: true }
-      },
-      {
-        path: 'comments',
-        component: CommentView,
-        meta: { requiresAuth: true }
-      },
-      {
-        path: 'sys-config',
-        component: SysConfigView,
-        meta: { requiresAuth: true }
-      },
-      {
-        path: 'about',
-        component: AboutEditView,
-        meta: { requiresAuth: true }
-      },
-      {
-        path: 'messages',
-        component: MessageAdminView,
-        meta: { requiresAuth: true }
-      },
-      {
-        path: 'admin-users',
-        component: AdminUserView,
-        meta: { requiresAuth: true }
-      },
-      {
-        path: 'series',
-        component: SeriesView,
-        meta: { requiresAuth: true }
-      },
-      {
-        path: 'friend-links',
-        component: FriendLinkView,
-        meta: { requiresAuth: true }
-      },
-      {
-        path: 'logs/operation',
-        component: OperationLogView,
-        meta: { requiresAuth: true }
-      },
-      {
-        path: 'logs/login',
-        component: LoginLogView,
-        meta: { requiresAuth: true }
-      }
+      { path: 'dashboard',        component: DashboardView,    meta: { requiresAuth: true } },
+      { path: 'articles',         component: ArticleListView,  meta: { requiresAuth: true } },
+      { path: 'articles/edit',    component: ArticleEditView,  meta: { requiresAuth: true } },
+      { path: 'articles/edit/:id',component: ArticleEditView,  meta: { requiresAuth: true } },
+      { path: 'categories',       component: AdminCategoryView,meta: { requiresAuth: true } },
+      { path: 'tags',             component: AdminTagView,     meta: { requiresAuth: true } },
+      { path: 'comments',         component: CommentView,      meta: { requiresAuth: true } },
+      { path: 'sys-config',       component: SysConfigView,    meta: { requiresAuth: true } },
+      { path: 'about',            component: AboutEditView,    meta: { requiresAuth: true } },
+      { path: 'messages',         component: MessageAdminView, meta: { requiresAuth: true } },
+      { path: 'admin-users',      component: AdminUserView,    meta: { requiresAuth: true } },
+      { path: 'series',           component: SeriesView,       meta: { requiresAuth: true } },
+      { path: 'friend-links',     component: FriendLinkView,   meta: { requiresAuth: true } },
+      { path: 'logs/operation',   component: OperationLogView, meta: { requiresAuth: true } },
+      { path: 'logs/login',       component: LoginLogView,     meta: { requiresAuth: true } }
     ]
   }
 ]
@@ -183,12 +85,7 @@ var router = createRouter({
 router.beforeEach(function(to, from, next) {
   if (to.meta.requiresAuth) {
     var authStore = useAuthStore()
-    // mock 模式下（后端未启动），自动注入 mock token，无需登录
-    if (isMockMode() && !authStore.isLoggedIn) {
-      authStore.setAuth('mock-token-auto')
-    }
     if (!authStore.isLoggedIn) {
-      // 未登录，跳转到登录页
       next('/admin/login')
       return
     }

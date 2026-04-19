@@ -1,24 +1,19 @@
 <template>
   <v-app style="background: #f8f9fa;">
     <v-main>
-      <div
-        class="d-flex align-center justify-center"
-        style="min-height: 100vh; padding: 24px;"
-      >
+      <div class="d-flex align-center justify-center" style="min-height: 100vh; padding: 24px;">
         <div style="width: 100%; max-width: 420px;">
 
           <!-- Logo 区域 -->
           <div class="text-center mb-8">
-            <div
-              style="
-                width: 56px; height: 56px;
-                background: #1a73e8;
-                border-radius: 16px;
-                display: flex; align-items: center; justify-content: center;
-                margin: 0 auto 16px;
-                box-shadow: 0 4px 12px rgba(26,115,232,0.3);
-              "
-            >
+            <div style="
+              width: 56px; height: 56px;
+              background: #1a73e8;
+              border-radius: 16px;
+              display: flex; align-items: center; justify-content: center;
+              margin: 0 auto 16px;
+              box-shadow: 0 4px 12px rgba(26,115,232,0.3);
+            ">
               <v-icon color="white" size="30">mdi-pencil</v-icon>
             </div>
             <h1 style="font-size: 24px; font-weight: 700; color: #202124; margin: 0 0 6px;">
@@ -30,16 +25,10 @@
           </div>
 
           <!-- 登录卡片 -->
-          <v-card
-            elevation="0"
-            rounded="xl"
-            style="border: 1px solid #e8eaed; padding: 32px;"
-          >
+          <v-card elevation="0" rounded="xl" style="border: 1px solid #e8eaed; padding: 32px;">
             <v-form @submit.prevent="handleLogin">
               <div class="mb-4">
-                <label style="font-size: 13px; font-weight: 500; color: #3c4043; display: block; margin-bottom: 6px;">
-                  用户名
-                </label>
+                <label style="font-size: 13px; font-weight: 500; color: #3c4043; display: block; margin-bottom: 6px;">用户名</label>
                 <v-text-field
                   v-model="form.username"
                   variant="outlined"
@@ -52,9 +41,7 @@
               </div>
 
               <div class="mb-6">
-                <label style="font-size: 13px; font-weight: 500; color: #3c4043; display: block; margin-bottom: 6px;">
-                  密码
-                </label>
+                <label style="font-size: 13px; font-weight: 500; color: #3c4043; display: block; margin-bottom: 6px;">密码</label>
                 <v-text-field
                   v-model="form.password"
                   :type="showPassword ? 'text' : 'password'"
@@ -69,7 +56,6 @@
                 />
               </div>
 
-              <!-- 错误提示 -->
               <v-alert
                 v-if="errorMsg"
                 type="error"
@@ -95,7 +81,6 @@
             </v-form>
           </v-card>
 
-          <!-- 底部提示 -->
           <p class="text-center mt-4" style="font-size: 12px; color: #9aa0a6;">
             默认账号：admin / admin123
           </p>
@@ -109,7 +94,6 @@
 import { login } from '../../api/auth.js'
 import { useAuthStore } from '../../store/auth.js'
 import { useRouter } from 'vue-router'
-import { isMockMode } from '../../api/request.js'
 
 export default {
   name: 'LoginView',
@@ -124,14 +108,6 @@ export default {
       loading: false,
       errorMsg: '',
       showPassword: false
-    }
-  },
-  mounted: function() {
-    // mock 模式下（后端未启动），自动登录直接进入后台
-    if (isMockMode()) {
-      var self = this
-      self.authStore.setAuth('mock-token-auto')
-      self.router.replace('/admin/dashboard')
     }
   },
   methods: {

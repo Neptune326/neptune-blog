@@ -1,109 +1,31 @@
 <template>
   <v-app>
-    <!-- Mock 模式提示条 -->
-    <div
-      v-if="isMockMode"
-      style="
-        position: fixed;
-        top: 0; left: 0; right: 0;
-        z-index: 9999;
-        background: #f29900;
-        color: white;
-        text-align: center;
-        font-size: 13px;
-        font-weight: 500;
-        padding: 6px 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-      "
-    >
-      <span>⚡ Mock 模式</span>
-      <span style="opacity: 0.85; font-weight: 400;">后端服务未启动，当前展示模拟数据。</span>
-      <button
-        @click="retryConnect"
-        style="
-          background: rgba(255,255,255,0.25);
-          border: none;
-          color: white;
-          cursor: pointer;
-          padding: 2px 8px;
-          border-radius: 4px;
-          font-size: 12px;
-          margin-left: 4px;
-        "
-      >
-        重新连接
-      </button>
-      <button
-        @click="dismissBanner"
-        style="
-          background: rgba(255,255,255,0.15);
-          border: none;
-          color: white;
-          cursor: pointer;
-          padding: 2px 8px;
-          border-radius: 4px;
-          font-size: 12px;
-        "
-      >
-        知道了
-      </button>
-    </div>
-
-    <!-- 检测中：全屏加载 -->
-    <div
-      v-if="!ready"
-      style="
-        position: fixed; inset: 0;
-        background: #f8f9fa;
-        display: flex; align-items: center; justify-content: center;
-        z-index: 9990;
-      "
-    >
-      <div style="text-align: center;">
-        <div style="
-          width: 40px; height: 40px;
-          border: 3px solid #e8eaed;
-          border-top-color: #1a73e8;
-          border-radius: 50%;
-          animation: spin 0.8s linear infinite;
-          margin: 0 auto 12px;
-        "></div>
-        <div style="font-size: 13px; color: #80868b;">正在连接服务...</div>
-      </div>
-    </div>
-
     <!-- 主内容区（带路由过渡动画） -->
-    <div v-if="ready" :style="isMockMode ? 'padding-top: 36px;' : ''">
-      <router-view v-slot="{ Component }">
-        <transition name="page-fade" mode="out-in">
-          <component :is="Component" />
-        </transition>
-      </router-view>
-    </div>
+    <router-view v-slot="{ Component }">
+      <transition name="page-fade" mode="out-in">
+        <component :is="Component" />
+      </transition>
+    </router-view>
 
     <!-- Live2D 看板娘（全局挂载，仅前台页面显示，且配置开启时） -->
-    <Live2DWidget v-if="ready && isFrontend && live2dEnabled" />
+    <Live2DWidget v-if="isFrontend && live2dEnabled" />
 
     <!-- 粒子飘落特效（仅前台，可通过系统配置控制） -->
     <ParticleCanvas
-      v-if="ready && isFrontend && particleEnabled"
+      v-if="isFrontend && particleEnabled"
       :type="particleType"
       :count="particleCount"
     />
 
     <!-- 鼠标点击特效（仅前台） -->
-    <ClickEffect v-if="ready && isFrontend && clickEffectEnabled" />
+    <ClickEffect v-if="isFrontend && clickEffectEnabled" />
 
     <!-- 图片灯箱（全局，自动监听 markdown-body 内图片点击） -->
-    <ImageLightbox v-if="ready && isFrontend" />
+    <ImageLightbox v-if="isFrontend" />
   </v-app>
 </template>
 
 <script>
-import { detectBackend, isMockMode } from './api/request.js'
 import request from './api/request.js'
 import Live2DWidget from './components/frontend/Live2DWidget.vue'
 import ParticleCanvas from './components/frontend/ParticleCanvas.vue'
@@ -115,9 +37,6 @@ export default {
   components: { Live2DWidget, ParticleCanvas, ClickEffect, ImageLightbox },
   data: function() {
     return {
-      showMockBanner: false,
-      bannerDismissed: false,
-      ready: false,
       particleEnabled: false,
       particleType: 'sakura',
       particleCount: 25,
@@ -126,25 +45,16 @@ export default {
     }
   },
   computed: {
-    isMockMode: function() {
-      return this.showMockBanner && !this.bannerDismissed
-    },
     isFrontend: function() {
       return this.$route && !this.$route.path.startsWith('/admin')
     }
   },
   mounted: function() {
-    var self = this
-    detectBackend().then(function(backendOk) {
-      self.showMockBanner = !backendOk
-      self.ready = true
-      self.loadEffectConfig()
-    })
+    this.loadEffectConfig()
     // 复制保护：复制文章内容时追加版权声明
     document.addEventListener('copy', function(e) {
       var selection = window.getSelection()
       if (!selection || selection.toString().length < 30) return
-      // 只在前台文章页生效
       if (!window.location.pathname.startsWith('/article/')) return
       var original = selection.toString()
       var notice = '\n\n---\n版权声明：本文采用 CC BY-NC-SA 4.0 协议，转载请注明出处。\n原文链接：' + window.location.href
@@ -155,25 +65,8 @@ export default {
     })
   },
   methods: {
-    dismissBanner: function() {
-      this.bannerDismissed = true
-    },
-    // 重新检测后端，后端已启动则刷新页面
-    retryConnect: function() {
-      var self = this
-      import('./api/request.js').then(function(m) {
-        m.detectBackend().then(function(ok) {
-          if (ok) {
-            window.location.reload()
-          } else {
-            self.$toast && self.$toast.warning('后端仍未启动，请稍后再试')
-          }
-        })
-      })
-    },
     loadEffectConfig: function() {
       var self = this
-      // 读取公开的前台站点配置（不需要鉴权）
       request({ method: 'get', url: '/api/site-config' })
         .then(function(data) {
           if (!data) return
