@@ -7,6 +7,18 @@ import vuetify from './plugins/vuetify.js'
 import toastPlugin from './plugins/toast.js'
 import { setupMock, detectBackend } from './api/request.js'
 
+// 拦截 oml2d.com 的统计请求（SSL 证书有问题），静默丢弃
+;(function() {
+  var _origFetch = window.fetch
+  window.fetch = function(input, init) {
+    var url = typeof input === 'string' ? input : (input && input.url) || ''
+    if (url.indexOf('oml2d.com') >= 0) {
+      return Promise.resolve(new Response('', { status: 200 }))
+    }
+    return _origFetch.apply(this, arguments)
+  }
+})()
+
 function bootstrap(mockPlugin) {
   if (mockPlugin) {
     setupMock(mockPlugin)
