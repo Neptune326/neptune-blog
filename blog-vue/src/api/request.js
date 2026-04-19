@@ -102,8 +102,9 @@ request.interceptors.response.use(
     // 后台页面的写操作自动弹出成功提示
     // 通过 config._silent = true 可跳过（适用于自己处理提示的请求）
     var config = response.config || {}
-    if (!config._silent && window.location.pathname.startsWith('/admin')) {
-      var msg = getSuccessMsg(config.method, config.url || '')
+    var url = config.url || ''
+    if (!config._silent && window.location.pathname.startsWith('/admin') && url.indexOf('/api/admin/') === 0) {
+      var msg = getSuccessMsg(config.method, url)
       if (msg) toast.success(msg)
     }
 
@@ -118,7 +119,7 @@ request.interceptors.response.use(
       }
       // mock 成功也触发提示
       var mConfig = error.config
-      if (!mConfig._silent && window.location.pathname.startsWith('/admin')) {
+      if (!mConfig._silent && window.location.pathname.startsWith('/admin') && (mConfig.url || '').indexOf('/api/admin/') === 0) {
         var mMsg = getSuccessMsg(mConfig.method, mConfig.url || '')
         if (mMsg) toast.success(mMsg)
       }
