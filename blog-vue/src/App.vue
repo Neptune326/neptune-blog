@@ -82,6 +82,9 @@
 
     <!-- 鼠标点击特效（仅前台） -->
     <ClickEffect v-if="ready && isFrontend && clickEffectEnabled" />
+
+    <!-- 图片灯箱（全局，自动监听 markdown-body 内图片点击） -->
+    <ImageLightbox v-if="ready && isFrontend" />
   </v-app>
 </template>
 
@@ -91,10 +94,11 @@ import request from './api/request.js'
 import Live2DWidget from './components/frontend/Live2DWidget.vue'
 import ParticleCanvas from './components/frontend/ParticleCanvas.vue'
 import ClickEffect from './components/frontend/ClickEffect.vue'
+import ImageLightbox from './components/frontend/ImageLightbox.vue'
 
 export default {
   name: 'App',
-  components: { Live2DWidget, ParticleCanvas, ClickEffect },
+  components: { Live2DWidget, ParticleCanvas, ClickEffect, ImageLightbox },
   data: function() {
     return {
       showMockBanner: false,
@@ -119,8 +123,20 @@ export default {
     detectBackend().then(function(backendOk) {
       self.showMockBanner = !backendOk
       self.ready = true
-      // 加载特效配置
       self.loadEffectConfig()
+    })
+    // 复制保护：复制文章内容时追加版权声明
+    document.addEventListener('copy', function(e) {
+      var selection = window.getSelection()
+      if (!selection || selection.toString().length < 30) return
+      // 只在前台文章页生效
+      if (!window.location.pathname.startsWith('/article/')) return
+      var original = selection.toString()
+      var notice = '\n\n---\n版权声明：本文采用 CC BY-NC-SA 4.0 协议，转载请注明出处。\n原文链接：' + window.location.href
+      if (e.clipboardData) {
+        e.clipboardData.setData('text/plain', original + notice)
+        e.preventDefault()
+      }
     })
   },
   methods: {
@@ -356,5 +372,20 @@ html {
 .markdown-body h3,
 .markdown-body h4 {
   scroll-margin-top: 80px;
+}
+
+/* 打印样式 */
+@media print {
+  .v-app-bar, .v-navigation-drawer, .v-footer,
+  .ReadingProgress, .TableOfContents,
+  .v-btn, button:not(.print-keep),
+  .v-snackbar, .v-alert,
+  [class*="sidebar"], [class*="related"],
+  [class*="comment"] {
+    display: none !important;
+  }
+  .v-main { padding: 0 !important; }
+  .markdown-body { font-size: 14px; line-height: 1.8; }
+  body { background: white !important; }
 }
 </style>

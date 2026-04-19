@@ -140,8 +140,8 @@
                 <!-- Markdown 正文 -->
                 <div class="markdown-body" ref="articleContent" v-html="renderedContent" />
 
-                <!-- 文章底部：点赞 + 版权声明 -->
-                <div class="d-flex align-center justify-center my-6" style="gap: 16px;">
+                <!-- 文章底部：点赞 + 收藏 + 打印 -->
+                <div class="d-flex align-center justify-center my-6 flex-wrap" style="gap: 12px;">
                   <button
                     @click="toggleLike"
                     :disabled="likeLoading"
@@ -165,6 +165,33 @@
                     </svg>
                     {{ liked ? '已点赞' : '点个赞' }}
                     <span style="font-size: 13px; opacity: 0.8;">{{ likeCount }}</span>
+                  </button>
+
+                  <!-- 收藏按钮 -->
+                  <ArticleFavorite
+                    v-if="article"
+                    :article-id="article.id"
+                    :article-title="article.title"
+                  />
+
+                  <!-- 打印/PDF -->
+                  <button
+                    @click="printArticle"
+                    style="
+                      display: flex; align-items: center; gap: 8px;
+                      padding: 10px 20px;
+                      border-radius: 24px;
+                      border: 2px solid #e8eaed;
+                      cursor: pointer;
+                      font-size: 15px;
+                      font-weight: 600;
+                      transition: all 0.2s;
+                      background: white;
+                      color: #5f6368;
+                    "
+                  >
+                    <v-icon size="18">mdi-printer-outline</v-icon>
+                    打印
                   </button>
                 </div>
 
@@ -334,13 +361,19 @@
                       />
                     </v-col>
                     <v-col cols="12">
-                      <v-textarea
-                        v-model="commentForm.content"
-                        label="写下你的评论..."
-                        variant="outlined"
-                        rows="4"
-                        :rules="[function(v) { return !!v || '请填写评论内容' }]"
-                      />
+                      <div style="position: relative;">
+                        <v-textarea
+                          v-model="commentForm.content"
+                          label="写下你的评论..."
+                          variant="outlined"
+                          rows="4"
+                          :rules="[function(v) { return !!v || '请填写评论内容' }]"
+                        />
+                        <!-- Emoji 选择器 -->
+                        <div style="position: absolute; bottom: 12px; left: 12px; z-index: 10;">
+                          <EmojiPicker @select="insertEmoji" />
+                        </div>
+                      </div>
                     </v-col>
                   </v-row>
                   <div class="d-flex justify-end">
@@ -374,6 +407,10 @@ import { marked } from 'marked'
 import CommentList from '../../components/frontend/CommentList.vue'
 import ReadingProgress from '../../components/frontend/ReadingProgress.vue'
 import TableOfContents from '../../components/frontend/TableOfContents.vue'
+import ArticleFavorite from '../../components/frontend/ArticleFavorite.vue'
+import Breadcrumb from '../../components/frontend/Breadcrumb.vue'
+import ImageLightbox from '../../components/frontend/ImageLightbox.vue'
+import EmojiPicker from '../../components/frontend/EmojiPicker.vue'
 import { getArticleById } from '../../api/article.js'
 import { getArticleComments, submitComment } from '../../api/comment.js'
 import { smoothScrollToTop } from '../../utils/smoothScroll.js'
@@ -381,7 +418,7 @@ import request from '../../api/request.js'
 
 export default {
   name: 'ArticleDetailView',
-  components: { CommentList, ReadingProgress, TableOfContents },
+  components: { CommentList, ReadingProgress, TableOfContents, ArticleFavorite, Breadcrumb, ImageLightbox, EmojiPicker },
   data: function() {
     return {
       article: null,
@@ -563,6 +600,14 @@ export default {
       var url = encodeURIComponent(window.location.href)
       var title = encodeURIComponent(this.article ? this.article.title : '')
       window.open('https://service.weibo.com/share/share.php?url=' + url + '&title=' + title, '_blank')
+    },
+    // 打印文章
+    printArticle: function() {
+      window.print()
+    },
+    // 插入 Emoji 到评论框
+    insertEmoji: function(emoji) {
+      this.commentForm.content = (this.commentForm.content || '') + emoji
     },
     formatDate: function(dateStr) {
       if (!dateStr) return ''

@@ -124,7 +124,13 @@
 
         <!-- Markdown 编辑器 -->
         <div class="mb-4">
-          <div class="text-body-2 text-grey mb-2">文章内容（Markdown）</div>
+          <div class="d-flex align-center justify-space-between mb-2">
+            <div class="text-body-2 text-grey">文章内容（Markdown）</div>
+            <div v-if="draftSaved" style="font-size: 12px; color: #34a853; display: flex; align-items: center; gap: 4px;">
+              <v-icon size="14" color="success">mdi-check-circle-outline</v-icon>
+              草稿已自动保存
+            </div>
+          </div>
           <MdEditor
             v-model="form.content"
             :theme="'light'"
@@ -190,7 +196,10 @@ export default {
         content: '',
         status: 0,
         publishTime: null
-      }
+      },
+      autoSaveTimer: null,
+      draftSaved: false,
+      draftRestored: false
     }
   },
   computed: {
@@ -204,7 +213,15 @@ export default {
     this.loadTags()
     if (this.isEdit) {
       this.loadArticle()
+    } else {
+      // 新建文章时，尝试恢复草稿
+      this.restoreDraft()
     }
+    // 自动保存草稿（每 30 秒）
+    this.autoSaveTimer = setInterval(this.saveDraft, 30000)
+  },
+  beforeUnmount: function() {
+    if (this.autoSaveTimer) clearInterval(this.autoSaveTimer)
   },
   methods: {
     // 加载分类列表
@@ -280,6 +297,8 @@ export default {
 
       promise
         .then(function() {
+          // 提交成功后清除草稿
+          try { localStorage.removeItem('article_draft') } catch (e) {}
           self.router.push('/admin/articles')
         })
         .catch(function(err) {
@@ -292,6 +311,37 @@ export default {
     // 返回列表页
     goBack: function() {
       this.router.push('/admin/articles')
+    },
+    // 草稿自动保存
+    saveDraft: function() {
+      if (!this.form.title && !this.form.content) return
+      try {
+        localStorage.setItem('article_draft', JSON.stringify({
+          title: this.form.title,
+          content: this.form.content,
+          summary: this.form.summary,
+          savedAt: new Date().toLocaleTimeString()
+        }))
+        this.draftSaved = true
+        var self = this
+        setTimeout(function() { self.draftSaved = false }, 2000)
+      } catch (e) {}
+    },
+    // 恢复草稿
+    restoreDraft: function() {
+      try {
+        var draft = localStorage.getItem('article_draft')
+        if (!draft) return
+        var data = JSON.parse(draft)
+        if (!data.title && !data.content) return
+        if (confirm('检测到未保存的草稿（' + (data.savedAt || '') + '），是否恢复？')) {
+          this.form.title = data.title || ''
+          this.form.content = data.content || ''
+          this.form.summary = data.summary || ''
+          this.draftRestored = true
+        }
+        localStorage.removeItem('article_draft')
+      } catch (e) {}
     },
     triggerUpload: function() {
       this.$refs.fileInput.click()

@@ -165,6 +165,21 @@
       </div>
     </div>
 
+    <!-- 随机文章 -->
+    <div
+      style="background: white; border: 1px solid #e8eaed; border-radius: 12px; padding: 16px 20px; text-align: center;"
+    >
+      <div style="font-size: 13px; color: #80868b; margin-bottom: 10px;">✨ 随机发现一篇好文章</div>
+      <v-btn
+        color="primary"
+        variant="tonal"
+        prepend-icon="mdi-shuffle-variant"
+        block
+        @click="goRandom"
+        style="font-size: 13px;"
+      >随机阅读</v-btn>
+    </div>
+
     <!-- 最新文章 -->
     <div
       v-if="recentArticles.length > 0"
@@ -272,10 +287,15 @@ import request from '../../api/request.js'
 import DailyQuote from './DailyQuote.vue'
 import TypewriterText from './TypewriterText.vue'
 import WeatherWidget from './WeatherWidget.vue'
+import { useRouter } from 'vue-router'
 
 export default {
   name: 'BlogSidebar',
   components: { DailyQuote, TypewriterText, WeatherWidget },
+  setup: function() {
+    var router = useRouter()
+    return { router }
+  },
   data: function() {
     return {
       categories: [],
@@ -334,6 +354,20 @@ export default {
     formatDate: function(dateStr) {
       if (!dateStr) return ''
       return dateStr.substring(0, 10)
+    },
+    goRandom: function() {
+      var self = this
+      var list = self.recentArticles.concat(self.hotArticles)
+      // 去重
+      var seen = {}
+      var unique = list.filter(function(a) {
+        if (seen[a.id]) return false
+        seen[a.id] = true
+        return true
+      })
+      if (unique.length === 0) return
+      var pick = unique[Math.floor(Math.random() * unique.length)]
+      self.router.push('/article/' + pick.id)
     }
   }
 }
