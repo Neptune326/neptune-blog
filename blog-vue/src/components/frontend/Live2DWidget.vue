@@ -67,38 +67,26 @@ export default {
     initLive2D: function() {
       var self = this
 
-      // 动态 import oh-my-live2d（避免 SSR 问题）
       import('oh-my-live2d').then(function(module) {
         var loadOml2d = module.loadOml2d || module.default
         if (typeof loadOml2d !== 'function') {
-          console.warn('[Live2D] loadOml2d 不是函数，module:', module)
+          console.warn('[Live2D] loadOml2d 不是函数')
           return
         }
 
         loadOml2d({
-          // 模型配置 —— 使用 jsdelivr CDN（国内相对稳定）
           models: [
             {
-              path: 'https://cdn.jsdelivr.net/gh/eikanya/Live2d-model@master/Live2D/Senko_Normals/senko.model3.json',
-              scale: 0.12,
-              position: [0, 50],
-              stageStyle: { width: 200, height: 250 }
-            },
-            {
-              path: 'https://cdn.jsdelivr.net/gh/guansss/pixi-live2d-display@master/test/assets/haru/haru_greeter_t03.model3.json',
-              scale: 0.1,
-              position: [0, 30],
+              // 使用 npm.elemecdn.com 国内镜像，访问更稳定
+              path: 'https://npm.elemecdn.com/live2d-widget-model-shizuku@1.0.5/assets/shizuku.model.json',
+              scale: 0.2,
+              position: [0, 60],
               stageStyle: { width: 200, height: 250 }
             }
           ],
           stageStyle: { width: 200, height: 250 },
           tips: {
-            style: { width: 180, height: 80, offsetX: 20, offsetY: 80 },
-            idleTips: {
-              wordTheDay: function(wordTheDayData) {
-                return wordTheDayData && wordTheDayData.hitokoto
-              }
-            }
+            style: { width: 180, height: 80, offsetX: 20, offsetY: 80 }
           },
           menus: {
             items: function(defaultItems) { return defaultItems }
@@ -110,31 +98,8 @@ export default {
           }
         })
       }).catch(function(err) {
-        console.warn('[Live2D] oh-my-live2d 加载失败:', err)
-        self.loadFallback()
+        console.warn('[Live2D] 加载失败:', err)
       })
-    },
-
-    // 降级方案：使用 CDN 加载
-    loadFallback: function() {
-      var self = this
-      var script = document.createElement('script')
-      // 使用国内可访问的 CDN
-      script.src = 'https://cdn.jsdelivr.net/npm/oh-my-live2d/dist/index.min.js'
-      script.onload = function() {
-        if (window.OML2D) {
-          window.OML2D.loadOml2d({
-            models: [{
-              path: 'https://cdn.jsdelivr.net/gh/eikanya/Live2d-model/Live2D/Senko_Normals/senko.model3.json',
-              scale: 0.12
-            }],
-            dockedPosition: 'left'
-          })
-          self.showGreeting()
-          self.greetingTimer = setInterval(self.showGreeting.bind(self), 30000)
-        }
-      }
-      document.head.appendChild(script)
     },
 
     showGreeting: function() {
