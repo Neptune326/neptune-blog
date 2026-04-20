@@ -276,8 +276,8 @@
 </template>
 
 <script>
-import { getSysConfig, updateSysConfig } from '../../../api/sysConfig.js'
-import { uploadImage } from '../../../api/upload.js'
+import { getSysConfig, updateSysConfig } from '@/api/sysConfig.js'
+import { uploadImage } from '@/api/upload.js'
 
 export default {
   name: 'SysConfigView',
@@ -387,4 +387,5 @@ export default {
   background: #f0f7ff !important;
 }
 </style>
+
 

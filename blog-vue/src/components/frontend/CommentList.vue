@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div>
     <div v-if="comments.length === 0" class="text-center py-8" style="color: #80868b;">
       <v-icon size="40" color="grey-lighten-1">mdi-comment-outline</v-icon>
@@ -146,7 +146,7 @@
 </template>
 
 <script>
-import { submitComment } from '../../api/comment.js'
+import { submitComment } from '@/api/comment.js'
 
 export default {
   name: 'CommentList',
@@ -223,3 +223,4 @@ export default {
   color: #1a73e8;
 }
 </style>
+

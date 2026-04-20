@@ -91,8 +91,8 @@
 </template>
 
 <script>
-import { login } from '../../../api/auth.js'
-import { useAuthStore } from '../../../store/auth.js'
+import { login } from '@/api/auth.js'
+import { useAuthStore } from '@/store/auth.js'
 import { useRouter } from 'vue-router'
 
 export default {
@@ -134,4 +134,5 @@ export default {
   }
 }
 </script>
+
 

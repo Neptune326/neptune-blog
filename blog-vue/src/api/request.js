@@ -1,7 +1,7 @@
-// axios 请求封装
+﻿// axios 请求封装
 import axios from 'axios'
-import { useAuthStore } from '../store/auth.js'
-import { toast } from '../plugins/toast.js'
+import { useAuthStore } from '@/store/auth.js'
+import { toast } from '@/plugins/toast.js'
 
 // ===== axios 实例 =====
 var request = axios.create({
@@ -58,3 +58,4 @@ request.interceptors.response.use(
 )
 
 export default request
+

@@ -1,44 +1,44 @@
-// 路由配置
+﻿// 路由配置
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore } from '../store/auth.js'
+import { useAuthStore } from '@/store/auth.js'
 
 // ===== 前台视图 =====
-import LandingView from '../views/frontend/home/LandingView.vue'
-import HomeView from '../views/frontend/home/HomeView.vue'
-import ArticleDetailView from '../views/frontend/article/ArticleDetailView.vue'
-import FrontCategoryView from '../views/frontend/browse/CategoryView.vue'
-import FrontTagView from '../views/frontend/browse/TagView.vue'
-import ArchiveView from '../views/frontend/browse/ArchiveView.vue'
-import SearchView from '../views/frontend/browse/SearchView.vue'
-import AboutView from '../views/frontend/other/AboutView.vue'
-import MessageView from '../views/frontend/other/MessageView.vue'
-import NotFoundView from '../views/frontend/other/NotFoundView.vue'
+import LandingView from '@/views/frontend/home/LandingView.vue'
+import HomeView from '@/views/frontend/home/HomeView.vue'
+import ArticleDetailView from '@/views/frontend/article/ArticleDetailView.vue'
+import FrontCategoryView from '@/views/frontend/browse/CategoryView.vue'
+import FrontTagView from '@/views/frontend/browse/TagView.vue'
+import ArchiveView from '@/views/frontend/browse/ArchiveView.vue'
+import SearchView from '@/views/frontend/browse/SearchView.vue'
+import AboutView from '@/views/frontend/other/AboutView.vue'
+import MessageView from '@/views/frontend/other/MessageView.vue'
+import NotFoundView from '@/views/frontend/other/NotFoundView.vue'
 
 // ===== 后台布局 =====
-import AdminLayout from '../components/admin/AdminLayout.vue'
+import AdminLayout from '@/components/admin/AdminLayout.vue'
 
 // ===== 后台视图 =====
-import LoginView from '../views/admin/auth/LoginView.vue'
-import DashboardView from '../views/admin/dashboard/DashboardView.vue'
+import LoginView from '@/views/admin/auth/LoginView.vue'
+import DashboardView from '@/views/admin/dashboard/DashboardView.vue'
 // content
-import ArticleListView from '../views/admin/content/ArticleListView.vue'
-import ArticleEditView from '../views/admin/content/ArticleEditView.vue'
-import AdminCategoryView from '../views/admin/content/CategoryView.vue'
-import AdminTagView from '../views/admin/content/TagView.vue'
-import SeriesView from '../views/admin/content/SeriesView.vue'
+import ArticleListView from '@/views/admin/content/ArticleListView.vue'
+import ArticleEditView from '@/views/admin/content/ArticleEditView.vue'
+import AdminCategoryView from '@/views/admin/content/CategoryView.vue'
+import AdminTagView from '@/views/admin/content/TagView.vue'
+import SeriesView from '@/views/admin/content/SeriesView.vue'
 // interaction
-import CommentView from '../views/admin/interaction/CommentView.vue'
-import MessageAdminView from '../views/admin/interaction/MessageAdminView.vue'
-import CommentBlacklistView from '../views/admin/interaction/CommentBlacklistView.vue'
+import CommentView from '@/views/admin/interaction/CommentView.vue'
+import MessageAdminView from '@/views/admin/interaction/MessageAdminView.vue'
+import CommentBlacklistView from '@/views/admin/interaction/CommentBlacklistView.vue'
 // system
-import SysConfigView from '../views/admin/system/SysConfigView.vue'
-import AboutEditView from '../views/admin/system/AboutEditView.vue'
-import AdminUserView from '../views/admin/system/AdminUserView.vue'
-import FriendLinkView from '../views/admin/system/FriendLinkView.vue'
-import DataBackupView from '../views/admin/system/DataBackupView.vue'
+import SysConfigView from '@/views/admin/system/SysConfigView.vue'
+import AboutEditView from '@/views/admin/system/AboutEditView.vue'
+import AdminUserView from '@/views/admin/system/AdminUserView.vue'
+import FriendLinkView from '@/views/admin/system/FriendLinkView.vue'
+import DataBackupView from '@/views/admin/system/DataBackupView.vue'
 // logs
-import OperationLogView from '../views/admin/logs/OperationLogView.vue'
-import LoginLogView from '../views/admin/logs/LoginLogView.vue'
+import OperationLogView from '@/views/admin/logs/OperationLogView.vue'
+import LoginLogView from '@/views/admin/logs/LoginLogView.vue'
 
 var routes = [
   // ===== 前台路由（无需登录）=====
@@ -107,3 +107,4 @@ router.beforeEach(function(to, from, next) {
 })
 
 export default router
+

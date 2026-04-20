@@ -152,9 +152,9 @@
 </template>
 
 <script>
-import ArticleCard from '../../../components/frontend/ArticleCard.vue'
-import Pagination from '../../../components/frontend/Pagination.vue'
-import { getArticles } from '../../../api/article.js'
+import ArticleCard from '@/components/frontend/ArticleCard.vue'
+import Pagination from '@/components/frontend/Pagination.vue'
+import { getArticles } from '@/api/article.js'
 
 export default {
   name: 'SearchView',
@@ -247,4 +247,5 @@ export default {
   }
 }
 </script>
+
 

@@ -177,10 +177,10 @@
 <script>
 import { MdEditor } from 'md-editor-v3'
 import 'md-editor-v3/lib/style.css'
-import { adminGetArticleById, createArticle, updateArticle } from '../../../api/article.js'
-import { adminGetCategories } from '../../../api/category.js'
-import { adminGetTags } from '../../../api/tag.js'
-import { uploadImage } from '../../../api/upload.js'
+import { adminGetArticleById, createArticle, updateArticle } from '@/api/article.js'
+import { adminGetCategories } from '@/api/category.js'
+import { adminGetTags } from '@/api/tag.js'
+import { uploadImage } from '@/api/upload.js'
 import { useRoute, useRouter } from 'vue-router'
 
 var DRAFT_KEY = 'article_new_draft'
@@ -404,4 +404,5 @@ export default {
   }
 }
 </script>
+
 

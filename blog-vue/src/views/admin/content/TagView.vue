@@ -86,8 +86,8 @@ import {
   adminCreateTag,
   adminUpdateTag,
   adminDeleteTag
-} from '../../../api/tag.js'
-import TablePagination from '../../../components/admin/TablePagination.vue'
+} from '@/api/tag.js'
+import TablePagination from '@/components/admin/TablePagination.vue'
 
 export default {
   name: 'AdminTagView',
@@ -178,4 +178,5 @@ export default {
   }
 }
 </script>
+
 

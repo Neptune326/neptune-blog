@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <v-app style="background: #f8f9fa; height: 100vh; overflow: hidden;">
     <!-- 左侧导航栏 —— 固定，不随内容滚动 -->
     <v-navigation-drawer
@@ -182,9 +182,9 @@
 </template>
 
 <script>
-import { logout } from '../../api/auth.js'
-import request from '../../api/request.js'
-import { useAuthStore } from '../../store/auth.js'
+import { logout } from '@/api/auth.js'
+import request from '@/api/request.js'
+import { useAuthStore } from '@/store/auth.js'
 import { useRouter, useRoute } from 'vue-router'
 
 export default {
@@ -282,3 +282,4 @@ export default {
   }
 }
 </script>
+

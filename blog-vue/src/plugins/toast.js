@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 全局 Toast 提示插件
  * 用法：this.$toast.success('操作成功')
  *       this.$toast.error('操作失败')
@@ -6,7 +6,7 @@
  *       this.$toast.info('提示信息')
  */
 import { createApp, h } from 'vue'
-import Toast from '../components/common/Toast.vue'
+import Toast from '@/components/common/Toast.vue'
 
 var toastInstance = null
 
@@ -40,3 +40,4 @@ export default {
     app.config.globalProperties.$toast = toast
   }
 }
+

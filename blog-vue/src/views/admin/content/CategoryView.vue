@@ -93,8 +93,8 @@ import {
   adminCreateCategory,
   adminUpdateCategory,
   adminDeleteCategory
-} from '../../../api/category.js'
-import TablePagination from '../../../components/admin/TablePagination.vue'
+} from '@/api/category.js'
+import TablePagination from '@/components/admin/TablePagination.vue'
 
 export default {
   name: 'AdminCategoryView',
@@ -185,4 +185,5 @@ export default {
   }
 }
 </script>
+
 

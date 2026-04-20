@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <!-- 博客侧边栏 -->
   <div style="display: flex; flex-direction: column; gap: 16px;">
 
@@ -281,10 +281,10 @@
 </template>
 
 <script>
-import { getCategories } from '../../api/category.js'
-import { getTags } from '../../api/tag.js'
-import { getArticles } from '../../api/article.js'
-import request from '../../api/request.js'
+import { getCategories } from '@/api/category.js'
+import { getTags } from '@/api/tag.js'
+import { getArticles } from '@/api/article.js'
+import request from '@/api/request.js'
 import DailyQuote from './DailyQuote.vue'
 import TypewriterText from './TypewriterText.vue'
 import WeatherWidget from './WeatherWidget.vue'
@@ -411,3 +411,4 @@ export default {
   border-color: #1a73e8 !important;
 }
 </style>
+

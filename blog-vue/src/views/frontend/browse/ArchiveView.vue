@@ -142,7 +142,7 @@
 </template>
 
 <script>
-import { getArchive } from '../../../api/article.js'
+import { getArchive } from '@/api/article.js'
 
 export default {
   name: 'ArchiveView',
@@ -212,4 +212,5 @@ export default {
   color: #1a73e8 !important;
 }
 </style>
+
 

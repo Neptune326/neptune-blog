@@ -413,9 +413,9 @@
 </template>
 
 <script>
-import { getArticles } from '../../../api/article.js'
-import request from '../../../api/request.js'
-import SiteRuntime from '../../../components/frontend/SiteRuntime.vue'
+import { getArticles } from '@/api/article.js'
+import request from '@/api/request.js'
+import SiteRuntime from '@/components/frontend/SiteRuntime.vue'
 
 // 默认二次元背景图（使用 picsum 的动漫风格占位，实际可替换为真实二次元图源）
 var DEFAULT_ANIME_IMAGES = [
@@ -612,4 +612,5 @@ export default {
   to { transform: rotate(360deg); }
 }
 </style>
+
 

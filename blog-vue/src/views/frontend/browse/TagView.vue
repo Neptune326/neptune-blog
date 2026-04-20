@@ -47,9 +47,9 @@
 </template>
 
 <script>
-import ArticleCard from '../../../components/frontend/ArticleCard.vue'
-import Pagination from '../../../components/frontend/Pagination.vue'
-import { getTagArticles } from '../../../api/tag.js'
+import ArticleCard from '@/components/frontend/ArticleCard.vue'
+import Pagination from '@/components/frontend/Pagination.vue'
+import { getTagArticles } from '@/api/tag.js'
 
 export default {
   name: 'TagView',
@@ -100,4 +100,5 @@ export default {
   }
 }
 </script>
+
 

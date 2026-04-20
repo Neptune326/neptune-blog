@@ -44,9 +44,9 @@
 </template>
 
 <script>
-import ArticleCard from '../../../components/frontend/ArticleCard.vue'
-import Pagination from '../../../components/frontend/Pagination.vue'
-import { getCategoryArticles } from '../../../api/category.js'
+import ArticleCard from '@/components/frontend/ArticleCard.vue'
+import Pagination from '@/components/frontend/Pagination.vue'
+import { getCategoryArticles } from '@/api/category.js'
 
 export default {
   name: 'CategoryView',
@@ -101,4 +101,5 @@ export default {
   }
 }
 </script>
+
 

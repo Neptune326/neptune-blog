@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <!-- 阅读进度条 + 回到顶部按钮 -->
   <div>
     <!-- 顶部进度条 -->
@@ -48,7 +48,7 @@
 </template>
 
 <script>
-import { smoothScrollToTop } from '../../utils/smoothScroll.js'
+import { smoothScrollToTop } from '@/utils/smoothScroll.js'
 
 export default {
   name: 'ReadingProgress',
@@ -96,3 +96,4 @@ export default {
   transform: translateY(12px);
 }
 </style>
+

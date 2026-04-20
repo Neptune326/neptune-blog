@@ -123,8 +123,8 @@
 </template>
 
 <script>
-import ReadingProgress from '../../../components/frontend/ReadingProgress.vue'
-import request from '../../../api/request.js'
+import ReadingProgress from '@/components/frontend/ReadingProgress.vue'
+import request from '@/api/request.js'
 
 export default {
   name: 'MessageView',
@@ -179,4 +179,5 @@ export default {
   }
 }
 </script>
+
 

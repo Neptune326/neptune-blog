@@ -100,8 +100,8 @@
 </template>
 
 <script>
-import request from '../../../api/request.js'
-import TablePagination from '../../../components/admin/TablePagination.vue'
+import request from '@/api/request.js'
+import TablePagination from '@/components/admin/TablePagination.vue'
 
 export default {
   name: 'AdminUserView',
@@ -202,6 +202,7 @@ export default {
   }
 }
 </script>
+
 
 
 

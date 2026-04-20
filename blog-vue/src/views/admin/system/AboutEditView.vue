@@ -35,7 +35,7 @@
 <script>
 import { MdEditor } from 'md-editor-v3'
 import 'md-editor-v3/lib/style.css'
-import { getSysConfig, updateSysConfig } from '../../../api/sysConfig.js'
+import { getSysConfig, updateSysConfig } from '@/api/sysConfig.js'
 
 export default {
   name: 'AboutEditView',
@@ -73,6 +73,7 @@ export default {
   }
 }
 </script>
+
 
 
 

@@ -116,8 +116,8 @@ import {
   approveComment,
   rejectComment,
   deleteComment
-} from '../../../api/comment.js'
-import TablePagination from '../../../components/admin/TablePagination.vue'
+} from '@/api/comment.js'
+import TablePagination from '@/components/admin/TablePagination.vue'
 
 export default {
   name: 'CommentView',
@@ -260,4 +260,5 @@ export default {
   white-space: nowrap;
 }
 </style>
+
 

@@ -86,7 +86,7 @@
 </template>
 
 <script>
-import { getSysConfig, updateSysConfig } from '../../../api/sysConfig.js'
+import { getSysConfig, updateSysConfig } from '@/api/sysConfig.js'
 
 export default {
   name: 'CommentBlacklistView',
@@ -147,4 +147,5 @@ export default {
   }
 }
 </script>
+
 

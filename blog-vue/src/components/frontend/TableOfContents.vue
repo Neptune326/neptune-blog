@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <!-- 文章目录（TOC）—— 右侧固定 -->
   <div
     v-if="headings.length > 0"
@@ -62,7 +62,7 @@
 </template>
 
 <script>
-import { smoothScrollToElement } from '../../utils/smoothScroll.js'
+import { smoothScrollToElement } from '@/utils/smoothScroll.js'
 
 export default {
   name: 'TableOfContents',
@@ -134,3 +134,4 @@ export default {
   }
 }
 </script>
+
