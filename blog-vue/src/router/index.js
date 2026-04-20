@@ -2,39 +2,43 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../store/auth.js'
 
-// 前台视图
-import LandingView from '../views/frontend/LandingView.vue'
-import HomeView from '../views/frontend/HomeView.vue'
-import ArticleDetailView from '../views/frontend/ArticleDetailView.vue'
-import FrontCategoryView from '../views/frontend/CategoryView.vue'
-import FrontTagView from '../views/frontend/TagView.vue'
-import ArchiveView from '../views/frontend/ArchiveView.vue'
-import SearchView from '../views/frontend/SearchView.vue'
-import NotFoundView from '../views/frontend/NotFoundView.vue'
-import AboutView from '../views/frontend/AboutView.vue'
-import MessageView from '../views/frontend/MessageView.vue'
+// ===== 前台视图 =====
+import LandingView from '../views/frontend/home/LandingView.vue'
+import HomeView from '../views/frontend/home/HomeView.vue'
+import ArticleDetailView from '../views/frontend/article/ArticleDetailView.vue'
+import FrontCategoryView from '../views/frontend/browse/CategoryView.vue'
+import FrontTagView from '../views/frontend/browse/TagView.vue'
+import ArchiveView from '../views/frontend/browse/ArchiveView.vue'
+import SearchView from '../views/frontend/browse/SearchView.vue'
+import AboutView from '../views/frontend/other/AboutView.vue'
+import MessageView from '../views/frontend/other/MessageView.vue'
+import NotFoundView from '../views/frontend/other/NotFoundView.vue'
 
-// 后台布局
+// ===== 后台布局 =====
 import AdminLayout from '../components/admin/AdminLayout.vue'
 
-// 后台视图
-import LoginView from '../views/admin/LoginView.vue'
-import DashboardView from '../views/admin/DashboardView.vue'
-import ArticleListView from '../views/admin/ArticleListView.vue'
-import ArticleEditView from '../views/admin/ArticleEditView.vue'
-import AdminCategoryView from '../views/admin/CategoryView.vue'
-import AdminTagView from '../views/admin/TagView.vue'
-import CommentView from '../views/admin/CommentView.vue'
-import SysConfigView from '../views/admin/SysConfigView.vue'
-import OperationLogView from '../views/admin/OperationLogView.vue'
-import LoginLogView from '../views/admin/LoginLogView.vue'
-import AboutEditView from '../views/admin/AboutEditView.vue'
-import MessageAdminView from '../views/admin/MessageAdminView.vue'
-import AdminUserView from '../views/admin/AdminUserView.vue'
-import SeriesView from '../views/admin/SeriesView.vue'
-import FriendLinkView from '../views/admin/FriendLinkView.vue'
-import CommentBlacklistView from '../views/admin/CommentBlacklistView.vue'
-import DataBackupView from '../views/admin/DataBackupView.vue'
+// ===== 后台视图 =====
+import LoginView from '../views/admin/auth/LoginView.vue'
+import DashboardView from '../views/admin/dashboard/DashboardView.vue'
+// content
+import ArticleListView from '../views/admin/content/ArticleListView.vue'
+import ArticleEditView from '../views/admin/content/ArticleEditView.vue'
+import AdminCategoryView from '../views/admin/content/CategoryView.vue'
+import AdminTagView from '../views/admin/content/TagView.vue'
+import SeriesView from '../views/admin/content/SeriesView.vue'
+// interaction
+import CommentView from '../views/admin/interaction/CommentView.vue'
+import MessageAdminView from '../views/admin/interaction/MessageAdminView.vue'
+import CommentBlacklistView from '../views/admin/interaction/CommentBlacklistView.vue'
+// system
+import SysConfigView from '../views/admin/system/SysConfigView.vue'
+import AboutEditView from '../views/admin/system/AboutEditView.vue'
+import AdminUserView from '../views/admin/system/AdminUserView.vue'
+import FriendLinkView from '../views/admin/system/FriendLinkView.vue'
+import DataBackupView from '../views/admin/system/DataBackupView.vue'
+// logs
+import OperationLogView from '../views/admin/logs/OperationLogView.vue'
+import LoginLogView from '../views/admin/logs/LoginLogView.vue'
 
 var routes = [
   // ===== 前台路由（无需登录）=====
@@ -59,23 +63,28 @@ var routes = [
     redirect: '/admin/dashboard',
     meta: { requiresAuth: true },
     children: [
-      { path: 'dashboard',        component: DashboardView,    meta: { requiresAuth: true } },
-      { path: 'articles',         component: ArticleListView,  meta: { requiresAuth: true } },
-      { path: 'articles/edit',    component: ArticleEditView,  meta: { requiresAuth: true } },
-      { path: 'articles/edit/:id',component: ArticleEditView,  meta: { requiresAuth: true } },
-      { path: 'categories',       component: AdminCategoryView,meta: { requiresAuth: true } },
-      { path: 'tags',             component: AdminTagView,     meta: { requiresAuth: true } },
-      { path: 'comments',         component: CommentView,      meta: { requiresAuth: true } },
-      { path: 'sys-config',       component: SysConfigView,    meta: { requiresAuth: true } },
-      { path: 'about',            component: AboutEditView,    meta: { requiresAuth: true } },
-      { path: 'messages',         component: MessageAdminView, meta: { requiresAuth: true } },
-      { path: 'admin-users',      component: AdminUserView,    meta: { requiresAuth: true } },
-      { path: 'series',           component: SeriesView,       meta: { requiresAuth: true } },
-      { path: 'friend-links',     component: FriendLinkView,          meta: { requiresAuth: true } },
-      { path: 'comment-blacklist',component: CommentBlacklistView,    meta: { requiresAuth: true } },
-      { path: 'data-backup',      component: DataBackupView,          meta: { requiresAuth: true } },
-      { path: 'logs/operation',   component: OperationLogView, meta: { requiresAuth: true } },
-      { path: 'logs/login',       component: LoginLogView,     meta: { requiresAuth: true } }
+      // dashboard
+      { path: 'dashboard',          component: DashboardView,        meta: { requiresAuth: true } },
+      // content
+      { path: 'articles',           component: ArticleListView,      meta: { requiresAuth: true } },
+      { path: 'articles/edit',      component: ArticleEditView,      meta: { requiresAuth: true } },
+      { path: 'articles/edit/:id',  component: ArticleEditView,      meta: { requiresAuth: true } },
+      { path: 'categories',         component: AdminCategoryView,    meta: { requiresAuth: true } },
+      { path: 'tags',               component: AdminTagView,         meta: { requiresAuth: true } },
+      { path: 'series',             component: SeriesView,           meta: { requiresAuth: true } },
+      // interaction
+      { path: 'comments',           component: CommentView,          meta: { requiresAuth: true } },
+      { path: 'messages',           component: MessageAdminView,     meta: { requiresAuth: true } },
+      { path: 'comment-blacklist',  component: CommentBlacklistView, meta: { requiresAuth: true } },
+      // system
+      { path: 'sys-config',         component: SysConfigView,        meta: { requiresAuth: true } },
+      { path: 'about',              component: AboutEditView,        meta: { requiresAuth: true } },
+      { path: 'admin-users',        component: AdminUserView,        meta: { requiresAuth: true } },
+      { path: 'friend-links',       component: FriendLinkView,       meta: { requiresAuth: true } },
+      { path: 'data-backup',        component: DataBackupView,       meta: { requiresAuth: true } },
+      // logs
+      { path: 'logs/operation',     component: OperationLogView,     meta: { requiresAuth: true } },
+      { path: 'logs/login',         component: LoginLogView,         meta: { requiresAuth: true } }
     ]
   }
 ]

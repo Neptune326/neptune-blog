@@ -18,7 +18,9 @@
     />
 
     <!-- 鼠标点击特效（仅前台） -->
-    <ClickEffect v-if="isFrontend && clickEffectEnabled" />
+    <ClickEffect v-if="isFrontend && clickEffectEnabled === 'true'" />
+    <!-- 彩色粒子点击特效 -->
+    <ColorClickEffect v-if="isFrontend && clickEffectEnabled === 'color'" />
 
     <!-- 图片灯箱（全局，自动监听 markdown-body 内图片点击） -->
     <ImageLightbox v-if="isFrontend" />
@@ -43,16 +45,17 @@ import ImageLightbox from './components/frontend/ImageLightbox.vue'
 import MouseTrail from './components/frontend/MouseTrail.vue'
 import MusicPlayer from './components/frontend/MusicPlayer.vue'
 import Confetti from './components/frontend/Confetti.vue'
+import ColorClickEffect from './components/frontend/ColorClickEffect.vue'
 
 export default {
   name: 'App',
-  components: { Live2DWidget, ParticleCanvas, ClickEffect, ImageLightbox, MouseTrail, MusicPlayer, Confetti },
+  components: { Live2DWidget, ParticleCanvas, ClickEffect, ImageLightbox, MouseTrail, MusicPlayer, Confetti, ColorClickEffect },
   data: function() {
     return {
       particleEnabled: false,
       particleType: 'sakura',
       particleCount: 25,
-      clickEffectEnabled: true,
+      clickEffectEnabled: 'true',
       live2dEnabled: false,
       mouseTrailEnabled: false,
       musicPlaylist: []
@@ -87,7 +90,7 @@ export default {
           self.particleEnabled = data.particle_enabled === 'true'
           self.particleType = data.particle_type || 'sakura'
           self.particleCount = parseInt(data.particle_count || '25')
-          self.clickEffectEnabled = data.click_effect_enabled !== 'false'
+          self.clickEffectEnabled = data.click_effect_enabled || 'none'
           self.live2dEnabled = data.live2d_enabled === 'true'
           self.mouseTrailEnabled = data.mouse_trail_enabled === 'true'
           // 音乐播放列表
@@ -99,7 +102,7 @@ export default {
           }
         })
         .catch(function() {
-          self.clickEffectEnabled = true
+          self.clickEffectEnabled = 'true'
           self.particleEnabled = true
           self.live2dEnabled = true
         })

@@ -146,18 +146,13 @@
             </div>
 
             <!-- 鼠标点击特效 -->
-            <div class="d-flex align-center justify-space-between" style="padding: 12px 16px; background: #f8f9fa; border-radius: 10px;">
-              <div>
-                <div style="font-size: 14px; font-weight: 500; color: #202124;">鼠标点击特效</div>
-                <div style="font-size: 12px; color: #80868b; margin-top: 2px;">点击页面时飘出 Emoji 粒子动画</div>
-              </div>
-              <v-switch
-                v-model="form.click_effect_enabled"
-                color="pink"
-                hide-details
-                true-value="true"
-                false-value="false"
-              />
+            <div style="padding: 12px 16px; background: #f8f9fa; border-radius: 10px;">
+              <div style="font-size: 14px; font-weight: 500; color: #202124; margin-bottom: 8px;">鼠标点击特效</div>
+              <v-btn-toggle v-model="form.click_effect_enabled" density="compact" variant="outlined" color="pink">
+                <v-btn value="none" size="small">无效果</v-btn>
+                <v-btn value="true" size="small">😊 Emoji 粒子</v-btn>
+                <v-btn value="color" size="small">🎨 彩色粒子</v-btn>
+              </v-btn-toggle>
             </div>
 
             <!-- 鼠标轨迹特效 -->
