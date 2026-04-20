@@ -7,9 +7,6 @@
       </transition>
     </router-view>
 
-    <!-- Live2D 看板娘（全局挂载，仅前台页面显示，且配置开启时） -->
-    <Live2DWidget v-if="isFrontend && live2dEnabled" />
-
     <!-- 粒子飘落特效（仅前台，可通过系统配置控制） -->
     <ParticleCanvas
       v-if="isFrontend && particleEnabled"
@@ -38,7 +35,6 @@
 
 <script>
 import request from './api/request.js'
-import Live2DWidget from './components/frontend/Live2DWidget.vue'
 import ParticleCanvas from './components/frontend/ParticleCanvas.vue'
 import ClickEffect from './components/frontend/ClickEffect.vue'
 import ImageLightbox from './components/frontend/ImageLightbox.vue'
@@ -49,14 +45,13 @@ import ColorClickEffect from './components/frontend/ColorClickEffect.vue'
 
 export default {
   name: 'App',
-  components: { Live2DWidget, ParticleCanvas, ClickEffect, ImageLightbox, MouseTrail, MusicPlayer, Confetti, ColorClickEffect },
+  components: { ParticleCanvas, ClickEffect, ImageLightbox, MouseTrail, MusicPlayer, Confetti, ColorClickEffect },
   data: function() {
     return {
       particleEnabled: false,
       particleType: 'sakura',
       particleCount: 25,
       clickEffectEnabled: 'true',
-      live2dEnabled: false,
       mouseTrailEnabled: false,
       musicPlaylist: []
     }
@@ -91,7 +86,6 @@ export default {
           self.particleType = data.particle_type || 'sakura'
           self.particleCount = parseInt(data.particle_count || '25')
           self.clickEffectEnabled = data.click_effect_enabled || 'none'
-          self.live2dEnabled = data.live2d_enabled === 'true'
           self.mouseTrailEnabled = data.mouse_trail_enabled === 'true'
           // 音乐播放列表
           if (data.music_playlist) {
@@ -104,7 +98,6 @@ export default {
         .catch(function() {
           self.clickEffectEnabled = 'true'
           self.particleEnabled = true
-          self.live2dEnabled = true
         })
     }
   }

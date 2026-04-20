@@ -100,21 +100,6 @@
           </div>
 
           <div class="d-flex flex-column" style="gap: 16px;">
-            <!-- Live2D 开关 -->
-            <div class="d-flex align-center justify-space-between" style="padding: 12px 16px; background: #f8f9fa; border-radius: 10px;">
-              <div>
-                <div style="font-size: 14px; font-weight: 500; color: #202124;">Live2D 看板娘</div>
-                <div style="font-size: 12px; color: #80868b; margin-top: 2px;">在前台页面左下角显示 Live2D 动态角色</div>
-              </div>
-              <v-switch
-                v-model="form.live2d_enabled"
-                color="primary"
-                hide-details
-                true-value="true"
-                false-value="false"
-              />
-            </div>
-
             <!-- 评论审核开关 -->
             <div class="d-flex align-center justify-space-between" style="padding: 12px 16px; background: #f8f9fa; border-radius: 10px;">
               <div>
@@ -293,7 +278,6 @@ export default {
         blog_description: '',
         login_max_fail_count: '5',
         login_lock_duration: '10',
-        live2d_enabled: 'true',
         comment_audit_enabled: 'true',
         anime_theme_enabled: 'false',
         gallery_images: '[]',
