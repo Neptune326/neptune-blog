@@ -175,7 +175,7 @@
     <!-- 内容区 —— 独立滚动 -->
     <v-main style="background: #f8f9fa; height: 100vh; overflow-y: auto;">
       <v-container fluid style="padding: 24px;">
-        <router-view />
+        <router-view :key="route.fullPath" />
       </v-container>
     </v-main>
   </v-app>
