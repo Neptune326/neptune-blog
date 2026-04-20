@@ -1,124 +1,68 @@
 <template>
-  <!-- Live2D 看板娘 —— 对话气泡（模型由 oh-my-live2d 自动挂载到 body） -->
-  <div
-    v-if="bubbleVisible && message"
-    style="
-      position: fixed;
-      bottom: 230px;
-      left: 30px;
-      background: white;
-      border: 1px solid #e8eaed;
-      border-radius: 12px 12px 12px 0;
-      padding: 10px 14px;
-      font-size: 13px;
-      color: #3c4043;
-      max-width: 200px;
-      line-height: 1.6;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-      z-index: 9100;
-      pointer-events: none;
-      animation: bubbleFadeIn 0.3s ease;
-    "
-    class="d-none d-lg-block"
-  >
-    {{ message }}
-    <!-- 气泡小尾巴 -->
-    <div style="
-      position: absolute;
-      bottom: -8px; left: 16px;
-      width: 0; height: 0;
-      border-left: 8px solid transparent;
-      border-right: 8px solid transparent;
-      border-top: 8px solid white;
-      filter: drop-shadow(0 2px 1px rgba(0,0,0,0.05));
-    "></div>
-  </div>
+  <!-- live2d-widget 会自动挂载到 body，此组件只负责加载脚本 -->
+  <div></div>
 </template>
 
 <script>
 export default {
   name: 'Live2DWidget',
-  data: function() {
-    return {
-      message: '',
-      bubbleVisible: false,
-      messageTimer: null,
-      greetingTimer: null,
-      greetings: [
-        '你好呀，欢迎来到我的博客！✨',
-        '今天也要好好学习哦～ 📚',
-        '有什么想看的文章吗？',
-        '记得收藏喜欢的文章哦！',
-        '代码写累了？休息一下吧～ ☕',
-        '发现 Bug 了？别慌，慢慢调试！🐛',
-        '坚持每天进步一点点！💪'
-      ],
-      greetingIndex: 0
-    }
-  },
   mounted: function() {
-    this.initLive2D()
+    this.loadWidget()
   },
   beforeUnmount: function() {
-    if (this.messageTimer) clearTimeout(this.messageTimer)
-    if (this.greetingTimer) clearInterval(this.greetingTimer)
+    // 移除挂载的 live2d 元素
+    var el = document.getElementById('waifu')
+    if (el) el.remove()
+    var toggle = document.getElementById('waifu-toggle')
+    if (toggle) toggle.remove()
   },
   methods: {
-    initLive2D: function() {
-      var self = this
+    loadWidget: function() {
+      // 避免重复加载
+      if (document.getElementById('live2d-widget-script')) return
 
-      import('oh-my-live2d').then(function(module) {
-        var loadOml2d = module.loadOml2d || module.default
-        if (typeof loadOml2d !== 'function') {
-          console.warn('[Live2D] loadOml2d 不是函数')
-          return
-        }
+      // 配置项（在加载脚本前设置）
+      window.live2d_settings = {
+        // 模型目录（使用 stevenjoezhang 的 CDN）
+        modelAPI: 'https://live2d.fghrsh.net/api/',
+        // 随机切换模型
+        modelRandMode: true,
+        // 显示工具栏
+        showToolMenu: true,
+        // 工具栏按钮
+        tools: ['hitokoto', 'asteroids', 'switch-model', 'switch-texture', 'photo', 'info', 'quit'],
+        // 一言 API
+        hitokotoAPI: 'https://v1.hitokoto.cn/?encode=text',
+        // 位置：左下角
+        waifuPath: 'https://fastly.jsdelivr.net/gh/stevenjoezhang/live2d-widget@latest/waifu-tips.json',
+        // 看板娘尺寸
+        modelWidth: 150,
+        modelHeight: 200
+      }
 
-        loadOml2d({
-          models: [
-            {
-              // 使用 npm.elemecdn.com 国内镜像，访问更稳定
-              path: 'https://npm.elemecdn.com/live2d-widget-model-shizuku@1.0.5/assets/shizuku.model.json',
-              scale: 0.2,
-              position: [0, 60],
-              stageStyle: { width: 200, height: 250 }
-            }
-          ],
-          stageStyle: { width: 200, height: 250 },
-          tips: {
-            style: { width: 180, height: 80, offsetX: 20, offsetY: 80 }
-          },
-          menus: {
-            items: function(defaultItems) { return defaultItems }
-          },
-          dockedPosition: 'left',
-          onLoad: function() {
-            self.showGreeting()
-            self.greetingTimer = setInterval(self.showGreeting.bind(self), 30000)
-          }
-        })
-      }).catch(function(err) {
-        console.warn('[Live2D] 加载失败:', err)
-      })
-    },
+      var script = document.createElement('script')
+      script.id = 'live2d-widget-script'
+      script.src = 'https://fastly.jsdelivr.net/gh/stevenjoezhang/live2d-widget@latest/autoload.js'
+      script.async = true
+      script.onerror = function() {
+        // jsdelivr 失败时尝试备用 CDN
+        var fallback = document.createElement('script')
+        fallback.src = 'https://cdn.jsdelivr.net/gh/stevenjoezhang/live2d-widget@latest/autoload.js'
+        fallback.async = true
+        document.head.appendChild(fallback)
+      }
+      document.head.appendChild(script)
 
-    showGreeting: function() {
-      var self = this
-      self.message = self.greetings[self.greetingIndex]
-      self.greetingIndex = (self.greetingIndex + 1) % self.greetings.length
-      self.bubbleVisible = true
-      if (self.messageTimer) clearTimeout(self.messageTimer)
-      self.messageTimer = setTimeout(function() {
-        self.bubbleVisible = false
-      }, 5000)
+      // 注入样式（覆盖默认位置，确保不遮挡内容）
+      var style = document.createElement('style')
+      style.id = 'live2d-widget-style'
+      style.textContent = [
+        '#waifu { bottom: 0; left: 0; }',
+        '#waifu-toggle { bottom: 150px; left: 0; }',
+        '#waifu canvas { max-width: 150px; max-height: 200px; }'
+      ].join('\n')
+      document.head.appendChild(style)
     }
   }
 }
 </script>
-
-<style scoped>
-@keyframes bubbleFadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-</style>

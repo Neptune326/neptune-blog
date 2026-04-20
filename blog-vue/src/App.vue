@@ -92,11 +92,36 @@ export default {
   box-sizing: border-box;
 }
 
+/* CSS 变量：亮色主题默认值 */
+:root {
+  --bg-primary: #f8f9fa;
+  --bg-card: #ffffff;
+  --bg-hover: #f1f3f4;
+  --text-primary: #202124;
+  --text-secondary: #5f6368;
+  --text-muted: #80868b;
+  --border-color: #e8eaed;
+  --link-color: #1a73e8;
+}
+
+/* 暗色主题变量覆盖 */
+body.dark-mode {
+  --bg-primary: #202124;
+  --bg-card: #292a2d;
+  --bg-hover: #35363a;
+  --text-primary: #e8eaed;
+  --text-secondary: #9aa0a6;
+  --text-muted: #80868b;
+  --border-color: #3c4043;
+  --link-color: #8ab4f8;
+}
+
 body {
   font-family: 'Google Sans', 'Roboto', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
-  background-color: #f8f9fa;
-  color: #202124;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* 链接样式 */
@@ -308,5 +333,73 @@ html {
   .v-main { padding: 0 !important; }
   .markdown-body { font-size: 14px; line-height: 1.8; }
   body { background: white !important; }
+}
+
+/* ===== 暗色主题全局覆盖 ===== */
+body.dark-mode .v-app-bar {
+  background: #292a2d !important;
+  border-bottom-color: #3c4043 !important;
+}
+body.dark-mode .v-card {
+  background: #292a2d !important;
+  border-color: #3c4043 !important;
+}
+body.dark-mode .v-footer {
+  background: #292a2d !important;
+  border-top-color: #3c4043 !important;
+}
+body.dark-mode .v-table {
+  background: #292a2d !important;
+  color: #e8eaed !important;
+}
+body.dark-mode .v-table thead tr {
+  background: #35363a !important;
+}
+body.dark-mode .v-table tbody tr:hover {
+  background: #35363a !important;
+}
+body.dark-mode .markdown-body {
+  color: #e8eaed;
+}
+body.dark-mode .markdown-body code {
+  background: #35363a;
+  color: #f28b82;
+}
+body.dark-mode .markdown-body pre {
+  background: #35363a;
+  border-color: #3c4043;
+}
+body.dark-mode .markdown-body pre code {
+  color: #e8eaed;
+}
+body.dark-mode .markdown-body blockquote {
+  background: #35363a;
+  border-left-color: #8ab4f8;
+  color: #9aa0a6;
+}
+body.dark-mode .markdown-body th {
+  background: #35363a;
+}
+body.dark-mode .markdown-body td,
+body.dark-mode .markdown-body th {
+  border-color: #3c4043;
+}
+body.dark-mode .markdown-body tr:nth-child(even) td {
+  background: #35363a;
+}
+body.dark-mode a {
+  color: #8ab4f8;
+}
+body.dark-mode a:hover {
+  color: #aecbfa;
+}
+/* 前台文章列表页暗色 */
+body.dark-mode .v-app[style*="background: #f8f9fa"] {
+  background: #202124 !important;
+}
+/* 侧边栏暗色 */
+body.dark-mode .v-navigation-drawer {
+  background: #292a2d !important;
+  border-right-color: #3c4043 !important;
 }
 </style>

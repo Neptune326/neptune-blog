@@ -1,5 +1,5 @@
 <template>
-  <v-app style="background: #f8f9fa;">
+  <v-app style="background: var(--bg-primary, #f8f9fa);">
     <!-- 阅读进度条 + 回到顶部 -->
     <ReadingProgress />
 

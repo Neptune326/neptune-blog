@@ -38,15 +38,16 @@ export default {
   methods: {
     toggle: function() {
       this.theme.global.name.value = this.isDark ? 'googleLight' : 'googleDark'
-      // 持久化到 localStorage
       localStorage.setItem('blog-theme', this.theme.global.name.value)
+      // 同步更新 body class，供 CSS 变量使用
+      document.body.classList.toggle('dark-mode', !this.isDark)
     }
   },
   mounted: function() {
-    // 恢复上次的主题设置
     var saved = localStorage.getItem('blog-theme')
     if (saved) {
       this.theme.global.name.value = saved
+      document.body.classList.toggle('dark-mode', saved === 'googleDark')
     }
   }
 }
