@@ -118,7 +118,7 @@
       </router-link>
     </div>
 
-    <!-- 标签云 -->
+    <!-- 标签云（按文章数量显示大小） -->
     <div
       style="
         background: white;
@@ -141,26 +141,27 @@
         标签云
       </div>
       <div v-if="tags.length === 0" style="color: #9aa0a6; font-size: 13px;">加载中...</div>
-      <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+      <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
         <router-link
           v-for="tag in tags"
           :key="tag.id"
           :to="'/tag/' + tag.id"
-          style="
-            text-decoration: none;
-            font-size: 12px;
-            padding: 3px 10px;
-            border-radius: 12px;
-            border: 1px solid #e8eaed;
-            color: #5f6368;
-            background: #f8f9fa;
-            transition: all 0.15s;
-            white-space: nowrap;
-          "
+          :style="{
+            textDecoration: 'none',
+            fontSize: getTagFontSize(tag.articleCount) + 'px',
+            padding: '2px 8px',
+            borderRadius: '12px',
+            border: '1px solid #e8eaed',
+            color: getTagColor(tag.articleCount),
+            background: '#f8f9fa',
+            transition: 'all 0.15s',
+            whiteSpace: 'nowrap',
+            lineHeight: '1.8'
+          }"
           class="sidebar-tag-link"
         >
           # {{ tag.name }}
-          <span style="color: #9aa0a6; font-size: 10px; margin-left: 2px;">{{ tag.articleCount }}</span>
+          <span style="font-size: 10px; opacity: 0.7; margin-left: 2px;">{{ tag.articleCount }}</span>
         </router-link>
       </div>
     </div>
@@ -368,6 +369,26 @@ export default {
       if (unique.length === 0) return
       var pick = unique[Math.floor(Math.random() * unique.length)]
       self.router.push('/article/' + pick.id)
+    },
+    // 根据文章数量计算标签字体大小（11~19px）
+    getTagFontSize: function(count) {
+      var counts = this.tags.map(function(t) { return t.articleCount || 1 })
+      var max = Math.max.apply(null, counts)
+      var min = Math.min.apply(null, counts)
+      if (max === min) return 13
+      var ratio = ((count || 1) - min) / (max - min)
+      return Math.round(11 + ratio * 8)
+    },
+    // 根据文章数量计算标签颜色
+    getTagColor: function(count) {
+      var counts = this.tags.map(function(t) { return t.articleCount || 1 })
+      var max = Math.max.apply(null, counts)
+      var min = Math.min.apply(null, counts)
+      if (max === min) return '#5f6368'
+      var ratio = ((count || 1) - min) / (max - min)
+      if (ratio > 0.7) return '#1a73e8'
+      if (ratio > 0.4) return '#34a853'
+      return '#5f6368'
     }
   }
 }

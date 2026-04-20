@@ -134,7 +134,10 @@
                     <button @click="copyLink" title="复制链接" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:4px;color:#5f6368;font-size:12px;transition:background 0.15s;" class="share-btn">
                       <v-icon size="14">mdi-link-variant</v-icon>
                     </button>
+                    <QRCodeShare />
                   </div>
+                  <!-- 字体大小调节 -->
+                  <FontSizeControl />
                 </div>
 
                 <!-- Markdown 正文 -->
@@ -193,6 +196,9 @@
                     <v-icon size="18">mdi-printer-outline</v-icon>
                     打印
                   </button>
+
+                  <!-- 打赏 -->
+                  <RewardButton />
                 </div>
 
                 <!-- 版权声明 -->
@@ -411,6 +417,9 @@ import ArticleFavorite from '../../components/frontend/ArticleFavorite.vue'
 import Breadcrumb from '../../components/frontend/Breadcrumb.vue'
 import ImageLightbox from '../../components/frontend/ImageLightbox.vue'
 import EmojiPicker from '../../components/frontend/EmojiPicker.vue'
+import FontSizeControl from '../../components/frontend/FontSizeControl.vue'
+import QRCodeShare from '../../components/frontend/QRCodeShare.vue'
+import RewardButton from '../../components/frontend/RewardButton.vue'
 import { getArticleById } from '../../api/article.js'
 import { getArticleComments, submitComment } from '../../api/comment.js'
 import { smoothScrollToTop } from '../../utils/smoothScroll.js'
@@ -418,7 +427,7 @@ import request from '../../api/request.js'
 
 export default {
   name: 'ArticleDetailView',
-  components: { CommentList, ReadingProgress, TableOfContents, ArticleFavorite, Breadcrumb, ImageLightbox, EmojiPicker },
+  components: { CommentList, ReadingProgress, TableOfContents, ArticleFavorite, Breadcrumb, ImageLightbox, EmojiPicker, FontSizeControl, QRCodeShare, RewardButton },
   data: function() {
     return {
       article: null,

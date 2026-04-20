@@ -160,6 +160,21 @@
               />
             </div>
 
+            <!-- 鼠标轨迹特效 -->
+            <div class="d-flex align-center justify-space-between" style="padding: 12px 16px; background: #f8f9fa; border-radius: 10px;">
+              <div>
+                <div style="font-size: 14px; font-weight: 500; color: #202124;">鼠标轨迹特效</div>
+                <div style="font-size: 12px; color: #80868b; margin-top: 2px;">鼠标移动时留下彩色粒子轨迹</div>
+              </div>
+              <v-switch
+                v-model="form.mouse_trail_enabled"
+                color="pink"
+                hide-details
+                true-value="true"
+                false-value="false"
+              />
+            </div>
+
             <!-- 粒子飘落特效 -->
             <div style="padding: 12px 16px; background: #f8f9fa; border-radius: 10px;">
               <div class="d-flex align-center justify-space-between mb-2">
@@ -288,6 +303,7 @@ export default {
         anime_theme_enabled: 'false',
         gallery_images: '[]',
         click_effect_enabled: 'true',
+        mouse_trail_enabled: 'false',
         particle_enabled: 'true',
         particle_type: 'sakura'
       }

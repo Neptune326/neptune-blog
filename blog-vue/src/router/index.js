@@ -33,6 +33,8 @@ import MessageAdminView from '../views/admin/MessageAdminView.vue'
 import AdminUserView from '../views/admin/AdminUserView.vue'
 import SeriesView from '../views/admin/SeriesView.vue'
 import FriendLinkView from '../views/admin/FriendLinkView.vue'
+import CommentBlacklistView from '../views/admin/CommentBlacklistView.vue'
+import DataBackupView from '../views/admin/DataBackupView.vue'
 
 var routes = [
   // ===== 前台路由（无需登录）=====
@@ -69,7 +71,9 @@ var routes = [
       { path: 'messages',         component: MessageAdminView, meta: { requiresAuth: true } },
       { path: 'admin-users',      component: AdminUserView,    meta: { requiresAuth: true } },
       { path: 'series',           component: SeriesView,       meta: { requiresAuth: true } },
-      { path: 'friend-links',     component: FriendLinkView,   meta: { requiresAuth: true } },
+      { path: 'friend-links',     component: FriendLinkView,          meta: { requiresAuth: true } },
+      { path: 'comment-blacklist',component: CommentBlacklistView,    meta: { requiresAuth: true } },
+      { path: 'data-backup',      component: DataBackupView,          meta: { requiresAuth: true } },
       { path: 'logs/operation',   component: OperationLogView, meta: { requiresAuth: true } },
       { path: 'logs/login',       component: LoginLogView,     meta: { requiresAuth: true } }
     ]

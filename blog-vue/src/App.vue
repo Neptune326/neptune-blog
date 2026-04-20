@@ -22,6 +22,15 @@
 
     <!-- 图片灯箱（全局，自动监听 markdown-body 内图片点击） -->
     <ImageLightbox v-if="isFrontend" />
+
+    <!-- 鼠标轨迹特效（仅前台，可配置开关） -->
+    <MouseTrail v-if="isFrontend && mouseTrailEnabled" />
+
+    <!-- 音乐播放器（仅前台，有歌单时显示） -->
+    <MusicPlayer v-if="isFrontend" :playlist="musicPlaylist" />
+
+    <!-- 彩带礼花（特殊日期自动触发） -->
+    <Confetti v-if="isFrontend" />
   </v-app>
 </template>
 
@@ -31,17 +40,22 @@ import Live2DWidget from './components/frontend/Live2DWidget.vue'
 import ParticleCanvas from './components/frontend/ParticleCanvas.vue'
 import ClickEffect from './components/frontend/ClickEffect.vue'
 import ImageLightbox from './components/frontend/ImageLightbox.vue'
+import MouseTrail from './components/frontend/MouseTrail.vue'
+import MusicPlayer from './components/frontend/MusicPlayer.vue'
+import Confetti from './components/frontend/Confetti.vue'
 
 export default {
   name: 'App',
-  components: { Live2DWidget, ParticleCanvas, ClickEffect, ImageLightbox },
+  components: { Live2DWidget, ParticleCanvas, ClickEffect, ImageLightbox, MouseTrail, MusicPlayer, Confetti },
   data: function() {
     return {
       particleEnabled: false,
       particleType: 'sakura',
       particleCount: 25,
       clickEffectEnabled: true,
-      live2dEnabled: false
+      live2dEnabled: false,
+      mouseTrailEnabled: false,
+      musicPlaylist: []
     }
   },
   computed: {
@@ -75,6 +89,14 @@ export default {
           self.particleCount = parseInt(data.particle_count || '25')
           self.clickEffectEnabled = data.click_effect_enabled !== 'false'
           self.live2dEnabled = data.live2d_enabled === 'true'
+          self.mouseTrailEnabled = data.mouse_trail_enabled === 'true'
+          // 音乐播放列表
+          if (data.music_playlist) {
+            try {
+              var pl = JSON.parse(data.music_playlist)
+              self.musicPlaylist = Array.isArray(pl) ? pl : []
+            } catch (e) {}
+          }
         })
         .catch(function() {
           self.clickEffectEnabled = true
@@ -155,7 +177,7 @@ a:hover {
 .markdown-body {
   line-height: 1.8;
   color: #202124;
-  font-size: 16px;
+  font-size: var(--article-font-size, 16px);
 }
 .markdown-body h1,
 .markdown-body h2,
