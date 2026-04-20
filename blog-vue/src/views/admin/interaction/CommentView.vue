@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div>
     <!-- 状态筛选 -->
     <v-card class="mb-4 pa-4">
@@ -116,8 +116,8 @@ import {
   approveComment,
   rejectComment,
   deleteComment
-} from '../../api/comment.js'
-import TablePagination from '../../components/admin/TablePagination.vue'
+} from '../../../api/comment.js'
+import TablePagination from '../../../components/admin/TablePagination.vue'
 
 export default {
   name: 'CommentView',
@@ -260,3 +260,4 @@ export default {
   white-space: nowrap;
 }
 </style>
+

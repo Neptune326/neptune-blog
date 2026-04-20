@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div>
     <div class="mb-6 d-flex align-center justify-space-between">
       <div>
@@ -86,7 +86,7 @@
 </template>
 
 <script>
-import { getSysConfig, updateSysConfig } from '../../api/sysConfig.js'
+import { getSysConfig, updateSysConfig } from '../../../api/sysConfig.js'
 
 export default {
   name: 'CommentBlacklistView',
@@ -147,3 +147,4 @@ export default {
   }
 }
 </script>
+

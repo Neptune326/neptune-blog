@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <v-app style="background: #f8f9fa;">
     <ReadingProgress />
     <v-app-bar color="white" elevation="0" style="border-bottom: 1px solid #e8eaed;">
@@ -123,8 +123,8 @@
 </template>
 
 <script>
-import ReadingProgress from '../../components/frontend/ReadingProgress.vue'
-import request from '../../api/request.js'
+import ReadingProgress from '../../../components/frontend/ReadingProgress.vue'
+import request from '../../../api/request.js'
 
 export default {
   name: 'MessageView',
@@ -179,3 +179,4 @@ export default {
   }
 }
 </script>
+

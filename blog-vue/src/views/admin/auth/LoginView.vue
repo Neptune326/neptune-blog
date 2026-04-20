@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <v-app style="background: #f8f9fa;">
     <v-main>
       <div class="d-flex align-center justify-center" style="min-height: 100vh; padding: 24px;">
@@ -91,8 +91,8 @@
 </template>
 
 <script>
-import { login } from '../../api/auth.js'
-import { useAuthStore } from '../../store/auth.js'
+import { login } from '../../../api/auth.js'
+import { useAuthStore } from '../../../store/auth.js'
 import { useRouter } from 'vue-router'
 
 export default {
@@ -134,3 +134,4 @@ export default {
   }
 }
 </script>
+

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div>
     <!-- 页面标题 -->
     <div class="mb-6">
@@ -276,8 +276,8 @@
 </template>
 
 <script>
-import { getSysConfig, updateSysConfig } from '../../api/sysConfig.js'
-import { uploadImage } from '../../api/upload.js'
+import { getSysConfig, updateSysConfig } from '../../../api/sysConfig.js'
+import { uploadImage } from '../../../api/upload.js'
 
 export default {
   name: 'SysConfigView',
@@ -387,3 +387,4 @@ export default {
   background: #f0f7ff !important;
 }
 </style>
+

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div>
     <div class="mb-6">
       <h1 style="font-size: 20px; font-weight: 700; color: #202124; margin: 0 0 4px;">数据备份</h1>
@@ -48,7 +48,7 @@
 </template>
 
 <script>
-import request from '../../api/request.js'
+import request from '../../../api/request.js'
 
 export default {
   name: 'DataBackupView',
@@ -111,3 +111,4 @@ export default {
   }
 }
 </script>
+

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <v-app style="background: #f8f9fa;">
     <ReadingProgress />
 
@@ -65,8 +65,8 @@
 
 <script>
 import { marked } from 'marked'
-import ReadingProgress from '../../components/frontend/ReadingProgress.vue'
-import request from '../../api/request.js'
+import ReadingProgress from '../../../components/frontend/ReadingProgress.vue'
+import request from '../../../api/request.js'
 
 export default {
   name: 'AboutView',
@@ -108,3 +108,4 @@ export default {
   }
 }
 </script>
+

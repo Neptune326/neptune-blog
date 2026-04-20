@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div>
     <div class="mb-6 d-flex align-center justify-space-between">
       <div>
@@ -87,8 +87,8 @@
 </template>
 
 <script>
-import request from '../../api/request.js'
-import TablePagination from '../../components/admin/TablePagination.vue'
+import request from '../../../api/request.js'
+import TablePagination from '../../../components/admin/TablePagination.vue'
 
 export default {
   name: 'MessageAdminView',
@@ -165,3 +165,4 @@ export default {
   }
 }
 </script>
+

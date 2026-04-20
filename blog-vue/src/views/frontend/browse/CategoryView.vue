@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <v-app style="background: #f8f9fa;">
     <v-app-bar color="white" elevation="0" style="border-bottom: 1px solid #e8eaed;">
       <v-container style="max-width: 1100px; display: flex; align-items: center; padding: 0 16px;">
@@ -44,9 +44,9 @@
 </template>
 
 <script>
-import ArticleCard from '../../components/frontend/ArticleCard.vue'
-import Pagination from '../../components/frontend/Pagination.vue'
-import { getCategoryArticles } from '../../api/category.js'
+import ArticleCard from '../../../components/frontend/ArticleCard.vue'
+import Pagination from '../../../components/frontend/Pagination.vue'
+import { getCategoryArticles } from '../../../api/category.js'
 
 export default {
   name: 'CategoryView',
@@ -101,3 +101,4 @@ export default {
   }
 }
 </script>
+

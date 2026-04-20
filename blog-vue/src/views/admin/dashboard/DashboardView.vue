@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div>
     <!-- 欢迎语 -->
     <div class="mb-6 d-flex align-center justify-space-between flex-wrap" style="gap: 12px;">
@@ -127,8 +127,8 @@ import * as echarts from 'echarts/core'
 import { LineChart, PieChart } from 'echarts/charts'
 import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/components'
 import { CanvasRenderer } from 'echarts/renderers'
-import request from '../../api/request.js'
-import { useAuthStore } from '../../store/auth.js'
+import request from '../../../api/request.js'
+import { useAuthStore } from '../../../store/auth.js'
 
 echarts.use([LineChart, PieChart, GridComponent, TooltipComponent, LegendComponent, CanvasRenderer])
 
@@ -294,3 +294,4 @@ export default {
   }
 }
 </script>
+

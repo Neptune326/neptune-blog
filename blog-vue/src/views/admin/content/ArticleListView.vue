@@ -207,11 +207,11 @@
 </template>
 
 <script>
-import { adminGetArticles, deleteArticle } from '../../api/article.js'
-import { adminGetCategories } from '../../api/category.js'
-import request from '../../api/request.js'
+import { adminGetArticles, deleteArticle } from '../../../api/article.js'
+import { adminGetCategories } from '../../../api/category.js'
+import request from '../../../api/request.js'
 import { useRouter } from 'vue-router'
-import TablePagination from '../../components/admin/TablePagination.vue'
+import TablePagination from '../../../components/admin/TablePagination.vue'
 
 var DRAFT_KEY = 'article_new_draft'
 
@@ -480,4 +480,5 @@ export default {
   }
 }
 </script>
+
 

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <v-app style="background: #f8f9fa;">
     <v-app-bar color="white" elevation="0" style="border-bottom: 1px solid #e8eaed;">
       <v-container style="max-width: 1100px; display: flex; align-items: center; padding: 0 16px;">
@@ -142,7 +142,7 @@
 </template>
 
 <script>
-import { getArchive } from '../../api/article.js'
+import { getArchive } from '../../../api/article.js'
 
 export default {
   name: 'ArchiveView',
@@ -212,3 +212,4 @@ export default {
   color: #1a73e8 !important;
 }
 </style>
+

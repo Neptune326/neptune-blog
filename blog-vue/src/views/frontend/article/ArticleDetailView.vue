@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <v-app style="background: var(--bg-primary, #f8f9fa);">
     <!-- 阅读进度条 + 回到顶部 -->
     <ReadingProgress />
@@ -410,20 +410,20 @@
 
 <script>
 import { marked } from 'marked'
-import CommentList from '../../components/frontend/CommentList.vue'
-import ReadingProgress from '../../components/frontend/ReadingProgress.vue'
-import TableOfContents from '../../components/frontend/TableOfContents.vue'
-import ArticleFavorite from '../../components/frontend/ArticleFavorite.vue'
-import Breadcrumb from '../../components/frontend/Breadcrumb.vue'
-import ImageLightbox from '../../components/frontend/ImageLightbox.vue'
-import EmojiPicker from '../../components/frontend/EmojiPicker.vue'
-import FontSizeControl from '../../components/frontend/FontSizeControl.vue'
-import QRCodeShare from '../../components/frontend/QRCodeShare.vue'
-import RewardButton from '../../components/frontend/RewardButton.vue'
-import { getArticleById } from '../../api/article.js'
-import { getArticleComments, submitComment } from '../../api/comment.js'
-import { smoothScrollToTop } from '../../utils/smoothScroll.js'
-import request from '../../api/request.js'
+import CommentList from '../../../components/frontend/CommentList.vue'
+import ReadingProgress from '../../../components/frontend/ReadingProgress.vue'
+import TableOfContents from '../../../components/frontend/TableOfContents.vue'
+import ArticleFavorite from '../../../components/frontend/ArticleFavorite.vue'
+import Breadcrumb from '../../../components/frontend/Breadcrumb.vue'
+import ImageLightbox from '../../../components/frontend/ImageLightbox.vue'
+import EmojiPicker from '../../../components/frontend/EmojiPicker.vue'
+import FontSizeControl from '../../../components/frontend/FontSizeControl.vue'
+import QRCodeShare from '../../../components/frontend/QRCodeShare.vue'
+import RewardButton from '../../../components/frontend/RewardButton.vue'
+import { getArticleById } from '../../../api/article.js'
+import { getArticleComments, submitComment } from '../../../api/comment.js'
+import { smoothScrollToTop } from '../../../utils/smoothScroll.js'
+import request from '../../../api/request.js'
 
 export default {
   name: 'ArticleDetailView',
@@ -646,3 +646,4 @@ export default {
   100% { background-position: -200% 0; }
 }
 </style>
+

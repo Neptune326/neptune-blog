@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <v-app style="background: var(--bg-primary, #f8f9fa);">
     <!-- 阅读进度条 + 回到顶部 -->
     <ReadingProgress />
@@ -158,15 +158,15 @@
 </template>
 
 <script>
-import ArticleCard from '../../components/frontend/ArticleCard.vue'
-import Pagination from '../../components/frontend/Pagination.vue'
-import ArticleSkeleton from '../../components/frontend/ArticleSkeleton.vue'
-import BlogSidebar from '../../components/frontend/BlogSidebar.vue'
-import ReadingProgress from '../../components/frontend/ReadingProgress.vue'
-import DarkModeToggle from '../../components/frontend/DarkModeToggle.vue'
-import { getArticles } from '../../api/article.js'
-import { smoothScrollToTop } from '../../utils/smoothScroll.js'
-import SiteRuntime from '../../components/frontend/SiteRuntime.vue'
+import ArticleCard from '../../../components/frontend/ArticleCard.vue'
+import Pagination from '../../../components/frontend/Pagination.vue'
+import ArticleSkeleton from '../../../components/frontend/ArticleSkeleton.vue'
+import BlogSidebar from '../../../components/frontend/BlogSidebar.vue'
+import ReadingProgress from '../../../components/frontend/ReadingProgress.vue'
+import DarkModeToggle from '../../../components/frontend/DarkModeToggle.vue'
+import { getArticles } from '../../../api/article.js'
+import { smoothScrollToTop } from '../../../utils/smoothScroll.js'
+import SiteRuntime from '../../../components/frontend/SiteRuntime.vue'
 
 export default {
   name: 'HomeView',
@@ -232,3 +232,4 @@ export default {
   background: #f8f9fa;
 }
 </style>
+

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div>
     <!-- 新建按钮 -->
     <div class="d-flex justify-end mb-3">
@@ -86,8 +86,8 @@ import {
   adminCreateTag,
   adminUpdateTag,
   adminDeleteTag
-} from '../../api/tag.js'
-import TablePagination from '../../components/admin/TablePagination.vue'
+} from '../../../api/tag.js'
+import TablePagination from '../../../components/admin/TablePagination.vue'
 
 export default {
   name: 'AdminTagView',
@@ -178,3 +178,4 @@ export default {
   }
 }
 </script>
+
