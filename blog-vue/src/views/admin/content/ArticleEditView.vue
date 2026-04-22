@@ -151,6 +151,7 @@
             v-model="form.content"
             :theme="'light'"
             :id="'article-editor'"
+            :toolbars-exclude="['pageFullscreen', 'fullscreen']"
             style="height: 500px"
           />
         </div>
