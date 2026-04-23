@@ -1,5 +1,6 @@
 package com.blog.service;
 
+import com.blog.dto.ChangePasswordDTO;
 import com.blog.dto.LoginDTO;
 
 /**
@@ -20,5 +21,5 @@ public interface AuthService {
     void logout();
 
     /** 修改密码 */
-    void changePassword(com.blog.dto.ChangePasswordDTO dto);
+    void changePassword(ChangePasswordDTO dto);
 }

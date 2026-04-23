@@ -6,6 +6,7 @@ import com.blog.service.TagService;
 import com.blog.vo.TagVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/admin/tags")
+@Validated
 @RequiredArgsConstructor
 public class TagAdminController {
 

@@ -6,15 +6,17 @@ import com.blog.common.annotation.OperationLog;
 import com.blog.common.exception.BusinessException;
 import com.blog.common.result.Result;
 import com.blog.common.result.ResultCode;
+import com.blog.dto.AdminCreateDTO;
+import com.blog.dto.AdminResetPasswordDTO;
 import com.blog.entity.Admin;
 import com.blog.mapper.AdminMapper;
+import com.blog.vo.AdminVO;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -27,28 +29,26 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/users")
+@Validated
 @RequiredArgsConstructor
 public class AdminUserController {
 
     private final AdminMapper adminMapper;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    /** 获取管理员列表（隐藏密码） */
+    /** 获取管理员列表 */
     @GetMapping
-    public Result<List<Admin>> list() {
+    public Result<List<AdminVO>> list() {
         checkSuperAdmin();
         List<Admin> admins = adminMapper.selectList(null);
-        // 隐藏密码字段
-        admins.forEach(a -> a.setPassword(null));
-        return Result.success(admins);
+        return Result.success(admins.stream().map(this::toAdminVO).collect(Collectors.toList()));
     }
 
     /** 创建管理员 */
     @OperationLog(module = "管理员管理", action = "创建管理员")
     @PostMapping
-    public Result<Void> create(@RequestBody @Valid CreateAdminRequest req) {
+    public Result<Void> create(@RequestBody @Valid AdminCreateDTO req) {
         checkSuperAdmin();
-        // 检查用户名是否已存在
         long count = adminMapper.selectCount(
                 new LambdaQueryWrapper<Admin>().eq(Admin::getUsername, req.getUsername())
         );
@@ -70,10 +70,12 @@ public class AdminUserController {
     @OperationLog(module = "管理员管理", action = "重置密码")
     @PutMapping("/{id}/reset-password")
     public Result<Void> resetPassword(@PathVariable Long id,
-                                       @RequestBody @Valid ResetPasswordRequest req) {
+                                      @RequestBody @Valid AdminResetPasswordDTO req) {
         checkSuperAdmin();
         Admin admin = adminMapper.selectById(id);
-        if (admin == null) throw new BusinessException(ResultCode.NOT_FOUND);
+        if (admin == null) {
+            throw new BusinessException(ResultCode.NOT_FOUND);
+        }
         admin.setPassword(passwordEncoder.encode(req.getNewPassword()));
         admin.setUpdateTime(LocalDateTime.now());
         adminMapper.updateById(admin);
@@ -87,7 +89,9 @@ public class AdminUserController {
     public Result<Void> delete(@PathVariable Long id) {
         checkSuperAdmin();
         Admin admin = adminMapper.selectById(id);
-        if (admin == null) throw new BusinessException(ResultCode.NOT_FOUND);
+        if (admin == null) {
+            throw new BusinessException(ResultCode.NOT_FOUND);
+        }
         if ("super".equals(admin.getRole())) {
             throw new BusinessException(ResultCode.FORBIDDEN);
         }
@@ -100,7 +104,6 @@ public class AdminUserController {
         return Result.success();
     }
 
-    /** 检查当前用户是否为超级管理员 */
     private void checkSuperAdmin() {
         String username = (String) StpUtil.getLoginId();
         Admin admin = adminMapper.selectOne(
@@ -111,19 +114,9 @@ public class AdminUserController {
         }
     }
 
-    @Data
-    public static class CreateAdminRequest {
-        @NotBlank(message = "用户名不能为空")
-        private String username;
-        @NotBlank(message = "密码不能为空")
-        @Size(min = 6, message = "密码至少 6 位")
-        private String password;
-    }
-
-    @Data
-    public static class ResetPasswordRequest {
-        @NotBlank(message = "新密码不能为空")
-        @Size(min = 6, message = "密码至少 6 位")
-        private String newPassword;
+    private AdminVO toAdminVO(Admin admin) {
+        AdminVO adminVO = new AdminVO();
+        BeanUtils.copyProperties(admin, adminVO);
+        return adminVO;
     }
 }

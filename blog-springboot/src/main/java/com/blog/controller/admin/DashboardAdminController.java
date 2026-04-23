@@ -10,12 +10,14 @@ import com.blog.mapper.MessageMapper;
 import com.blog.mapper.TagMapper;
 import com.blog.vo.DashboardVO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/admin/dashboard")
+@Validated
 @RequiredArgsConstructor
 public class DashboardAdminController {
 

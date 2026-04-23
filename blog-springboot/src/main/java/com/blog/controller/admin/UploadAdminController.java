@@ -3,6 +3,7 @@ package com.blog.controller.admin;
 import com.blog.common.result.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,6 +21,7 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/upload")
+@Validated
 public class UploadAdminController {
 
     @Value("${blog.upload.path:./uploads/}")

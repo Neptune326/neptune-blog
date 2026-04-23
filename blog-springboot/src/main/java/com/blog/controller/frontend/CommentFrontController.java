@@ -7,6 +7,7 @@ import com.blog.vo.CommentVO;
 import com.blog.vo.PageVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/api")
+@Validated
 @RequiredArgsConstructor
 public class CommentFrontController {
 

@@ -1,10 +1,12 @@
 package com.blog.controller.admin;
 
 import com.blog.common.result.Result;
+import com.blog.dto.ChangePasswordDTO;
 import com.blog.dto.LoginDTO;
 import com.blog.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/auth")
+@Validated
 public class AuthAdminController {
 
     /** 认证服务 */
@@ -54,7 +57,7 @@ public class AuthAdminController {
      * POST /api/admin/auth/change-password
      */
     @PostMapping("/change-password")
-    public Result<Void> changePassword(@RequestBody @Valid com.blog.dto.ChangePasswordDTO dto) {
+    public Result<Void> changePassword(@RequestBody @Valid ChangePasswordDTO dto) {
         authService.changePassword(dto);
         return Result.success();
     }

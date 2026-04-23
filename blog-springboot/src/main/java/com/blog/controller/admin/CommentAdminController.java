@@ -5,6 +5,7 @@ import com.blog.service.CommentService;
 import com.blog.vo.CommentVO;
 import com.blog.vo.PageVO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/api/admin/comments")
+@Validated
 @RequiredArgsConstructor
 public class CommentAdminController {
 

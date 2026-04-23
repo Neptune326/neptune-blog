@@ -7,6 +7,7 @@ import com.blog.vo.ArticleListVO;
 import com.blog.vo.ArticleVO;
 import com.blog.vo.PageVO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/articles")
+@Validated
 @RequiredArgsConstructor
 public class ArticleFrontController {
 

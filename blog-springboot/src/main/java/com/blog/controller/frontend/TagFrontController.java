@@ -7,6 +7,7 @@ import com.blog.vo.ArticleListVO;
 import com.blog.vo.PageVO;
 import com.blog.vo.TagVO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/tags")
+@Validated
 @RequiredArgsConstructor
 public class TagFrontController {
 

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.blog.common.exception.BusinessException;
 import com.blog.common.result.ResultCode;
 import com.blog.common.util.LoginRateLimiter;
+import com.blog.dto.ChangePasswordDTO;
 import com.blog.dto.LoginDTO;
 import com.blog.entity.Admin;
 import com.blog.entity.LoginLog;
@@ -96,7 +97,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void changePassword(com.blog.dto.ChangePasswordDTO dto) {
+    public void changePassword(ChangePasswordDTO dto) {
         String username = (String) StpUtil.getLoginId();
         Admin admin = adminMapper.selectOne(
                 new LambdaQueryWrapper<Admin>().eq(Admin::getUsername, username)

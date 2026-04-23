@@ -3,6 +3,7 @@ package com.blog.controller.frontend;
 import com.blog.common.result.Result;
 import com.blog.service.SysConfigService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +16,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/api/about")
+@Validated
 @RequiredArgsConstructor
 public class AboutFrontController {
 

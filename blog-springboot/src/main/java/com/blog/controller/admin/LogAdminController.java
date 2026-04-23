@@ -10,6 +10,7 @@ import com.blog.mapper.OperationLogMapper;
 import com.blog.vo.PageVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/logs")
+@Validated
 @RequiredArgsConstructor
 public class LogAdminController {
 
