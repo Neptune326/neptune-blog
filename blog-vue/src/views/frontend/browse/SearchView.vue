@@ -1,13 +1,13 @@
 ﻿<template>
-  <v-app style="background: #f8f9fa;">
-    <v-app-bar color="white" elevation="0" style="border-bottom: 1px solid #e8eaed;">
+  <v-app class="front-shell">
+    <v-app-bar elevation="0" class="front-app-bar">
       <v-container style="max-width: 1100px; display: flex; align-items: center; padding: 0 16px;">
         <v-btn icon variant="text" @click="$router.back()" style="color: #5f6368;">
           <v-icon>mdi-arrow-left</v-icon>
         </v-btn>
         <router-link to="/" class="d-flex align-center text-decoration-none ml-2" style="gap: 6px;">
           <v-icon color="primary" size="22">mdi-pencil-circle</v-icon>
-          <span style="font-size: 16px; font-weight: 600; color: #202124;">我的博客</span>
+          <span class="front-title" style="font-size: 16px; font-weight: 700;">我的博客</span>
         </router-link>
         <v-spacer />
       </v-container>
@@ -18,9 +18,9 @@
 
         <!-- 搜索框区域 -->
         <div class="mb-8">
-          <h1 class="mb-6" style="font-size: 24px; font-weight: 600; color: #202124;">搜索文章</h1>
+          <h1 class="mb-6 front-title" style="font-size: 28px; font-weight: 800;">搜索文章</h1>
 
-          <v-card elevation="0" rounded="xl" style="border: 1px solid #e8eaed; overflow: visible;">
+          <v-card elevation="0" rounded="xl" class="front-card" style="overflow: visible;">
             <div class="pa-4 d-flex align-center" style="gap: 12px;">
               <v-icon color="grey" size="22">mdi-magnify</v-icon>
               <input
@@ -32,7 +32,7 @@
                   border: none;
                   outline: none;
                   font-size: 16px;
-                  color: #202124;
+                  color: var(--front-text);
                   background: transparent;
                   font-family: inherit;
                 "
@@ -84,7 +84,7 @@
 
           <!-- 热门搜索 -->
           <div v-if="!searched" class="mt-4">
-            <div class="mb-2" style="font-size: 13px; color: #80868b; font-weight: 500;">热门搜索</div>
+            <div class="mb-2 front-muted" style="font-size: 13px; font-weight: 500;">热门搜索</div>
             <div style="display: flex; flex-wrap: wrap; gap: 8px;">
               <v-chip
                 v-for="hot in hotKeywords"
@@ -103,13 +103,13 @@
         </div>
 
         <!-- 搜索结果提示 -->
-        <div v-if="searched && !loading" class="mb-4" style="color: #5f6368; font-size: 14px;">
+        <div v-if="searched && !loading" class="mb-4 front-soft" style="font-size: 14px;">
           <span v-if="total > 0">
-            找到 <strong style="color: #1a73e8;">{{ total }}</strong> 篇与
-            "<strong style="color: #202124;">{{ lastKeyword }}</strong>" 相关的文章
+            找到 <strong style="color: var(--front-accent);">{{ total }}</strong> 篇与
+            "<strong class="front-title">{{ lastKeyword }}</strong>" 相关的文章
           </span>
           <span v-else>
-            未找到与 "<strong style="color: #202124;">{{ lastKeyword }}</strong>" 相关的文章
+            未找到与 "<strong class="front-title">{{ lastKeyword }}</strong>" 相关的文章
           </span>
         </div>
 

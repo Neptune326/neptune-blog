@@ -184,6 +184,70 @@
         </div>
       </v-card>
 
+      <!-- 前台主题装扮 -->
+      <v-card elevation="0" rounded="xl" style="border: 1px solid #e8eaed; margin-bottom: 20px;">
+        <div class="pa-5">
+          <div class="d-flex align-center mb-4" style="gap: 8px;">
+            <v-icon color="pink" size="20">mdi-palette-outline</v-icon>
+            <span style="font-size: 15px; font-weight: 600; color: #202124;">前台主题装扮</span>
+          </div>
+
+          <div class="d-flex flex-column" style="gap: 16px;">
+            <div class="d-flex align-center justify-space-between" style="padding: 12px 16px; background: #f8f9fa; border-radius: 10px;">
+              <div>
+                <div style="font-size: 14px; font-weight: 500; color: #202124;">沉浸主题</div>
+                <div style="font-size: 12px; color: #80868b; margin-top: 2px;">开启后前台页面使用统一主题变量和氛围视觉</div>
+              </div>
+              <v-switch
+                v-model="form.frontend_theme_enabled"
+                color="pink"
+                hide-details
+                true-value="true"
+                false-value="false"
+              />
+            </div>
+
+            <div class="d-flex align-center justify-space-between" style="padding: 12px 16px; background: #f8f9fa; border-radius: 10px;">
+              <div>
+                <div style="font-size: 14px; font-weight: 500; color: #202124;">访客装扮按钮</div>
+                <div style="font-size: 12px; color: #80868b; margin-top: 2px;">允许访客在前台切换主题并保存在本地</div>
+              </div>
+              <v-switch
+                v-model="form.frontend_theme_switcher_enabled"
+                color="pink"
+                hide-details
+                true-value="true"
+                false-value="false"
+              />
+            </div>
+
+            <div class="d-flex align-center justify-space-between" style="padding: 12px 16px; background: #f8f9fa; border-radius: 10px;">
+              <div>
+                <div style="font-size: 14px; font-weight: 500; color: #202124;">主题氛围层</div>
+                <div style="font-size: 12px; color: #80868b; margin-top: 2px;">显示轻量背景纹理和主题装饰，移动端自动降低密度</div>
+              </div>
+              <v-switch
+                v-model="form.frontend_ambient_enabled"
+                color="pink"
+                hide-details
+                true-value="true"
+                false-value="false"
+              />
+            </div>
+
+            <div style="padding: 12px 16px; background: #f8f9fa; border-radius: 10px;">
+              <div style="font-size: 14px; font-weight: 500; color: #202124; margin-bottom: 8px;">默认主题</div>
+              <v-btn-toggle v-model="form.frontend_theme_default" density="compact" variant="outlined" color="pink">
+                <v-btn value="classic" size="small">经典</v-btn>
+                <v-btn value="sakura" size="small">樱花</v-btn>
+                <v-btn value="neon" size="small">霓虹</v-btn>
+                <v-btn value="starry" size="small">星夜</v-btn>
+              </v-btn-toggle>
+            </div>
+          </div>
+        </div>
+      </v-card>
+
       <!-- AI 写作助手 -->
       <v-card elevation="0" rounded="xl" style="border: 1px solid #e8eaed; margin-bottom: 20px;">
         <div class="pa-5">
@@ -368,6 +432,10 @@ export default {
         mouse_trail_enabled: 'false',
         particle_enabled: 'true',
         particle_type: 'sakura',
+        frontend_theme_enabled: 'true',
+        frontend_theme_switcher_enabled: 'true',
+        frontend_theme_default: 'sakura',
+        frontend_ambient_enabled: 'true',
         ai_enabled: 'false',
         ai_base_url: 'https://api.openai.com',
         ai_model: '',

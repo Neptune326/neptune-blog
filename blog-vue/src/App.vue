@@ -7,6 +7,12 @@
       </transition>
     </router-view>
 
+    <ThemeAmbientLayer
+      v-if="isFrontend"
+      :enabled="frontendThemeEnabled && frontendAmbientEnabled"
+      :theme="frontendTheme"
+    />
+
     <!-- 粒子飘落特效（仅前台，可通过系统配置控制） -->
     <ParticleCanvas
       v-if="isFrontend && particleEnabled"
@@ -33,6 +39,13 @@
 
     <!-- 彩带礼花（特殊日期自动触发） -->
     <Confetti v-if="isFrontend" />
+
+    <ThemeSwitcher
+      v-if="isFrontend"
+      :enabled="frontendThemeEnabled && frontendThemeSwitcherEnabled"
+      :theme="frontendTheme"
+      @theme-change="setFrontendTheme"
+    />
   </v-app>
 </template>
 
@@ -46,10 +59,12 @@ import MusicPlayer from './components/frontend/MusicPlayer.vue'
 import Confetti from './components/frontend/Confetti.vue'
 import ColorClickEffect from './components/frontend/ColorClickEffect.vue'
 import Live2DWidget from './components/frontend/Live2DWidget.vue'
+import ThemeAmbientLayer from './components/frontend/ThemeAmbientLayer.vue'
+import ThemeSwitcher from './components/frontend/ThemeSwitcher.vue'
 
 export default {
   name: 'App',
-  components: { ParticleCanvas, ClickEffect, ImageLightbox, MouseTrail, MusicPlayer, Confetti, ColorClickEffect, Live2DWidget },
+  components: { ParticleCanvas, ClickEffect, ImageLightbox, MouseTrail, MusicPlayer, Confetti, ColorClickEffect, Live2DWidget, ThemeAmbientLayer, ThemeSwitcher },
   data: function() {
     return {
       particleEnabled: false,
@@ -58,7 +73,11 @@ export default {
       clickEffectEnabled: 'true',
       live2dEnabled: false,
       mouseTrailEnabled: false,
-      musicPlaylist: []
+      musicPlaylist: [],
+      frontendThemeEnabled: true,
+      frontendThemeSwitcherEnabled: true,
+      frontendAmbientEnabled: true,
+      frontendTheme: 'sakura'
     }
   },
   computed: {
@@ -67,6 +86,7 @@ export default {
     }
   },
   mounted: function() {
+    this.applyFrontendTheme(this.getStoredTheme() || this.frontendTheme)
     this.loadEffectConfig()
     // 复制保护：复制文章内容时追加版权声明
     document.addEventListener('copy', function(e) {
@@ -82,6 +102,26 @@ export default {
     })
   },
   methods: {
+    getStoredTheme: function() {
+      try {
+        var theme = localStorage.getItem('frontend_theme')
+        return this.isValidTheme(theme) ? theme : ''
+      } catch (e) {
+        return ''
+      }
+    },
+    isValidTheme: function(theme) {
+      return ['classic', 'sakura', 'neon', 'starry'].indexOf(theme) >= 0
+    },
+    setFrontendTheme: function(theme) {
+      if (!this.isValidTheme(theme)) return
+      this.frontendTheme = theme
+      try { localStorage.setItem('frontend_theme', theme) } catch (e) {}
+      this.applyFrontendTheme(theme)
+    },
+    applyFrontendTheme: function(theme) {
+      document.body.setAttribute('data-front-theme', this.isValidTheme(theme) ? theme : 'sakura')
+    },
     loadEffectConfig: function() {
       var self = this
       request({ method: 'get', url: '/api/site-config' })
@@ -93,6 +133,12 @@ export default {
           self.clickEffectEnabled = data.click_effect_enabled || 'none'
           self.live2dEnabled = data.live2d_enabled === 'true'
           self.mouseTrailEnabled = data.mouse_trail_enabled === 'true'
+          self.frontendThemeEnabled = data.frontend_theme_enabled !== 'false'
+          self.frontendThemeSwitcherEnabled = data.frontend_theme_switcher_enabled !== 'false'
+          self.frontendAmbientEnabled = data.frontend_ambient_enabled !== 'false'
+          var defaultTheme = self.isValidTheme(data.frontend_theme_default) ? data.frontend_theme_default : 'sakura'
+          self.frontendTheme = self.frontendThemeEnabled ? (self.getStoredTheme() || defaultTheme) : 'classic'
+          self.applyFrontendTheme(self.frontendTheme)
           // 音乐播放列表
           if (data.music_playlist) {
             try {
@@ -126,6 +172,69 @@ export default {
   --text-muted: #80868b;
   --border-color: #e8eaed;
   --link-color: #1a73e8;
+  --front-bg: #f8fafc;
+  --front-surface: rgba(255,255,255,0.82);
+  --front-card: rgba(255,255,255,0.9);
+  --front-text: #172033;
+  --front-text-soft: #5e6678;
+  --front-muted: #8a93a6;
+  --front-border: rgba(125,145,190,0.2);
+  --front-accent: #ec4899;
+  --front-accent-2: #38bdf8;
+  --front-shadow: 0 18px 45px rgba(88, 92, 130, 0.12);
+  --front-radius: 16px;
+}
+
+body[data-front-theme="classic"] {
+  --front-bg: #f8f9fa;
+  --front-surface: rgba(255,255,255,0.9);
+  --front-card: #ffffff;
+  --front-text: #202124;
+  --front-text-soft: #5f6368;
+  --front-muted: #80868b;
+  --front-border: #e8eaed;
+  --front-accent: #1a73e8;
+  --front-accent-2: #34a853;
+  --front-shadow: 0 12px 32px rgba(26,115,232,0.1);
+}
+
+body[data-front-theme="sakura"] {
+  --front-bg: #fff7fb;
+  --front-surface: rgba(255,255,255,0.78);
+  --front-card: rgba(255,255,255,0.86);
+  --front-text: #251827;
+  --front-text-soft: #735a71;
+  --front-muted: #9d829a;
+  --front-border: rgba(244,114,182,0.24);
+  --front-accent: #ec4899;
+  --front-accent-2: #38bdf8;
+  --front-shadow: 0 20px 48px rgba(236,72,153,0.16);
+}
+
+body[data-front-theme="neon"] {
+  --front-bg: #0f172a;
+  --front-surface: rgba(15,23,42,0.82);
+  --front-card: rgba(15,23,42,0.78);
+  --front-text: #f8fafc;
+  --front-text-soft: #cbd5e1;
+  --front-muted: #94a3b8;
+  --front-border: rgba(34,211,238,0.26);
+  --front-accent: #22d3ee;
+  --front-accent-2: #d946ef;
+  --front-shadow: 0 22px 56px rgba(34,211,238,0.18);
+}
+
+body[data-front-theme="starry"] {
+  --front-bg: #0b1020;
+  --front-surface: rgba(15,23,42,0.8);
+  --front-card: rgba(20,28,50,0.78);
+  --front-text: #f8fafc;
+  --front-text-soft: #cbd5e1;
+  --front-muted: #94a3b8;
+  --front-border: rgba(147,197,253,0.24);
+  --front-accent: #60a5fa;
+  --front-accent-2: #facc15;
+  --front-shadow: 0 22px 56px rgba(96,165,250,0.18);
 }
 
 /* 暗色主题变量覆盖 */
@@ -146,6 +255,73 @@ body {
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.front-shell {
+  min-height: 100vh;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--front-bg) 92%, white), var(--front-bg)) !important;
+  color: var(--front-text);
+  position: relative;
+}
+
+.front-shell .v-main,
+.front-shell .v-container,
+.front-shell .v-row,
+.front-shell .v-col {
+  position: relative;
+  z-index: 1;
+}
+
+.front-app-bar {
+  background: color-mix(in srgb, var(--front-surface) 92%, transparent) !important;
+  border-bottom: 1px solid var(--front-border) !important;
+  backdrop-filter: blur(18px);
+  color: var(--front-text) !important;
+}
+
+.front-card {
+  background: var(--front-card) !important;
+  border: 1px solid var(--front-border) !important;
+  box-shadow: var(--front-shadow) !important;
+  backdrop-filter: blur(18px);
+}
+
+.front-card:hover {
+  border-color: color-mix(in srgb, var(--front-accent) 42%, var(--front-border)) !important;
+}
+
+.front-title {
+  color: var(--front-text) !important;
+}
+
+.front-muted {
+  color: var(--front-muted) !important;
+}
+
+.front-soft {
+  color: var(--front-text-soft) !important;
+}
+
+.front-footer {
+  background: color-mix(in srgb, var(--front-surface) 88%, transparent) !important;
+  border-top: 1px solid var(--front-border) !important;
+  backdrop-filter: blur(16px);
+}
+
+.front-nav-mobile {
+  background: color-mix(in srgb, var(--front-surface) 94%, transparent) !important;
+  border-bottom: 1px solid var(--front-border) !important;
+  box-shadow: var(--front-shadow);
+  backdrop-filter: blur(18px);
+}
+
+.front-gradient-text {
+  color: var(--front-accent);
+  background: linear-gradient(135deg, var(--front-accent), var(--front-accent-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* 链接样式 */
@@ -425,5 +601,49 @@ body.dark-mode .v-app[style*="background: #f8f9fa"] {
 body.dark-mode .v-navigation-drawer {
   background: #292a2d !important;
   border-right-color: #3c4043 !important;
+}
+
+.front-shell .markdown-body,
+.front-shell .markdown-body h1,
+.front-shell .markdown-body h2,
+.front-shell .markdown-body h3,
+.front-shell .markdown-body h4 {
+  color: var(--front-text);
+}
+
+.front-shell .markdown-body pre,
+.front-shell .markdown-body code,
+.front-shell .markdown-body th,
+.front-shell .markdown-body tr:nth-child(even) td {
+  background: color-mix(in srgb, var(--front-accent) 8%, var(--front-card));
+}
+
+.front-shell .markdown-body pre,
+.front-shell .markdown-body td,
+.front-shell .markdown-body th,
+.front-shell .markdown-body h1,
+.front-shell .markdown-body h2 {
+  border-color: var(--front-border);
+}
+
+.front-shell .markdown-body blockquote {
+  background: color-mix(in srgb, var(--front-accent) 9%, transparent);
+  border-left-color: var(--front-accent);
+  color: var(--front-text-soft);
+}
+
+.front-shell .nav-link {
+  color: var(--front-text-soft) !important;
+}
+
+.front-shell .nav-link:hover,
+.front-shell .nav-link.active {
+  background: color-mix(in srgb, var(--front-accent) 12%, transparent);
+  color: var(--front-accent) !important;
+}
+
+.front-shell .tag-chip:hover {
+  background: color-mix(in srgb, var(--front-accent) 12%, transparent) !important;
+  color: var(--front-accent) !important;
 }
 </style>

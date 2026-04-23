@@ -350,7 +350,11 @@ INSERT INTO sys_config (config_key, config_value, config_desc, create_time, upda
 ('ai_model', '', 'AI model name', NOW(), NOW()),
 ('ai_api_key', '', 'AI API key', NOW(), NOW()),
 ('ai_temperature', '0.7', 'AI generation temperature', NOW(), NOW()),
-('ai_max_tokens', '1200', 'AI max output tokens', NOW(), NOW());
+('ai_max_tokens', '1200', 'AI max output tokens', NOW(), NOW()),
+('frontend_theme_enabled', 'true', 'Enable frontend immersive themes', NOW(), NOW()),
+('frontend_theme_switcher_enabled', 'true', 'Show frontend theme switcher', NOW(), NOW()),
+('frontend_theme_default', 'sakura', 'Default frontend theme', NOW(), NOW()),
+('frontend_ambient_enabled', 'true', 'Enable frontend ambient layer', NOW(), NOW());
 
 -- =====================================================
 -- 后续变更追加区

@@ -1,10 +1,9 @@
 <template>
   <!-- 文章卡片 —— Google Material Design 3 风格 -->
   <v-card
-    class="mb-4 card-clickable"
-    rounded="lg"
+    class="mb-4 card-clickable front-card article-card-modern"
+    rounded="xl"
     elevation="0"
-    style="border: 1px solid #e8eaed;"
     @click="goDetail"
   >
     <!-- 封面图 -->
@@ -13,7 +12,7 @@
       :src="article.coverUrl"
       height="220"
       cover
-      class="rounded-t-lg"
+      class="rounded-t-xl article-cover"
     >
       <!-- 分类标签 + 置顶标识 浮层 -->
       <template #default>
@@ -22,7 +21,7 @@
             v-if="article.categoryName"
             size="small"
             color="primary"
-            style="background: rgba(26,115,232,0.9); backdrop-filter: blur(4px);"
+            class="article-chip"
           >
             {{ article.categoryName }}
           </v-chip>
@@ -30,7 +29,7 @@
             v-if="article.isTop === 1"
             size="small"
             color="warning"
-            style="background: rgba(242,153,0,0.9); backdrop-filter: blur(4px);"
+            class="article-chip"
             prepend-icon="mdi-pin"
           >
             置顶
@@ -53,7 +52,7 @@
       <!-- 标题 -->
       <h3
         class="text-h6 font-weight-bold mb-2 line-clamp-2"
-        style="color: #202124; line-height: 1.4;"
+        style="color: var(--front-text); line-height: 1.4;"
       >
         {{ article.title }}
       </h3>
@@ -62,7 +61,7 @@
       <p
         v-if="article.summary"
         class="text-body-2 line-clamp-3 mb-3"
-        style="color: #5f6368; line-height: 1.6;"
+        style="color: var(--front-text-soft); line-height: 1.7;"
       >
         {{ article.summary }}
       </p>
@@ -70,7 +69,7 @@
       <!-- 底部：时间 + 阅读数 + 评论数 + 字数 + 标签 -->
       <div class="d-flex align-center justify-space-between flex-wrap" style="gap: 8px;">
         <!-- 左侧：元信息 -->
-        <div class="d-flex align-center flex-wrap" style="gap: 10px; color: #80868b; font-size: 12px;">
+        <div class="d-flex align-center flex-wrap article-meta">
           <span class="d-flex align-center" style="gap: 3px;">
             <v-icon size="13" color="grey">mdi-calendar-outline</v-icon>
             {{ formatDate(article.createTime) }}
@@ -145,3 +144,33 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.article-card-modern {
+  overflow: hidden;
+}
+
+.article-card-modern:hover {
+  transform: translateY(-4px);
+}
+
+.article-cover :deep(img) {
+  transition: transform 0.35s ease;
+}
+
+.article-card-modern:hover .article-cover :deep(img) {
+  transform: scale(1.04);
+}
+
+.article-chip {
+  background: color-mix(in srgb, var(--front-accent) 84%, transparent) !important;
+  color: white !important;
+  backdrop-filter: blur(10px);
+}
+
+.article-meta {
+  gap: 10px;
+  color: var(--front-muted);
+  font-size: 12px;
+}
+</style>

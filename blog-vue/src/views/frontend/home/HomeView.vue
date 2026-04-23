@@ -1,15 +1,15 @@
 ﻿<template>
-  <v-app style="background: var(--bg-primary, #f8f9fa);">
+  <v-app class="front-shell">
     <!-- 阅读进度条 + 回到顶部 -->
     <ReadingProgress />
 
     <!-- 顶部导航栏 -->
-    <v-app-bar color="white" elevation="0" style="border-bottom: 1px solid #e8eaed;">
+    <v-app-bar elevation="0" class="front-app-bar">
       <v-container style="max-width: 1200px; display: flex; align-items: center; padding: 0 16px;">
         <!-- Logo -->
         <router-link to="/" class="d-flex align-center text-decoration-none" style="gap: 8px;">
           <v-icon color="primary" size="28">mdi-pencil-circle</v-icon>
-          <span style="font-size: 20px; font-weight: 600; color: #202124; letter-spacing: -0.3px;">
+          <span class="front-title" style="font-size: 20px; font-weight: 700; letter-spacing: 0;">
             我的博客
           </span>
         </router-link>
@@ -47,12 +47,10 @@
       v-if="mobileMenu"
       style="
         position: fixed; top: 64px; left: 0; right: 0;
-        background: white;
-        border-bottom: 1px solid #e8eaed;
         z-index: 100;
         padding: 8px 0;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
       "
+      class="front-nav-mobile"
     >
       <router-link
         v-for="item in navItems"
@@ -63,7 +61,6 @@
           display: flex; align-items: center; gap: 10px;
           padding: 12px 20px;
           text-decoration: none;
-          color: #3c4043;
           font-size: 15px;
           font-weight: 500;
           transition: background 0.15s;
@@ -82,8 +79,8 @@
           <v-col cols="12" md="8">
             <!-- 排序切换 -->
             <div class="d-flex align-center justify-space-between mb-4" style="gap: 8px;">
-              <div style="font-size: 14px; color: #5f6368;">
-                共 <strong style="color: #202124;">{{ total }}</strong> 篇文章
+              <div class="front-soft" style="font-size: 14px;">
+                共 <strong class="front-title">{{ total }}</strong> 篇文章
               </div>
               <div class="d-flex" style="gap: 4px;">
                 <v-btn
@@ -141,9 +138,9 @@
     </v-main>
 
     <!-- 底部 -->
-    <v-footer color="white" style="border-top: 1px solid #e8eaed; padding: 20px 16px;">
+    <v-footer class="front-footer" style="padding: 20px 16px;">
       <v-container style="max-width: 1200px; text-align: center;">
-        <div style="color: #80868b; font-size: 13px; margin-bottom: 8px;">
+        <div class="front-muted" style="font-size: 13px; margin-bottom: 8px;">
           © {{ new Date().getFullYear() }} 我的博客 · 用 ❤️ 构建
         </div>
         <SiteRuntime class="mb-2" />
@@ -229,7 +226,10 @@ export default {
 
 <style scoped>
 .mobile-nav-link:hover {
-  background: #f8f9fa;
+  background: color-mix(in srgb, var(--front-accent) 10%, transparent);
+}
+.mobile-nav-link {
+  color: var(--front-text) !important;
 }
 </style>
 

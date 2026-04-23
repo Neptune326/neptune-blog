@@ -38,6 +38,10 @@ public class SiteConfigFrontController {
             "particle_type",
             "particle_count",
             "live2d_enabled",
+            "frontend_theme_enabled",
+            "frontend_theme_switcher_enabled",
+            "frontend_theme_default",
+            "frontend_ambient_enabled",
             "about_enabled",
             "message_enabled",
             "like_enabled"

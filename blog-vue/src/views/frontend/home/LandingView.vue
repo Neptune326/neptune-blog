@@ -1,10 +1,10 @@
 ﻿<template>
-  <v-app :style="animeMode ? 'background: #0a0e1a;' : 'background: #f0f4ff;'" style="min-height: 100vh; overflow-x: hidden;">
+  <v-app class="front-shell" :style="animeMode ? 'background: #0a0e1a;' : ''" style="min-height: 100vh; overflow-x: hidden;">
 
     <!-- 顶部导航 -->
     <nav :style="animeMode
       ? 'background: rgba(10,14,26,0.85); border-bottom: 1px solid rgba(255,255,255,0.06);'
-      : 'background: rgba(255,255,255,0.9); border-bottom: 1px solid rgba(99,102,241,0.12); box-shadow: 0 1px 12px rgba(99,102,241,0.08);'"
+      : 'background: var(--front-surface); border-bottom: 1px solid var(--front-border); box-shadow: var(--front-shadow);'"
       style="
         position: fixed; top: 0; left: 0; right: 0; z-index: 100;
         padding: 16px 32px;
@@ -113,31 +113,19 @@
 
       <!-- ===== 亮色模式：渐变背景 ===== -->
       <template v-else>
-        <!-- 主渐变背景 -->
+        <!-- 主题背景 -->
         <div style="
           position: absolute; inset: 0;
-          background: linear-gradient(135deg, #f0f4ff 0%, #faf5ff 40%, #f0fdf4 100%);
+          background: linear-gradient(135deg, color-mix(in srgb, var(--front-bg) 92%, white) 0%, var(--front-bg) 100%);
           pointer-events: none;
         "></div>
-        <!-- 彩色光晕 -->
+        <!-- 主题纹理 -->
         <div style="
           position: absolute; inset: 0;
           background:
-            radial-gradient(ellipse 70% 50% at 15% 40%, rgba(99,102,241,0.12) 0%, transparent 60%),
-            radial-gradient(ellipse 50% 40% at 85% 60%, rgba(139,92,246,0.1) 0%, transparent 60%),
-            radial-gradient(ellipse 40% 35% at 50% 90%, rgba(16,185,129,0.08) 0%, transparent 60%);
+            linear-gradient(120deg, color-mix(in srgb, var(--front-accent) 8%, transparent), transparent 42%),
+            repeating-linear-gradient(135deg, color-mix(in srgb, var(--front-accent-2) 7%, transparent) 0 1px, transparent 1px 32px);
           pointer-events: none;
-        "></div>
-        <!-- 装饰圆圈 -->
-        <div style="position: absolute; top: 15%; right: 8%; width: 300px; height: 300px; border-radius: 50%; background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.06)); pointer-events: none;"></div>
-        <div style="position: absolute; bottom: 20%; left: 5%; width: 200px; height: 200px; border-radius: 50%; background: linear-gradient(135deg, rgba(16,185,129,0.07), rgba(99,102,241,0.05)); pointer-events: none;"></div>
-        <!-- 点阵背景 -->
-        <div style="
-          position: absolute; inset: 0;
-          background-image: radial-gradient(circle, rgba(99,102,241,0.12) 1px, transparent 1px);
-          background-size: 32px 32px;
-          pointer-events: none;
-          opacity: 0.6;
         "></div>
       </template>
 
@@ -267,7 +255,7 @@
     </section>
 
     <!-- 最新文章预览 -->
-    <section :style="animeMode ? '' : 'background: #f8f7ff;'" style="padding: 80px 24px;">
+    <section :style="animeMode ? '' : 'background: color-mix(in srgb, var(--front-bg) 92%, white);'" style="padding: 80px 24px;">
       <div style="max-width: 1100px; margin: 0 auto;">
         <div style="text-align: center; margin-bottom: 48px;">
           <div style="font-size: 12px; font-weight: 600; color: #6366f1; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px;">LATEST POSTS</div>

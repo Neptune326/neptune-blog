@@ -1,17 +1,17 @@
 ﻿<template>
-  <v-app style="background: var(--bg-primary, #f8f9fa);">
+  <v-app class="front-shell">
     <!-- 阅读进度条 + 回到顶部 -->
     <ReadingProgress />
 
     <!-- 顶部导航栏 -->
-    <v-app-bar color="white" elevation="0" style="border-bottom: 1px solid #e8eaed;">
+    <v-app-bar elevation="0" class="front-app-bar">
       <v-container style="max-width: 1200px; display: flex; align-items: center; padding: 0 16px;">
         <v-btn icon variant="text" @click="$router.back()" style="color: #5f6368;">
           <v-icon>mdi-arrow-left</v-icon>
         </v-btn>
         <router-link to="/" class="d-flex align-center text-decoration-none ml-2" style="gap: 6px;">
           <v-icon color="primary" size="22">mdi-pencil-circle</v-icon>
-          <span style="font-size: 16px; font-weight: 600; color: #202124;">我的博客</span>
+          <span class="front-title" style="font-size: 16px; font-weight: 700;">我的博客</span>
         </router-link>
         <v-spacer />
         <!-- 分享按钮 -->
@@ -44,7 +44,7 @@
         <div v-if="loading">
           <v-row>
             <v-col cols="12" md="8">
-              <div style="background: white; border: 1px solid #e8eaed; border-radius: 12px; overflow: hidden;">
+              <div class="front-card" style="border-radius: 16px; overflow: hidden;">
                 <div class="skeleton" style="height: 300px;" />
                 <div style="padding: 32px;">
                   <div class="skeleton" style="height: 14px; width: 120px; border-radius: 4px; margin-bottom: 16px;" />
@@ -55,7 +55,7 @@
               </div>
             </v-col>
             <v-col cols="12" md="4" class="d-none d-md-block">
-              <div style="background: white; border: 1px solid #e8eaed; border-radius: 12px; padding: 16px;">
+              <div class="front-card" style="border-radius: 16px; padding: 16px;">
                 <div class="skeleton" style="height: 14px; width: 60px; border-radius: 4px; margin-bottom: 12px;" />
                 <div v-for="i in 5" :key="i" class="skeleton" style="height: 12px; border-radius: 4px; margin-bottom: 8px;" :style="{ width: (50 + i * 8) + '%' }" />
               </div>
@@ -66,14 +66,14 @@
         <v-row v-else-if="article">
           <!-- 文章主体 -->
           <v-col cols="12" md="8">
-            <v-card elevation="0" rounded="lg" class="mb-6" style="border: 1px solid #e8eaed;">
+            <v-card elevation="0" rounded="xl" class="mb-6 front-card article-detail-card">
               <!-- 封面图 -->
               <v-img
                 v-if="article.coverUrl"
                 :src="article.coverUrl"
                 height="320"
                 cover
-                class="rounded-t-lg"
+                class="rounded-t-xl article-hero-img"
               />
 
               <div class="pa-6 pa-md-8">
@@ -105,14 +105,14 @@
                 </div>
 
                 <!-- 标题 -->
-                <h1 class="mb-4" style="font-size: 28px; font-weight: 700; color: #202124; line-height: 1.35; letter-spacing: -0.3px;">
+                <h1 class="mb-4 front-title article-detail-title">
                   {{ article.title }}
                 </h1>
 
                 <!-- 元信息 -->
                 <div
                   class="d-flex align-center flex-wrap mb-6"
-                  style="gap: 16px; color: #80868b; font-size: 13px; border-bottom: 1px solid #e8eaed; padding-bottom: 20px;"
+                  style="gap: 16px; color: var(--front-muted); font-size: 13px; border-bottom: 1px solid var(--front-border); padding-bottom: 20px;"
                 >
                   <span class="d-flex align-center" style="gap: 4px;">
                     <v-icon size="15">mdi-calendar-outline</v-icon>
@@ -129,7 +129,7 @@
                   <v-spacer />
                   <!-- 分享按钮组 -->
                   <div class="d-flex align-center" style="gap: 6px;">
-                    <span style="font-size: 12px; color: #9aa0a6;">分享：</span>
+                    <span style="font-size: 12px; color: var(--front-muted);">分享：</span>
                     <button @click="shareWeibo" title="分享到微博" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:4px;color:#e6162d;font-size:12px;transition:background 0.15s;" class="share-btn">微博</button>
                     <button @click="copyLink" title="复制链接" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:4px;color:#5f6368;font-size:12px;transition:background 0.15s;" class="share-btn">
                       <v-icon size="14">mdi-link-variant</v-icon>
@@ -206,15 +206,15 @@
                   style="
                     margin-top: 32px;
                     padding: 16px;
-                    background: #f8f9fa;
-                    border-left: 3px solid #1a73e8;
+                      background: color-mix(in srgb, var(--front-accent) 8%, transparent);
+                      border-left: 3px solid var(--front-accent);
                     border-radius: 0 8px 8px 0;
                     font-size: 13px;
-                    color: #5f6368;
+                      color: var(--front-text-soft);
                     line-height: 1.6;
                   "
                 >
-                  <div style="font-weight: 600; color: #3c4043; margin-bottom: 4px;">版权声明</div>
+                  <div style="font-weight: 600; color: var(--front-text); margin-bottom: 4px;">版权声明</div>
                   本文采用 CC BY-NC-SA 4.0 协议，转载请注明出处。
                 </div>
 
@@ -234,8 +234,8 @@
                     style="
                       text-decoration: none;
                       padding: 12px 16px;
-                      background: white;
-                      border: 1px solid #e8eaed;
+                      background: var(--front-card);
+                      border: 1px solid var(--front-border);
                       border-radius: 10px;
                       transition: all 0.2s;
                     "
@@ -244,7 +244,7 @@
                     <div style="font-size: 11px; color: #9aa0a6; margin-bottom: 4px;">
                       ← 上一篇
                     </div>
-                    <div style="font-size: 13px; color: #3c4043; font-weight: 500; line-height: 1.4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    <div style="font-size: 13px; color: var(--front-text); font-weight: 500; line-height: 1.4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                       {{ prevArticle.title }}
                     </div>
                   </router-link>
@@ -256,8 +256,8 @@
                     style="
                       text-decoration: none;
                       padding: 12px 16px;
-                      background: white;
-                      border: 1px solid #e8eaed;
+                      background: var(--front-card);
+                      border: 1px solid var(--front-border);
                       border-radius: 10px;
                       text-align: right;
                       transition: all 0.2s;
@@ -267,7 +267,7 @@
                     <div style="font-size: 11px; color: #9aa0a6; margin-bottom: 4px;">
                       下一篇 →
                     </div>
-                    <div style="font-size: 13px; color: #3c4043; font-weight: 500; line-height: 1.4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    <div style="font-size: 13px; color: var(--front-text); font-weight: 500; line-height: 1.4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                       {{ nextArticle.title }}
                     </div>
                   </router-link>
@@ -311,7 +311,7 @@
 
 
             <!-- 评论区 -->
-            <v-card elevation="0" rounded="lg" style="border: 1px solid #e8eaed;">
+            <v-card elevation="0" rounded="xl" class="front-card">
               <div class="pa-6">
                 <div class="d-flex align-center mb-5" style="gap: 8px;">
                   <v-icon color="primary">mdi-comment-text-outline</v-icon>
@@ -632,8 +632,25 @@ export default {
   background: #f8fbff !important;
 }
 .related-link:hover {
-  background: #e8f0fe !important;
-  border-color: #1a73e8 !important;
+  background: color-mix(in srgb, var(--front-accent) 10%, transparent) !important;
+  border-color: var(--front-accent) !important;
+}
+.article-detail-card {
+  overflow: hidden;
+}
+.article-hero-img {
+  position: relative;
+}
+.article-detail-title {
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1.28;
+  letter-spacing: 0;
+}
+@media (max-width: 600px) {
+  .article-detail-title {
+    font-size: 24px;
+  }
 }
 
 .skeleton {
