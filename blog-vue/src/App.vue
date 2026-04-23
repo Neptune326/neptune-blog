@@ -28,6 +28,9 @@
     <!-- 音乐播放器（仅前台，有歌单时显示） -->
     <MusicPlayer v-if="isFrontend" :playlist="musicPlaylist" />
 
+    <!-- Live2D 看板娘（仅前台，可通过系统配置控制） -->
+    <Live2DWidget :enabled="isFrontend && live2dEnabled" />
+
     <!-- 彩带礼花（特殊日期自动触发） -->
     <Confetti v-if="isFrontend" />
   </v-app>
@@ -42,16 +45,18 @@ import MouseTrail from './components/frontend/MouseTrail.vue'
 import MusicPlayer from './components/frontend/MusicPlayer.vue'
 import Confetti from './components/frontend/Confetti.vue'
 import ColorClickEffect from './components/frontend/ColorClickEffect.vue'
+import Live2DWidget from './components/frontend/Live2DWidget.vue'
 
 export default {
   name: 'App',
-  components: { ParticleCanvas, ClickEffect, ImageLightbox, MouseTrail, MusicPlayer, Confetti, ColorClickEffect },
+  components: { ParticleCanvas, ClickEffect, ImageLightbox, MouseTrail, MusicPlayer, Confetti, ColorClickEffect, Live2DWidget },
   data: function() {
     return {
       particleEnabled: false,
       particleType: 'sakura',
       particleCount: 25,
       clickEffectEnabled: 'true',
+      live2dEnabled: false,
       mouseTrailEnabled: false,
       musicPlaylist: []
     }
@@ -86,6 +91,7 @@ export default {
           self.particleType = data.particle_type || 'sakura'
           self.particleCount = parseInt(data.particle_count || '25')
           self.clickEffectEnabled = data.click_effect_enabled || 'none'
+          self.live2dEnabled = data.live2d_enabled === 'true'
           self.mouseTrailEnabled = data.mouse_trail_enabled === 'true'
           // 音乐播放列表
           if (data.music_playlist) {
