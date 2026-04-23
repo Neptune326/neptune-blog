@@ -184,6 +184,89 @@
         </div>
       </v-card>
 
+      <!-- AI 写作助手 -->
+      <v-card elevation="0" rounded="xl" style="border: 1px solid #e8eaed; margin-bottom: 20px;">
+        <div class="pa-5">
+          <div class="d-flex align-center mb-4" style="gap: 8px;">
+            <v-icon color="primary" size="20">mdi-robot-outline</v-icon>
+            <span style="font-size: 15px; font-weight: 600; color: #202124;">AI 写作助手</span>
+          </div>
+
+          <div class="d-flex align-center justify-space-between mb-4" style="padding: 12px 16px; background: #f8f9fa; border-radius: 10px;">
+            <div>
+              <div style="font-size: 14px; font-weight: 500; color: #202124;">启用 AI 写作</div>
+              <div style="font-size: 12px; color: #80868b; margin-top: 2px;">开启后后台文章编辑页可调用 OpenAI 兼容接口</div>
+            </div>
+            <v-switch
+              v-model="form.ai_enabled"
+              color="primary"
+              hide-details
+              true-value="true"
+              false-value="false"
+            />
+          </div>
+
+          <v-row dense>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model="form.ai_base_url"
+                label="Base URL"
+                variant="outlined"
+                density="comfortable"
+                prepend-inner-icon="mdi-link-variant"
+                placeholder="https://api.openai.com"
+              />
+            </v-col>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model="form.ai_model"
+                label="模型名称"
+                variant="outlined"
+                density="comfortable"
+                prepend-inner-icon="mdi-cube-outline"
+                placeholder="填写服务商提供的模型名"
+              />
+            </v-col>
+            <v-col cols="12">
+              <v-text-field
+                v-model="form.ai_api_key"
+                label="API Key"
+                variant="outlined"
+                density="comfortable"
+                type="password"
+                prepend-inner-icon="mdi-key-outline"
+                autocomplete="off"
+              />
+            </v-col>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model="form.ai_temperature"
+                label="温度"
+                variant="outlined"
+                density="comfortable"
+                type="number"
+                min="0"
+                max="2"
+                step="0.1"
+                prepend-inner-icon="mdi-thermometer"
+              />
+            </v-col>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model="form.ai_max_tokens"
+                label="最大输出 Token"
+                variant="outlined"
+                density="comfortable"
+                type="number"
+                min="128"
+                max="8000"
+                prepend-inner-icon="mdi-counter"
+              />
+            </v-col>
+          </v-row>
+        </div>
+      </v-card>
+
       <!-- 画廊管理 -->
       <v-card elevation="0" rounded="xl" style="border: 1px solid #e8eaed; margin-bottom: 20px;">
         <div class="pa-5">
@@ -284,7 +367,13 @@ export default {
         click_effect_enabled: 'true',
         mouse_trail_enabled: 'false',
         particle_enabled: 'true',
-        particle_type: 'sakura'
+        particle_type: 'sakura',
+        ai_enabled: 'false',
+        ai_base_url: 'https://api.openai.com',
+        ai_model: '',
+        ai_api_key: '',
+        ai_temperature: '0.7',
+        ai_max_tokens: '1200'
       }
     }
   },

@@ -97,6 +97,100 @@
           class="mb-4"
         />
 
+        <!-- AI 写作助手 -->
+        <div class="mb-4" style="border: 1px solid #e8eaed; border-radius: 8px; padding: 16px; background: #fafafa;">
+          <div class="d-flex align-center justify-space-between mb-3" style="gap: 12px;">
+            <div class="d-flex align-center" style="gap: 8px;">
+              <v-icon color="primary" size="20">mdi-robot-outline</v-icon>
+              <span style="font-size: 14px; font-weight: 600; color: #202124;">AI 写作助手</span>
+            </div>
+            <v-btn
+              size="small"
+              color="primary"
+              variant="flat"
+              prepend-icon="mdi-send"
+              :loading="aiLoading"
+              @click="runAiAction(aiAction)"
+            >
+              生成
+            </v-btn>
+          </div>
+
+          <v-row dense>
+            <v-col cols="12" sm="6" md="4">
+              <v-select
+                v-model="aiAction"
+                :items="aiActions"
+                item-title="label"
+                item-value="value"
+                label="能力"
+                variant="outlined"
+                density="comfortable"
+                hide-details
+              />
+            </v-col>
+            <v-col cols="12" sm="6" md="4">
+              <v-select
+                v-model="aiTone"
+                :items="aiToneOptions"
+                item-title="label"
+                item-value="value"
+                label="语气"
+                variant="outlined"
+                density="comfortable"
+                hide-details
+              />
+            </v-col>
+            <v-col cols="12" md="4">
+              <div class="d-flex flex-wrap" style="gap: 8px; padding-top: 2px;">
+                <v-btn size="small" variant="outlined" prepend-icon="mdi-text-box-check-outline" :disabled="aiLoading" @click="runAiAction('summary')">摘要</v-btn>
+                <v-btn size="small" variant="outlined" prepend-icon="mdi-format-title" :disabled="aiLoading" @click="runAiAction('polish_title')">标题</v-btn>
+                <v-btn size="small" variant="outlined" prepend-icon="mdi-format-list-bulleted" :disabled="aiLoading" @click="runAiAction('outline')">大纲</v-btn>
+                <v-btn size="small" variant="outlined" prepend-icon="mdi-tag-multiple-outline" :disabled="aiLoading" @click="runAiAction('tags')">标签</v-btn>
+              </div>
+            </v-col>
+          </v-row>
+
+          <v-textarea
+            v-if="aiAction === 'custom'"
+            v-model="aiCustomPrompt"
+            label="自定义提示词"
+            variant="outlined"
+            density="comfortable"
+            rows="2"
+            class="mt-3"
+          />
+
+          <v-alert v-if="aiError" type="error" variant="tonal" density="compact" class="mt-3">
+            {{ aiError }}
+          </v-alert>
+
+          <div v-if="aiResult" class="mt-3" style="border-top: 1px solid #e8eaed; padding-top: 12px;">
+            <div class="d-flex align-center justify-space-between mb-2" style="gap: 12px;">
+              <span style="font-size: 13px; font-weight: 600; color: #3c4043;">生成结果</span>
+              <div class="d-flex flex-wrap justify-end" style="gap: 8px;">
+                <v-btn v-if="aiLastAction === 'summary'" size="small" color="primary" variant="tonal" @click="applyAiSummary">填入摘要</v-btn>
+                <v-btn v-if="aiLastAction === 'polish_title'" size="small" color="primary" variant="tonal" @click="applyAiTitle">替换标题</v-btn>
+                <v-btn v-if="aiLastAction !== 'summary' && aiLastAction !== 'polish_title' && aiLastAction !== 'tags'" size="small" color="primary" variant="tonal" @click="insertAiResult">插入正文</v-btn>
+                <v-btn size="small" variant="text" @click="clearAiResult">清空</v-btn>
+              </div>
+            </div>
+            <pre style="white-space: pre-wrap; word-break: break-word; margin: 0; font-size: 13px; line-height: 1.7; color: #202124; max-height: 260px; overflow: auto;">{{ aiResult }}</pre>
+            <div v-if="aiSuggestions.length" class="d-flex flex-wrap mt-3" style="gap: 8px;">
+              <v-chip
+                v-for="name in aiSuggestions"
+                :key="name"
+                color="primary"
+                variant="tonal"
+                size="small"
+                @click="applyAiTag(name)"
+              >
+                {{ name }}
+              </v-chip>
+            </div>
+          </div>
+        </div>
+
         <!-- 封面图：支持 URL 输入 + 本地上传 -->
         <div class="mb-4">
           <div style="font-size: 13px; color: #5f6368; margin-bottom: 8px;">封面图片</div>
@@ -181,6 +275,7 @@ import 'md-editor-v3/lib/style.css'
 import { adminGetArticleById, createArticle, updateArticle } from '@/api/article.js'
 import { adminGetCategories } from '@/api/category.js'
 import { adminGetTags } from '@/api/tag.js'
+import { generateAiWriting } from '@/api/ai.js'
 import { uploadImage } from '@/api/upload.js'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -205,6 +300,29 @@ export default {
         { label: '草稿', value: 0 },
         { label: '已发布', value: 1 }
       ],
+      aiActions: [
+        { label: '生成摘要', value: 'summary' },
+        { label: '润色标题', value: 'polish_title' },
+        { label: '生成大纲', value: 'outline' },
+        { label: '推荐标签', value: 'tags' },
+        { label: '续写正文', value: 'continue' },
+        { label: '改写内容', value: 'rewrite' },
+        { label: '自定义提示词', value: 'custom' }
+      ],
+      aiToneOptions: [
+        { label: '自然', value: 'natural' },
+        { label: '专业', value: 'professional' },
+        { label: '简洁', value: 'concise' },
+        { label: '活泼', value: 'lively' }
+      ],
+      aiAction: 'summary',
+      aiTone: 'natural',
+      aiCustomPrompt: '',
+      aiLoading: false,
+      aiResult: '',
+      aiSuggestions: [],
+      aiLastAction: '',
+      aiError: '',
       form: {
         title: '',
         categoryId: null,
@@ -285,6 +403,90 @@ export default {
           console.error('加载文章失败:', err)
           self.errorMsg = '加载文章失败'
         })
+    },
+    runAiAction: function(action) {
+      var self = this
+      if (self.aiLoading) return
+      if (action === 'custom' && !self.aiCustomPrompt) {
+        self.aiError = '请输入自定义提示词'
+        return
+      }
+      self.aiAction = action
+      self.aiLoading = true
+      self.aiError = ''
+      self.aiResult = ''
+      self.aiSuggestions = []
+      self.aiLastAction = action
+
+      generateAiWriting({
+        action: action,
+        title: self.form.title,
+        summary: self.form.summary,
+        content: self.form.content,
+        selectedText: '',
+        customPrompt: self.aiCustomPrompt,
+        tone: self.aiTone
+      })
+        .then(function(data) {
+          self.aiResult = data.result || ''
+          self.aiSuggestions = data.suggestions || []
+          if (action === 'tags' && !self.aiSuggestions.length && self.aiResult) {
+            self.aiSuggestions = self.parseAiTags(self.aiResult)
+          }
+        })
+        .catch(function(err) {
+          self.aiError = err.message || 'AI 生成失败'
+        })
+        .finally(function() {
+          self.aiLoading = false
+        })
+    },
+    applyAiSummary: function() {
+      this.form.summary = this.aiResult.trim()
+      this.$toast.success('摘要已填入')
+    },
+    applyAiTitle: function() {
+      var lines = this.aiResult.split(/\r?\n/)
+        .map(function(line) { return line.trim() })
+        .filter(function(line) { return !!line })
+      if (!lines.length) return
+      this.form.title = lines[0]
+        .replace(/^[-*\d.、\s]+/, '')
+        .replace(/^["“']|["”']$/g, '')
+      this.$toast.success('标题已替换')
+    },
+    insertAiResult: function() {
+      var text = this.aiResult.trim()
+      if (!text) return
+      var prefix = this.form.content && !this.form.content.endsWith('\n') ? '\n\n' : ''
+      this.form.content = (this.form.content || '') + prefix + text
+      this.$toast.success('内容已插入正文')
+    },
+    applyAiTag: function(name) {
+      var exists = (this.form.tagIds || []).some(function(tag) {
+        return (typeof tag === 'object' ? tag.name : tag) === name
+      })
+      if (exists) return
+      var matched = (this.tags || []).find(function(tag) {
+        return tag.name === name
+      })
+      if (matched) {
+        this.form.tagIds.push(matched)
+        this.$toast.success('标签已添加')
+      }
+    },
+    parseAiTags: function(text) {
+      var existing = (this.tags || []).map(function(tag) { return tag.name })
+      return text.split(/[,，\n、;；]/)
+        .map(function(name) { return name.trim() })
+        .filter(function(name, index, list) {
+          return !!name && existing.indexOf(name) !== -1 && list.indexOf(name) === index
+        })
+    },
+    clearAiResult: function() {
+      this.aiResult = ''
+      this.aiSuggestions = []
+      this.aiError = ''
     },
     handleSubmit: function() {
       var self = this

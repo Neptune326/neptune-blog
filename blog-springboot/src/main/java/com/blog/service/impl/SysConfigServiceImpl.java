@@ -13,14 +13,18 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
- * 系统配置服务实现
+ * System config service implementation.
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class SysConfigServiceImpl implements SysConfigService {
+
+    private static final Set<String> SENSITIVE_KEYS = Set.of("ai_api_key");
+    private static final String MASK_TEXT = "******";
 
     private final SysConfigMapper sysConfigMapper;
 
@@ -29,7 +33,7 @@ public class SysConfigServiceImpl implements SysConfigService {
         List<SysConfig> list = sysConfigMapper.selectList(null);
         Map<String, String> result = new HashMap<>();
         for (SysConfig config : list) {
-            result.put(config.getConfigKey(), config.getConfigValue());
+            result.put(config.getConfigKey(), maskValue(config.getConfigKey(), config.getConfigValue()));
         }
         return result;
     }
@@ -45,11 +49,14 @@ public class SysConfigServiceImpl implements SysConfigService {
     @Override
     public int getIntValue(String key, int defaultValue) {
         String value = getValue(key);
-        if (value == null) return defaultValue;
+        if (value == null) {
+            return defaultValue;
+        }
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
-            log.warn("系统配置 {} 的值 {} 不是有效整数，使用默认值 {}", key, value, defaultValue);
+            log.warn("[System config] invalid integer config, key: {}, value: {}, default: {}",
+                    key, logValue(key, value), defaultValue);
             return defaultValue;
         }
     }
@@ -64,16 +71,19 @@ public class SysConfigServiceImpl implements SysConfigService {
     @Transactional(rollbackFor = Exception.class)
     public void updateBatch(Map<String, String> configs) {
         for (Map.Entry<String, String> entry : configs.entrySet()) {
+            if (isSensitiveMaskedValue(entry.getKey(), entry.getValue())) {
+                log.info("[System config] keep existing sensitive config: {}", entry.getKey());
+                continue;
+            }
+
             SysConfig config = sysConfigMapper.selectOne(
                     new LambdaQueryWrapper<SysConfig>().eq(SysConfig::getConfigKey, entry.getKey())
             );
             if (config != null) {
-                // 已存在：更新
                 config.setConfigValue(entry.getValue());
                 config.setUpdateTime(LocalDateTime.now());
                 sysConfigMapper.updateById(config);
             } else {
-                // 不存在：插入（前端新增的配置项）
                 SysConfig newConfig = new SysConfig();
                 newConfig.setConfigKey(entry.getKey());
                 newConfig.setConfigValue(entry.getValue());
@@ -81,9 +91,31 @@ public class SysConfigServiceImpl implements SysConfigService {
                 newConfig.setUpdateTime(LocalDateTime.now());
                 sysConfigMapper.insert(newConfig);
             }
-            log.info("系统配置更新：{} = {}", entry.getKey(),
-                    entry.getValue() != null && entry.getValue().length() > 100
-                            ? entry.getValue().substring(0, 100) + "..." : entry.getValue());
+            log.info("[System config] updated: {} = {}", entry.getKey(), logValue(entry.getKey(), entry.getValue()));
         }
+    }
+
+    private String maskValue(String key, String value) {
+        if (!SENSITIVE_KEYS.contains(key) || value == null || value.isBlank()) {
+            return value;
+        }
+        if (value.length() <= 8) {
+            return MASK_TEXT;
+        }
+        return value.substring(0, Math.min(3, value.length())) + MASK_TEXT + value.substring(value.length() - 4);
+    }
+
+    private boolean isSensitiveMaskedValue(String key, String value) {
+        return SENSITIVE_KEYS.contains(key) && value != null && value.contains(MASK_TEXT);
+    }
+
+    private String logValue(String key, String value) {
+        if (SENSITIVE_KEYS.contains(key)) {
+            return MASK_TEXT;
+        }
+        if (value != null && value.length() > 100) {
+            return value.substring(0, 100) + "...";
+        }
+        return value;
     }
 }

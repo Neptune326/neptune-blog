@@ -344,7 +344,13 @@ INSERT INTO sys_config (config_key, config_value, config_desc, create_time, upda
 ('particle_count', '25', '粒子数量', NOW(), NOW()),
 ('mouse_trail_enabled', 'false', '是否开启鼠标轨迹特效', NOW(), NOW()),
 ('music_playlist', '[]', '音乐播放列表（JSON数组，每项含name/artist/url）', NOW(), NOW()),
-('comment_blacklist', '[]', '评论黑名单（JSON数组，含IP和关键词）', NOW(), NOW());
+('comment_blacklist', '[]', '评论黑名单（JSON数组，含IP和关键词）', NOW(), NOW()),
+('ai_enabled', 'false', 'Enable AI writing assistant', NOW(), NOW()),
+('ai_base_url', 'https://api.openai.com', 'OpenAI compatible base URL', NOW(), NOW()),
+('ai_model', '', 'AI model name', NOW(), NOW()),
+('ai_api_key', '', 'AI API key', NOW(), NOW()),
+('ai_temperature', '0.7', 'AI generation temperature', NOW(), NOW()),
+('ai_max_tokens', '1200', 'AI max output tokens', NOW(), NOW());
 
 -- =====================================================
 -- 后续变更追加区

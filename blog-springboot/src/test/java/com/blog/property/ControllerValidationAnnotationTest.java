@@ -1,6 +1,7 @@
 package com.blog.property;
 
 import com.blog.controller.admin.AdminUserController;
+import com.blog.controller.admin.AiAdminController;
 import com.blog.controller.admin.ArticleAdminController;
 import com.blog.controller.admin.ArticleHistoryAdminController;
 import com.blog.controller.admin.ArticleImportExportController;
@@ -42,6 +43,7 @@ class ControllerValidationAnnotationTest {
     void allControllers_shouldUseValidated() {
         List<Class<?>> controllerClasses = List.of(
                 AdminUserController.class,
+                AiAdminController.class,
                 ArticleAdminController.class,
                 ArticleHistoryAdminController.class,
                 ArticleImportExportController.class,
