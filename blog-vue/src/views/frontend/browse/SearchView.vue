@@ -1,4 +1,5 @@
 ﻿<template>
+<<<<<<< HEAD
   <v-app class="front-shell">
     <v-app-bar elevation="0" class="front-app-bar">
       <v-container style="max-width: 1100px; display: flex; align-items: center; padding: 0 16px;">
@@ -12,6 +13,10 @@
         <v-spacer />
       </v-container>
     </v-app-bar>
+=======
+  <v-app style="background: var(--bg-primary);">
+    <FrontendNavBar variant="back" container-max-width="1100px" />
+>>>>>>> cab4ca2899de7ec70ce6a25b534fbe02e1d9ca49
 
     <v-main>
       <v-container style="max-width: 860px; padding: 32px 16px;">
@@ -154,11 +159,12 @@
 <script>
 import ArticleCard from '@/components/frontend/ArticleCard.vue'
 import Pagination from '@/components/frontend/Pagination.vue'
+import FrontendNavBar from '@/components/frontend/FrontendNavBar.vue'
 import { getArticles } from '@/api/article.js'
 
 export default {
   name: 'SearchView',
-  components: { ArticleCard, Pagination },
+  components: { ArticleCard, Pagination, FrontendNavBar },
   data: function() {
     return {
       keyword: '',

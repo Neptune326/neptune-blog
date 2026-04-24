@@ -37,6 +37,8 @@ public class SiteConfigFrontController {
             "particle_enabled",
             "particle_type",
             "particle_count",
+            "mouse_trail_enabled",
+            "music_playlist",
             "live2d_enabled",
             "frontend_theme_enabled",
             "frontend_theme_switcher_enabled",
@@ -44,7 +46,9 @@ public class SiteConfigFrontController {
             "frontend_ambient_enabled",
             "about_enabled",
             "message_enabled",
-            "like_enabled"
+            "like_enabled",
+            "easter_konami_enabled",
+            "dev_fortune_enabled"
     ));
 
     /**

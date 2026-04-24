@@ -1,4 +1,5 @@
 ﻿<template>
+<<<<<<< HEAD
   <v-app class="front-shell">
     <!-- 阅读进度条 + 回到顶部 -->
     <ReadingProgress />
@@ -71,6 +72,13 @@
         {{ item.label }}
       </router-link>
     </div>
+=======
+  <v-app style="background: var(--bg-primary);">
+    <!-- 阅读进度条 + 回到顶部 -->
+    <ReadingProgress />
+
+    <FrontendNavBar variant="main" container-max-width="1200px" />
+>>>>>>> cab4ca2899de7ec70ce6a25b534fbe02e1d9ca49
 
     <v-main>
       <v-container style="max-width: 1200px; padding: 32px 16px;">
@@ -79,8 +87,13 @@
           <v-col cols="12" md="8">
             <!-- 排序切换 -->
             <div class="d-flex align-center justify-space-between mb-4" style="gap: 8px;">
+<<<<<<< HEAD
               <div class="front-soft" style="font-size: 14px;">
                 共 <strong class="front-title">{{ total }}</strong> 篇文章
+=======
+              <div class="text-secondary-ctx" style="font-size: 14px;">
+                共 <strong class="text-primary-ctx">{{ total }}</strong> 篇文章
+>>>>>>> cab4ca2899de7ec70ce6a25b534fbe02e1d9ca49
               </div>
               <div class="d-flex" style="gap: 4px;">
                 <v-btn
@@ -109,7 +122,7 @@
               <!-- 无文章提示 -->
               <div v-if="articles.length === 0" class="text-center py-16">
                 <v-icon size="64" color="grey-lighten-2">mdi-file-document-outline</v-icon>
-                <p class="mt-4 text-body-1" style="color: #80868b;">暂无文章，敬请期待</p>
+                <p class="mt-4 text-body-1 text-muted-ctx">暂无文章，敬请期待</p>
               </div>
 
               <!-- 文章卡片列表 -->
@@ -138,16 +151,22 @@
     </v-main>
 
     <!-- 底部 -->
+<<<<<<< HEAD
     <v-footer class="front-footer" style="padding: 20px 16px;">
       <v-container style="max-width: 1200px; text-align: center;">
         <div class="front-muted" style="font-size: 13px; margin-bottom: 8px;">
+=======
+    <v-footer class="front-footer" style="background: var(--bg-card) !important; border-top: 1px solid var(--border-color); padding: 20px 16px;">
+      <v-container style="max-width: 1200px; text-align: center;">
+        <div class="text-muted-ctx" style="font-size: 13px; margin-bottom: 8px;">
+>>>>>>> cab4ca2899de7ec70ce6a25b534fbe02e1d9ca49
           © {{ new Date().getFullYear() }} 我的博客 · 用 ❤️ 构建
         </div>
         <SiteRuntime class="mb-2" />
         <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-top: 8px;">
-          <router-link to="/" style="color: #9aa0a6; font-size: 12px; text-decoration: none;">首页</router-link>
-          <router-link to="/archive" style="color: #9aa0a6; font-size: 12px; text-decoration: none;">归档</router-link>
-          <router-link to="/search" style="color: #9aa0a6; font-size: 12px; text-decoration: none;">搜索</router-link>
+          <router-link to="/" class="footer-sub-link">首页</router-link>
+          <router-link to="/archive" class="footer-sub-link">归档</router-link>
+          <router-link to="/search" class="footer-sub-link">搜索</router-link>
         </div>
       </v-container>
     </v-footer>
@@ -160,14 +179,14 @@ import Pagination from '@/components/frontend/Pagination.vue'
 import ArticleSkeleton from '@/components/frontend/ArticleSkeleton.vue'
 import BlogSidebar from '@/components/frontend/BlogSidebar.vue'
 import ReadingProgress from '@/components/frontend/ReadingProgress.vue'
-import DarkModeToggle from '@/components/frontend/DarkModeToggle.vue'
+import FrontendNavBar from '@/components/frontend/FrontendNavBar.vue'
 import { getArticles } from '@/api/article.js'
 import { smoothScrollToTop } from '@/utils/smoothScroll.js'
 import SiteRuntime from '@/components/frontend/SiteRuntime.vue'
 
 export default {
   name: 'HomeView',
-  components: { ArticleCard, Pagination, ArticleSkeleton, BlogSidebar, ReadingProgress, DarkModeToggle, SiteRuntime },
+  components: { ArticleCard, Pagination, ArticleSkeleton, BlogSidebar, ReadingProgress, FrontendNavBar, SiteRuntime },
   data: function() {
     return {
       articles: [],
@@ -176,16 +195,7 @@ export default {
       pageNum: 1,
       pageSize: 10,
       sortBy: 'latest',
-      loading: false,
-      mobileMenu: false,
-      navItems: [
-        { to: '/', label: '首页', icon: 'mdi-home-outline' },
-        { to: '/articles', label: '文章', icon: 'mdi-file-document-outline' },
-        { to: '/archive', label: '归档', icon: 'mdi-archive-outline' },
-        { to: '/about', label: '关于', icon: 'mdi-account-circle-outline' },
-        { to: '/message', label: '留言', icon: 'mdi-message-text-outline' },
-        { to: '/search', label: '搜索', icon: 'mdi-magnify' }
-      ]
+      loading: false
     }
   },
   mounted: function() {
@@ -225,11 +235,31 @@ export default {
 </script>
 
 <style scoped>
+<<<<<<< HEAD
 .mobile-nav-link:hover {
   background: color-mix(in srgb, var(--front-accent) 10%, transparent);
 }
 .mobile-nav-link {
   color: var(--front-text) !important;
+=======
+.text-primary-ctx {
+  color: var(--text-primary);
+}
+.text-secondary-ctx {
+  color: var(--text-secondary);
+}
+.text-muted-ctx {
+  color: var(--text-muted);
+}
+.footer-sub-link {
+  color: var(--text-secondary);
+  font-size: 12px;
+  text-decoration: none;
+  opacity: 0.9;
+}
+.footer-sub-link:hover {
+  color: var(--link-color);
+>>>>>>> cab4ca2899de7ec70ce6a25b534fbe02e1d9ca49
 }
 </style>
 

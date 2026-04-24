@@ -37,19 +37,24 @@ var vuetify = createVuetify({
           'on-surface-variant': '#5f6368'
         }
       },
-      // 深色主题
+      // 深色主题（与 App.vue CSS 变量对齐，略分层避免一片灰）
       googleDark: {
         dark: true,
         colors: {
-          primary: '#8ab4f8',
-          secondary: '#81c995',
-          error: '#f28b82',
-          warning: '#fdd663',
-          info: '#8ab4f8',
-          success: '#81c995',
-          background: '#202124',
-          surface: '#292a2d',
-          'on-surface-variant': '#9aa0a6'
+          primary: '#a8c7fa',
+          secondary: '#7fc89c',
+          error: '#f2b8b5',
+          warning: '#f9d975',
+          info: '#a8c7fa',
+          success: '#7fc89c',
+          background: '#1c1b1f',
+          surface: '#2d2f35',
+          'on-background': '#e3e3e3',
+          'on-surface': '#e3e3e3',
+          'on-surface-variant': '#b0b3b8',
+          'surface-variant': '#444746',
+          outline: '#8e918f',
+          'outline-variant': '#444746'
         }
       }
     }
@@ -81,13 +86,23 @@ var vuetify = createVuetify({
     },
     VAppBar: {
       elevation: 0,
-      color: 'white',
-      style: 'border-bottom: 1px solid #e8eaed;'
+      color: 'surface'
     },
     VNavigationDrawer: {
-      color: 'white'
+      color: 'surface'
     }
   }
 })
+
+// 首屏前恢复用户主题，避免从落地页进站点时与 localStorage 不一致
+; (function() {
+  try {
+    if (typeof localStorage === 'undefined' || !vuetify || !vuetify.theme) return
+    var saved = localStorage.getItem('blog-theme')
+    if (saved === 'googleDark' || saved === 'googleLight') {
+      vuetify.theme.global.name.value = saved
+    }
+  } catch (e) {}
+})()
 
 export default vuetify

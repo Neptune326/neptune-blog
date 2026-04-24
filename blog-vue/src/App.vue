@@ -15,25 +15,26 @@
 
     <!-- 粒子飘落特效（仅前台，可通过系统配置控制） -->
     <ParticleCanvas
-      v-if="isFrontend && particleEnabled"
+      v-if="showHeavyEffects && particleEnabled"
       :type="particleType"
       :count="particleCount"
     />
 
     <!-- 鼠标点击特效（仅前台） -->
-    <ClickEffect v-if="isFrontend && clickEffectEnabled === 'true'" />
+    <ClickEffect v-if="showHeavyEffects && clickEffectEnabled === 'true'" />
     <!-- 彩色粒子点击特效 -->
-    <ColorClickEffect v-if="isFrontend && clickEffectEnabled === 'color'" />
+    <ColorClickEffect v-if="showHeavyEffects && clickEffectEnabled === 'color'" />
 
     <!-- 图片灯箱（全局，自动监听 markdown-body 内图片点击） -->
     <ImageLightbox v-if="isFrontend" />
 
     <!-- 鼠标轨迹特效（仅前台，可配置开关） -->
-    <MouseTrail v-if="isFrontend && mouseTrailEnabled" />
+    <MouseTrail v-if="showHeavyEffects && mouseTrailEnabled" />
 
     <!-- 音乐播放器（仅前台，有歌单时显示） -->
     <MusicPlayer v-if="isFrontend" :playlist="musicPlaylist" />
 
+<<<<<<< HEAD
     <!-- Live2D 看板娘（仅前台，可通过系统配置控制） -->
     <Live2DWidget :enabled="isFrontend && live2dEnabled" />
 
@@ -46,11 +47,41 @@
       :theme="frontendTheme"
       @theme-change="setFrontendTheme"
     />
+=======
+    <!-- 彩带礼花（特殊日期或 Konami 彩蛋） -->
+    <Confetti v-if="showHeavyEffects" ref="confettiRef" />
+
+    <!-- 连续访问里程碑（7 / 30 天） -->
+    <v-snackbar
+      v-model="visitMilestoneSnackbar"
+      :timeout="4200"
+      location="top"
+      color="surface"
+      rounded="lg"
+      elevation="6"
+    >
+      <span style="color: var(--text-primary);">{{ visitMilestoneText }}</span>
+    </v-snackbar>
+
+    <!-- Konami 彩蛋提示 -->
+    <v-snackbar
+      v-model="konamiSnackbar"
+      :timeout="4200"
+      location="top"
+      color="surface"
+      rounded="lg"
+      elevation="6"
+    >
+      <span style="color: var(--text-primary);">{{ konamiText }}</span>
+    </v-snackbar>
+>>>>>>> cab4ca2899de7ec70ce6a25b534fbe02e1d9ca49
   </v-app>
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue'
 import request from './api/request.js'
+<<<<<<< HEAD
 import ParticleCanvas from './components/frontend/ParticleCanvas.vue'
 import ClickEffect from './components/frontend/ClickEffect.vue'
 import ImageLightbox from './components/frontend/ImageLightbox.vue'
@@ -65,6 +96,25 @@ import ThemeSwitcher from './components/frontend/ThemeSwitcher.vue'
 export default {
   name: 'App',
   components: { ParticleCanvas, ClickEffect, ImageLightbox, MouseTrail, MusicPlayer, Confetti, ColorClickEffect, Live2DWidget, ThemeAmbientLayer, ThemeSwitcher },
+=======
+import { syncVisitStreak } from './utils/visitStreak.js'
+
+// 动效/播放器与首屏无强耦合，拆成异步块以缩小入口 JS、并行下载
+var ParticleCanvas = defineAsyncComponent(function() { return import('./components/frontend/ParticleCanvas.vue') })
+var ClickEffect = defineAsyncComponent(function() { return import('./components/frontend/ClickEffect.vue') })
+var ColorClickEffect = defineAsyncComponent(function() { return import('./components/frontend/ColorClickEffect.vue') })
+var ImageLightbox = defineAsyncComponent(function() { return import('./components/frontend/ImageLightbox.vue') })
+var MouseTrail = defineAsyncComponent(function() { return import('./components/frontend/MouseTrail.vue') })
+var MusicPlayer = defineAsyncComponent(function() { return import('./components/frontend/MusicPlayer.vue') })
+var Confetti = defineAsyncComponent(function() { return import('./components/frontend/Confetti.vue') })
+
+export default {
+  name: 'App',
+  provide: function() {
+    return { neptuneApp: this }
+  },
+  components: { ParticleCanvas, ClickEffect, ImageLightbox, MouseTrail, MusicPlayer, Confetti, ColorClickEffect },
+>>>>>>> cab4ca2899de7ec70ce6a25b534fbe02e1d9ca49
   data: function() {
     return {
       particleEnabled: false,
@@ -74,20 +124,54 @@ export default {
       live2dEnabled: false,
       mouseTrailEnabled: false,
       musicPlaylist: [],
+<<<<<<< HEAD
       frontendThemeEnabled: true,
       frontendThemeSwitcherEnabled: true,
       frontendAmbientEnabled: true,
       frontendTheme: 'sakura'
+=======
+      reduceMotion: false,
+      visitMilestoneSnackbar: false,
+      visitMilestoneText: '',
+      easterKonamiEnabled: true,
+      devFortuneEnabled: true,
+      konamiIndex: 0,
+      konamiSnackbar: false,
+      konamiText: ''
+>>>>>>> cab4ca2899de7ec70ce6a25b534fbe02e1d9ca49
     }
   },
   computed: {
     isFrontend: function() {
       return this.$route && !this.$route.path.startsWith('/admin')
+    },
+    showHeavyEffects: function() {
+      return this.isFrontend && !this.reduceMotion
+    }
+  },
+  watch: {
+    '$route.path': function() {
+      this.applyVisitStreakMilestone()
     }
   },
   mounted: function() {
+<<<<<<< HEAD
     this.applyFrontendTheme(this.getStoredTheme() || this.frontendTheme)
     this.loadEffectConfig()
+=======
+    var self = this
+    this.initReduceMotion()
+    this.applyVisitStreakMilestone()
+    // 站点配置对首屏 DOM 不阻塞：空闲时再拉，减轻与路由页竞争主线程
+    if (typeof requestIdleCallback === 'function') {
+      requestIdleCallback(function() { self.loadEffectConfig() }, { timeout: 1800 })
+    } else {
+      setTimeout(function() { self.loadEffectConfig() }, 0)
+    }
+    if (document.addEventListener) {
+      document.addEventListener('keydown', this.onKonamiKey, true)
+    }
+>>>>>>> cab4ca2899de7ec70ce6a25b534fbe02e1d9ca49
     // 复制保护：复制文章内容时追加版权声明
     document.addEventListener('copy', function(e) {
       var selection = window.getSelection()
@@ -101,7 +185,18 @@ export default {
       }
     })
   },
+  beforeDestroy: function() {
+    if (document.removeEventListener) {
+      document.removeEventListener('keydown', this.onKonamiKey, true)
+    }
+  },
+  beforeUnmount: function() {
+    if (document.removeEventListener) {
+      document.removeEventListener('keydown', this.onKonamiKey, true)
+    }
+  },
   methods: {
+<<<<<<< HEAD
     getStoredTheme: function() {
       try {
         var theme = localStorage.getItem('frontend_theme')
@@ -121,6 +216,63 @@ export default {
     },
     applyFrontendTheme: function(theme) {
       document.body.setAttribute('data-front-theme', this.isValidTheme(theme) ? theme : 'sakura')
+=======
+    onKonamiKey: function(e) {
+      if (!e) return
+      if (e.target) {
+        var tag = (e.target.tagName || '').toLowerCase()
+        if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable) return
+      }
+      if (!this.isFrontend) return
+      if (!this.easterKonamiEnabled) return
+      if (e.repeat) return
+      var code = (e.keyCode != null && e.keyCode) ? e.keyCode : (e.which != null ? e.which : 0)
+      if (!code) return
+      var KONAMI = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65]
+      var k = this.konamiIndex || 0
+      if (code === KONAMI[k]) {
+        this.konamiIndex = k + 1
+        if (this.konamiIndex >= KONAMI.length) {
+          this.konamiIndex = 0
+          this.fireKonamiEaster()
+        }
+      } else {
+        this.konamiIndex = (code === KONAMI[0]) ? 1 : 0
+      }
+    },
+    fireKonamiEaster: function() {
+      this.konamiText = 'Neptune 秘技解锁：感谢常来坐——今日代码顺顺利利。'
+      this.konamiSnackbar = true
+      if (this.showHeavyEffects && this.$refs.confettiRef && typeof this.$refs.confettiRef.playFor === 'function') {
+        this.$refs.confettiRef.playFor(4000)
+      }
+    },
+    initReduceMotion: function() {
+      var self = this
+      if (!window.matchMedia) {
+        self.reduceMotion = false
+        return
+      }
+      var mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+      self.reduceMotion = !!mq.matches
+      if (typeof mq.addEventListener === 'function') {
+        mq.addEventListener('change', function() {
+          self.reduceMotion = !!mq.matches
+        })
+      } else if (typeof mq.addListener === 'function') {
+        mq.addListener(function() {
+          self.reduceMotion = !!mq.matches
+        })
+      }
+    },
+    applyVisitStreakMilestone: function() {
+      if (!this.isFrontend) return
+      var r = syncVisitStreak()
+      if (r.milestone) {
+        this.visitMilestoneText = '已连续来访 ' + r.milestone + ' 天，感谢一路相伴。'
+        this.visitMilestoneSnackbar = true
+      }
+>>>>>>> cab4ca2899de7ec70ce6a25b534fbe02e1d9ca49
     },
     loadEffectConfig: function() {
       var self = this
@@ -146,10 +298,18 @@ export default {
               self.musicPlaylist = Array.isArray(pl) ? pl : []
             } catch (e) {}
           }
+          self.easterKonamiEnabled = (data.easter_konami_enabled == null)
+            ? true
+            : (String(data.easter_konami_enabled) === 'true')
+          self.devFortuneEnabled = (data.dev_fortune_enabled == null)
+            ? true
+            : (String(data.dev_fortune_enabled) === 'true')
         })
         .catch(function() {
           self.clickEffectEnabled = 'true'
           self.particleEnabled = true
+          self.easterKonamiEnabled = true
+          self.devFortuneEnabled = true
         })
     }
   }
@@ -237,16 +397,16 @@ body[data-front-theme="starry"] {
   --front-shadow: 0 22px 56px rgba(96,165,250,0.18);
 }
 
-/* 暗色主题变量覆盖 */
+/* 暗色主题变量覆盖（与 plugins/vuetify googleDark 协调，略提高层次与对比） */
 body.dark-mode {
-  --bg-primary: #202124;
-  --bg-card: #292a2d;
-  --bg-hover: #35363a;
+  --bg-primary: #1c1b1f;
+  --bg-card: #2d2f35;
+  --bg-hover: #3c3f47;
   --text-primary: #e8eaed;
-  --text-secondary: #9aa0a6;
-  --text-muted: #80868b;
-  --border-color: #3c4043;
-  --link-color: #8ab4f8;
+  --text-secondary: #c4c7c5;
+  --text-muted: #9aa0a6;
+  --border-color: #444746;
+  --link-color: #a8c7fa;
 }
 
 body {
@@ -326,12 +486,12 @@ body {
 
 /* 链接样式 */
 a {
-  color: #1a73e8;
+  color: var(--link-color);
   text-decoration: none;
   transition: color 0.2s;
 }
 a:hover {
-  color: #1557b0;
+  text-decoration: underline;
 }
 
 /* 卡片悬停效果 */
@@ -340,6 +500,12 @@ a:hover {
 }
 .v-card:hover {
   box-shadow: 0 2px 8px rgba(0,0,0,0.12), 0 1px 3px rgba(0,0,0,0.08) !important;
+}
+body.dark-mode .v-card:hover {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.3) !important;
+}
+body.dark-mode .card-clickable:hover {
+  box-shadow: 0 6px 24px rgba(0,0,0,0.4), 0 2px 8px rgba(80, 130, 255, 0.08) !important;
 }
 
 /* 可点击卡片 */
@@ -445,7 +611,7 @@ a:hover {
 
 /* 导航栏链接 */
 .nav-link {
-  color: #3c4043 !important;
+  color: var(--text-primary) !important;
   font-weight: 500;
   font-size: 14px;
   padding: 6px 12px;
@@ -453,12 +619,24 @@ a:hover {
   transition: background 0.2s, color 0.2s;
 }
 .nav-link:hover {
-  background: #e8f0fe;
-  color: #1a73e8 !important;
+  background: var(--bg-hover);
+  color: var(--link-color) !important;
 }
-.nav-link.active {
-  color: #1a73e8 !important;
-  background: #e8f0fe;
+.nav-link.active,
+.v-btn.nav-link.nav-link--active {
+  color: var(--link-color) !important;
+  background: rgba(26, 115, 232, 0.12) !important;
+}
+body.dark-mode .v-btn.nav-link.nav-link--active {
+  background: rgba(138, 180, 248, 0.15) !important;
+}
+
+/* 顶栏与移动端导航：键盘聚焦可见 */
+.frontend-nav-bar a:focus-visible,
+.v-btn.nav-link:focus-visible,
+.mobile-nav-link:focus-visible {
+  outline: 2px solid var(--link-color);
+  outline-offset: 2px;
 }
 
 /* 标签云样式 */
@@ -468,6 +646,10 @@ a:hover {
 .tag-chip:hover {
   background: #e8f0fe !important;
   color: #1a73e8 !important;
+}
+body.dark-mode .tag-chip:hover {
+  background: rgba(168, 199, 250, 0.12) !important;
+  color: var(--link-color) !important;
 }
 
 /* 滚动条美化 */
@@ -484,6 +666,15 @@ a:hover {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #80868b;
+}
+body.dark-mode ::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+body.dark-mode ::-webkit-scrollbar-thumb {
+  background: #5f6368;
+}
+body.dark-mode ::-webkit-scrollbar-thumb:hover {
+  background: #7c8084;
 }
 
 /* 加载旋转动画 */
@@ -505,6 +696,30 @@ a:hover {
 .page-fade-leave-to {
   opacity: 0;
   transform: translateY(-4px);
+}
+
+/* 系统减少动效：弱化路由过渡与卡片动效 */
+@media (prefers-reduced-motion: reduce) {
+  .v-card {
+    transition: none !important;
+  }
+  .v-card:hover {
+    transform: none !important;
+  }
+  .card-clickable:hover {
+    transform: none !important;
+  }
+  .page-fade-enter-active,
+  .page-fade-leave-active {
+    transition: opacity 0.12s ease !important;
+  }
+  .page-fade-enter-from,
+  .page-fade-leave-to {
+    transform: none !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 /* 全局平滑滚动 */
@@ -535,63 +750,84 @@ html {
   body { background: white !important; }
 }
 
-/* ===== 暗色主题全局覆盖 ===== */
+/* ===== 暗色主题全局覆盖（跟 CSS 变量，避免与顶栏行内 var 打架） */
+body.dark-mode .v-application {
+  background: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
 body.dark-mode .v-app-bar {
-  background: #292a2d !important;
-  border-bottom-color: #3c4043 !important;
+  background: var(--bg-card) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
 }
 body.dark-mode .v-card {
-  background: #292a2d !important;
-  border-color: #3c4043 !important;
+  background: var(--bg-card) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
 }
 body.dark-mode .v-footer {
-  background: #292a2d !important;
-  border-top-color: #3c4043 !important;
+  background: var(--bg-card) !important;
+  border-top-color: var(--border-color) !important;
+  color: var(--text-secondary) !important;
 }
 body.dark-mode .v-table {
-  background: #292a2d !important;
-  color: #e8eaed !important;
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
 }
 body.dark-mode .v-table thead tr {
-  background: #35363a !important;
+  background: var(--bg-hover) !important;
 }
 body.dark-mode .v-table tbody tr:hover {
-  background: #35363a !important;
+  background: var(--bg-hover) !important;
 }
 body.dark-mode .markdown-body {
-  color: #e8eaed;
+  color: var(--text-primary);
+}
+body.dark-mode .markdown-body h1,
+body.dark-mode .markdown-body h2,
+body.dark-mode .markdown-body h3,
+body.dark-mode .markdown-body h4 {
+  color: var(--text-primary);
+}
+body.dark-mode .markdown-body h1,
+body.dark-mode .markdown-body h2 {
+  border-bottom-color: var(--border-color);
 }
 body.dark-mode .markdown-body code {
-  background: #35363a;
-  color: #f28b82;
+  background: #3c3f48;
+  color: #f2b8b5;
 }
 body.dark-mode .markdown-body pre {
-  background: #35363a;
-  border-color: #3c4043;
+  background: #25262c;
+  border-color: var(--border-color);
 }
 body.dark-mode .markdown-body pre code {
-  color: #e8eaed;
+  color: var(--text-primary);
 }
 body.dark-mode .markdown-body blockquote {
-  background: #35363a;
-  border-left-color: #8ab4f8;
-  color: #9aa0a6;
+  background: rgba(168, 199, 250, 0.08);
+  border-left-color: var(--link-color);
+  color: var(--text-secondary);
 }
 body.dark-mode .markdown-body th {
-  background: #35363a;
+  background: var(--bg-hover);
 }
 body.dark-mode .markdown-body td,
 body.dark-mode .markdown-body th {
-  border-color: #3c4043;
+  border-color: var(--border-color);
 }
 body.dark-mode .markdown-body tr:nth-child(even) td {
-  background: #35363a;
+  background: rgba(0,0,0,0.2);
 }
 body.dark-mode a {
-  color: #8ab4f8;
+  color: var(--link-color);
 }
 body.dark-mode a:hover {
-  color: #aecbfa;
+  color: #c5d7fc;
+}
+/* 侧栏等区块在暗色下的统一 hover（与 BlogSidebar 类名配合） */
+body.dark-mode .blog-sidebar .sidebar-cat-link:hover {
+  background: var(--bg-hover);
 }
 /* 前台文章列表页暗色 */
 body.dark-mode .v-app[style*="background: #f8f9fa"] {

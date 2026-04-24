@@ -11,6 +11,22 @@
 
 不允许忽略本文件。
 
+---
+
+## Neptune Blog 项目适用（必读）
+
+本仓库为 **neptune-blog**（`blog-springboot` + `blog-vue`）。**凡在本仓库的修改，均须遵守本文件，并与本仓库既有实现保持一致**；以下为本项目对上文「企业模板类」条文的落地约定，避免与现网代码风格冲突。
+
+| 项目 | 说明 |
+|------|------|
+| 统一返回体 | 本仓库使用 `com.blog.common.result.Result<T>` 及 `ResultCode`，**与文档示例中的 `CommonResult` 等价为项目内既定封装**，新增接口沿用 `Result` / `Result.error`，不在此仓库引入另一套统一返回类。 |
+| Service 接口命名 | 本仓库为 `*Service`（如 `SysConfigService`），**未**采用 `I*Service` 前缀；**新增模块**在新建接口时保持与同目录现有 `*Service` 一致。 |
+| 外部 HTTP 调用 | 调用第三方或自建 Meting 等 HTTP 时：关键步骤使用 `@Slf4j` + `[业务名]` 前缀的 `log.info` / `log.warn`；**禁止**在日志中输出 Token、完整直链内敏感 query 等。 |
+| 异常 | 在**本仓库**未接入 `ServiceExceptionUtil` 的前提下，Service 可抛出带业务语义的受检/非受检异常，由 `GlobalExceptionHandler` 或各层已有模式统一处理；**新增代码**若引入新的异常类型，须与现有一致。 |
+| **增量 / 新 SQL** | 凡新增或调整 `init.sql`、或单独交付的 `.sql` 补丁：须在语句**上方**或本文件「**后续变更追加区**」增加 **`yyyy-MM-dd` + 一句变更说明**（见 `blog-springboot/src/main/resources/sql/init.sql` 文末示例），便于排障与发版对账。 |
+
+**自检要求**：每轮修改后对照本文「代码评审 Checklist」与上表，确认命名、日志、SQL 标注、与既有 `Result`/`Service` 风格一致。
+
 # Java/Spring Boot 编码规范
 
 > 版本: 4.1 | 更新: 2026-01-21

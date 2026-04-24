@@ -1,19 +1,8 @@
 ﻿<template>
-  <v-app style="background: #f8f9fa;">
+  <v-app style="background: var(--bg-primary);">
     <ReadingProgress />
 
-    <v-app-bar color="white" elevation="0" style="border-bottom: 1px solid #e8eaed;">
-      <v-container style="max-width: 1100px; display: flex; align-items: center; padding: 0 16px;">
-        <v-btn icon variant="text" @click="$router.back()" style="color: #5f6368;">
-          <v-icon>mdi-arrow-left</v-icon>
-        </v-btn>
-        <router-link to="/" class="d-flex align-center text-decoration-none ml-2" style="gap: 6px;">
-          <v-icon color="primary" size="22">mdi-pencil-circle</v-icon>
-          <span style="font-size: 16px; font-weight: 600; color: #202124;">我的博客</span>
-        </router-link>
-        <v-spacer />
-      </v-container>
-    </v-app-bar>
+    <FrontendNavBar variant="back" container-max-width="1100px" />
 
     <v-main>
       <v-container style="max-width: 820px; padding: 32px 16px;">
@@ -66,11 +55,12 @@
 <script>
 import { marked } from 'marked'
 import ReadingProgress from '@/components/frontend/ReadingProgress.vue'
+import FrontendNavBar from '@/components/frontend/FrontendNavBar.vue'
 import request from '@/api/request.js'
 
 export default {
   name: 'AboutView',
-  components: { ReadingProgress },
+  components: { ReadingProgress, FrontendNavBar },
   data: function() {
     return {
       loading: false,

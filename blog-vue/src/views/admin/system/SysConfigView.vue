@@ -171,19 +171,61 @@
                 />
               </div>
               <!-- 粒子类型选择 -->
-              <div v-if="form.particle_enabled === 'true'" class="d-flex align-center" style="gap: 8px; margin-top: 8px;">
+              <div v-if="form.particle_enabled === 'true'" class="d-flex flex-wrap align-center" style="gap: 8px; margin-top: 8px;">
                 <span style="font-size: 12px; color: #80868b;">类型：</span>
                 <v-btn-toggle v-model="form.particle_type" density="compact" variant="outlined" color="pink">
                   <v-btn value="sakura" size="small">🌸 樱花</v-btn>
                   <v-btn value="snow" size="small">❄️ 雪花</v-btn>
                   <v-btn value="star" size="small">⭐ 星星</v-btn>
                 </v-btn-toggle>
+                <v-text-field
+                  v-model="form.particle_count"
+                  type="number"
+                  min="5"
+                  max="80"
+                  density="compact"
+                  variant="outlined"
+                  hide-details
+                  style="max-width: 100px;"
+                  label="数量"
+                />
               </div>
+            </div>
+
+            <!-- Konami 键盘彩蛋 -->
+            <div class="d-flex align-center justify-space-between" style="padding: 12px 16px; background: #f8f9fa; border-radius: 10px;">
+              <div>
+                <div style="font-size: 14px; font-weight: 500; color: #202124;">Konami 键盘彩蛋</div>
+                <div style="font-size: 12px; color: #80868b; margin-top: 2px;">前台依次输入 上上下下左右左右BA 时触发短礼花与提示（受访客「减少动效」与前台礼花总开关影响）</div>
+              </div>
+              <v-switch
+                v-model="form.easter_konami_enabled"
+                color="teal"
+                hide-details
+                true-value="true"
+                false-value="false"
+              />
+            </div>
+
+            <!-- 侧栏开发者今日小签 -->
+            <div class="d-flex align-center justify-space-between" style="padding: 12px 16px; background: #f8f9fa; border-radius: 10px;">
+              <div>
+                <div style="font-size: 14px; font-weight: 500; color: #202124;">侧栏开发者今日小签</div>
+                <div style="font-size: 12px; color: #80868b; margin-top: 2px;">在含侧栏的首页等页面展示宜/忌趣味短句（仅本地展示，不请求接口）</div>
+              </div>
+              <v-switch
+                v-model="form.dev_fortune_enabled"
+                color="teal"
+                hide-details
+                true-value="true"
+                false-value="false"
+              />
             </div>
           </div>
         </div>
       </v-card>
 
+<<<<<<< HEAD
       <!-- 前台主题装扮 -->
       <v-card elevation="0" rounded="xl" style="border: 1px solid #e8eaed; margin-bottom: 20px;">
         <div class="pa-5">
@@ -328,6 +370,40 @@
               />
             </v-col>
           </v-row>
+=======
+      <!-- 背景音乐（前台悬浮播放器） -->
+      <v-card elevation="0" rounded="xl" style="border: 1px solid #e8eaed; margin-bottom: 20px;">
+        <div class="pa-5">
+          <div class="d-flex align-center mb-1" style="gap: 8px;">
+            <v-icon color="primary" size="20">mdi-music-note</v-icon>
+            <span style="font-size: 15px; font-weight: 600; color: #202124;">背景音乐</span>
+          </div>
+          <p style="font-size: 12px; color: #80868b; margin: 0 0 12px;">
+            支持直链 <code>url</code>，或通过 <strong>server + 歌曲 id</strong> 由 Meting 兼容 API 解析（网易、QQ 音乐等）。为空 <code>[]</code> 时不显示前台播放器。详见
+            <router-link to="/admin/feature-guide">集成功能说明</router-link>。
+          </p>
+          <v-text-field
+            v-model="form.meting_api_base"
+            class="mb-3"
+            label="Meting API 根地址（可选）"
+            variant="outlined"
+            density="comfortable"
+            prepend-inner-icon="mdi-api"
+            placeholder="https://api.injahow.cn/meting/"
+            hint="留空则使用默认；若公共接口不可用可自建并填写，须以 / 结尾或保存后由服务端自动补全"
+            persistent-hint
+          />
+          <v-textarea
+            v-model="form.music_playlist"
+            variant="outlined"
+            density="comfortable"
+            rows="6"
+            placeholder='[{"name":"曲名","url":"https://..."}] 或 [{"server":"netease","id":"歌曲id","name":"可选"}]'
+            class="font-mono text-body-2"
+            hint="须为合法 JSON；保存后前台刷新即可"
+            persistent-hint
+          />
+>>>>>>> cab4ca2899de7ec70ce6a25b534fbe02e1d9ca49
         </div>
       </v-card>
 
@@ -432,6 +508,7 @@ export default {
         mouse_trail_enabled: 'false',
         particle_enabled: 'true',
         particle_type: 'sakura',
+<<<<<<< HEAD
         frontend_theme_enabled: 'true',
         frontend_theme_switcher_enabled: 'true',
         frontend_theme_default: 'sakura',
@@ -442,6 +519,13 @@ export default {
         ai_api_key: '',
         ai_temperature: '0.7',
         ai_max_tokens: '1200'
+=======
+        particle_count: '25',
+        music_playlist: '[]',
+        meting_api_base: '',
+        easter_konami_enabled: 'true',
+        dev_fortune_enabled: 'true'
+>>>>>>> cab4ca2899de7ec70ce6a25b534fbe02e1d9ca49
       }
     }
   },
@@ -480,6 +564,33 @@ export default {
       var self = this
       // 将画廊图片同步到 form
       self.form.gallery_images = JSON.stringify(self.galleryImages)
+      // 校验音乐播放列表 JSON
+      if (self.form.music_playlist && self.form.music_playlist.trim()) {
+        try {
+          var pl = JSON.parse(self.form.music_playlist)
+          if (!Array.isArray(pl)) throw new Error('须为数组')
+          for (var pi = 0; pi < pl.length; pi++) {
+            var item = pl[pi]
+            if (!item || typeof item !== 'object') throw new Error('项须为对象')
+            var u = item.url != null && String(item.url).trim() !== ''
+            var sv = item.server != null && String(item.server).trim() !== '' &&
+              item.id != null && String(item.id).trim() !== ''
+            if (!u && !sv) {
+              throw new Error('每项须包含 url，或同时包含 server 与 id')
+            }
+          }
+        } catch (e) {
+          self.$toast.error(e.message || '背景音乐 JSON 不合法，参见集成功能说明')
+          return
+        }
+      }
+      if (self.form.meting_api_base && String(self.form.meting_api_base).trim() !== '') {
+        var b = String(self.form.meting_api_base).trim()
+        if (!/^https?:\/\//i.test(b)) {
+          self.$toast.error('Meting API 根地址须以 http:// 或 https:// 开头')
+          return
+        }
+      }
       self.saving = true
       updateSysConfig(self.form)
         .then(function() {

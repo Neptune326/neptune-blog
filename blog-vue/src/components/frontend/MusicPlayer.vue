@@ -1,101 +1,93 @@
 <template>
-  <!-- 悬浮音乐播放器 -->
+  <!-- 悬浮音乐播放器：支持直链 url，或通过 Meting 解析 网易云/QQ 等（server+id） -->
   <div
     v-if="playlist.length > 0"
-    style="
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      z-index: 9200;
-      background: white;
-      border: 1px solid #e8eaed;
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-      overflow: hidden;
-      transition: all 0.3s ease;
-    "
+    class="music-player-wrap"
     :style="expanded ? 'width: 280px;' : 'width: 52px;'"
   >
-    <!-- 收起状态：只显示播放按钮 -->
-    <div v-if="!expanded" style="padding: 8px; display: flex; justify-content: center;">
-      <button @click="expanded = true" style="background: none; border: none; cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.15s;"
-        @mouseenter="$event.target.style.background='#f1f3f4'" @mouseleave="$event.target.style.background='none'">
+    <div v-if="!expanded" class="mp-collapsed">
+      <button type="button" class="mp-icon-btn" @click="expanded = true">
         <v-icon size="20" color="primary">mdi-music-note</v-icon>
       </button>
     </div>
 
-    <!-- 展开状态 -->
-    <div v-else style="padding: 12px;">
-      <!-- 标题栏 -->
+    <div v-else class="mp-expanded">
       <div class="d-flex align-center justify-space-between mb-2">
-        <span style="font-size: 12px; font-weight: 600; color: #202124;">🎵 音乐播放器</span>
-        <button @click="expanded = false" style="background: none; border: none; cursor: pointer; color: #80868b; padding: 2px;">
+        <span class="mp-title">🎵 音乐播放器</span>
+        <button type="button" class="mp-close" @click="expanded = false">
           <v-icon size="16">mdi-chevron-down</v-icon>
         </button>
       </div>
 
-      <!-- 当前歌曲 -->
+      <div v-if="resolveError" class="mp-err text-caption mb-2">{{ resolveError }}</div>
+
       <div style="margin-bottom: 10px;">
-        <div style="font-size: 13px; font-weight: 500; color: #202124; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-          {{ currentSong.name }}
-        </div>
-        <div style="font-size: 11px; color: #80868b; margin-top: 2px;">{{ currentSong.artist || '未知艺术家' }}</div>
+        <div class="mp-line-name">{{ displayName }}</div>
+        <div class="mp-line-artist">{{ displayArtist }}</div>
       </div>
 
-      <!-- 进度条 -->
       <div style="margin-bottom: 10px;">
-        <div style="height: 3px; background: #e8eaed; border-radius: 2px; cursor: pointer; position: relative;" @click="seek">
-          <div :style="{ width: progress + '%' }" style="height: 100%; background: #1a73e8; border-radius: 2px; transition: width 0.1s;"></div>
+        <div class="mp-progress-bg" @click="seek">
+          <div :style="{ width: progress + '%' }" class="mp-progress-fill" />
         </div>
-        <div class="d-flex justify-space-between mt-1" style="font-size: 10px; color: #9aa0a6;">
+        <div class="d-flex justify-space-between mt-1 mp-time">
           <span>{{ formatTime(currentTime) }}</span>
           <span>{{ formatTime(duration) }}</span>
         </div>
       </div>
 
-      <!-- 控制按钮 -->
       <div class="d-flex align-center justify-center" style="gap: 8px;">
-        <button @click="prev" style="background: none; border: none; cursor: pointer; color: #5f6368; padding: 4px;">
+        <button type="button" class="mp-ctrl" @click="prev">
           <v-icon size="18">mdi-skip-previous</v-icon>
         </button>
-        <button @click="togglePlay" style="background: #1a73e8; border: none; cursor: pointer; color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-          <v-icon size="18" color="white">{{ playing ? 'mdi-pause' : 'mdi-play' }}</v-icon>
+        <button
+          type="button"
+          class="mp-play"
+          :disabled="loadingResolve"
+          @click="togglePlay"
+        >
+          <v-icon v-if="loadingResolve" size="18" class="mp-spin">mdi-loading</v-icon>
+          <v-icon v-else size="18" color="white">{{ playing ? 'mdi-pause' : 'mdi-play' }}</v-icon>
         </button>
-        <button @click="next" style="background: none; border: none; cursor: pointer; color: #5f6368; padding: 4px;">
+        <button type="button" class="mp-ctrl" @click="next">
           <v-icon size="18">mdi-skip-next</v-icon>
         </button>
-        <button @click="toggleLoop" style="background: none; border: none; cursor: pointer; padding: 4px;" :style="loop ? 'color: #1a73e8;' : 'color: #9aa0a6;'">
+        <button
+          type="button"
+          class="mp-ctrl"
+          :style="loop ? 'color: #1a73e8;' : 'color: #9aa0a6;'"
+          @click="toggleLoop"
+        >
           <v-icon size="16">{{ loop ? 'mdi-repeat-once' : 'mdi-repeat' }}</v-icon>
         </button>
       </div>
 
-      <!-- 播放列表 -->
-      <div style="margin-top: 10px; max-height: 120px; overflow-y: auto;">
+      <div class="mp-list">
         <div
           v-for="(song, idx) in playlist"
           :key="idx"
+          class="mp-row"
+          :class="{ 'mp-row--active': idx === currentIndex }"
           @click="playSong(idx)"
-          style="padding: 5px 6px; border-radius: 6px; cursor: pointer; font-size: 12px; transition: background 0.1s; display: flex; align-items: center; gap: 6px;"
-          :style="idx === currentIndex ? 'background: #e8f0fe; color: #1a73e8;' : 'color: #3c4043;'"
-          @mouseenter="$event.currentTarget.style.background = idx === currentIndex ? '#e8f0fe' : '#f8f9fa'"
-          @mouseleave="$event.currentTarget.style.background = idx === currentIndex ? '#e8f0fe' : 'transparent'"
         >
-          <v-icon size="12" :color="idx === currentIndex ? 'primary' : 'grey'">{{ idx === currentIndex && playing ? 'mdi-volume-high' : 'mdi-music-note' }}</v-icon>
-          <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ song.name }}</span>
+          <v-icon size="12" :color="idx === currentIndex ? 'primary' : 'grey'">
+            {{ idx === currentIndex && playing ? 'mdi-volume-high' : 'mdi-music-note' }}
+          </v-icon>
+          <span class="mp-row-text">{{ rowLabel(song, idx) }}</span>
         </div>
       </div>
     </div>
 
-    <!-- 隐藏的 audio 元素 -->
     <audio ref="audio" @timeupdate="onTimeUpdate" @ended="onEnded" @loadedmetadata="onLoaded" />
   </div>
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   name: 'MusicPlayer',
   props: {
-    // 播放列表：[{ name, artist, url }]
     playlist: { type: Array, default: function() { return [] } }
   },
   data: function() {
@@ -105,18 +97,45 @@ export default {
       loop: false,
       currentIndex: 0,
       currentTime: 0,
-      duration: 0
+      duration: 0,
+      loadingResolve: false,
+      resolveError: '',
+      resolvedMeta: {}
     }
   },
   computed: {
     currentSong: function() {
-      return this.playlist[this.currentIndex] || { name: '暂无歌曲', artist: '' }
+      return this.playlist[this.currentIndex] || { name: '', artist: '' }
+    },
+    displayName: function() {
+      var m = this.resolvedMeta[this.currentIndex]
+      if (m && m.name) return m.name
+      if (this.currentSong.name) return this.currentSong.name
+      if (this.currentSong.server && this.currentSong.id) {
+        return (this.currentSong.server === 'netease' ? '网易' : this.currentSong.server === 'tencent' ? 'QQ' : this.currentSong.server) + ' #' + this.currentSong.id
+      }
+      return '暂无歌曲'
+    },
+    displayArtist: function() {
+      var m = this.resolvedMeta[this.currentIndex]
+      if (m && m.artist) return m.artist
+      return this.currentSong.artist || '未知艺术家'
     },
     progress: function() {
       return this.duration > 0 ? (this.currentTime / this.duration) * 100 : 0
     }
   },
   watch: {
+    playlist: {
+      handler: function() {
+        this.resolvedMeta = {}
+        this.resolveError = ''
+        this.currentIndex = 0
+        var self = this
+        this.$nextTick(function() { self.loadSong() })
+      },
+      deep: true
+    },
     currentIndex: function() {
       this.loadSong()
     }
@@ -125,22 +144,84 @@ export default {
     if (this.playlist.length > 0) this.loadSong()
   },
   methods: {
+    rowLabel: function(song, idx) {
+      var m = this.resolvedMeta[idx]
+      if (m && m.name) return m.name
+      if (song.name) return song.name
+      if (song.url) return (song.name || '直链') + ''
+      if (song.server && song.id) {
+        var tag = song.server === 'netease' ? '网易' : song.server === 'tencent' ? 'QQ' : song.server
+        return tag + ' · ' + String(song.id)
+      }
+      return '未命名'
+    },
     loadSong: function() {
+      var self = this
       var audio = this.$refs.audio
-      if (!audio || !this.currentSong.url) return
-      audio.src = this.currentSong.url
-      if (this.playing) audio.play().catch(function() {})
+      if (!audio || this.playlist.length === 0) return
+      var song = this.playlist[this.currentIndex]
+      if (!song) return
+      this.resolveError = ''
+
+      if (song.url) {
+        audio.src = song.url
+        if (this.playing) {
+          audio.play().catch(function() { self.playing = false })
+        }
+        return
+      }
+      if (song.server && song.id) {
+        this.loadingResolve = true
+        axios
+          .get('/api/meting/resolve', {
+            params: { server: String(song.server).trim(), id: String(song.id).trim() }
+          })
+          .then(function(res) {
+            var body = res.data
+            if (!body || body.code !== 200) {
+              throw new Error((body && body.message) || '解析失败')
+            }
+            var data = body.data
+            if (!data || !data.url) throw new Error('未返回播放地址')
+            self.resolvedMeta = Object.assign({}, self.resolvedMeta, {
+              [self.currentIndex]: {
+                name: data.name || song.name,
+                artist: data.artist || song.artist,
+                url: data.url
+              }
+            })
+            audio.src = data.url
+            if (self.playing) {
+              audio.play().catch(function() { self.playing = false })
+            }
+          })
+          .catch(function(e) {
+            self.resolveError = (e && e.message) ? e.message : '网络错误或暂无法解析'
+            self.playing = false
+          })
+          .finally(function() {
+            self.loadingResolve = false
+          })
+        return
+      }
+      this.resolveError = '请配置 url，或同时配置 server 与 id（网易云/QQ 等）'
     },
     togglePlay: function() {
+      var self = this
       var audio = this.$refs.audio
       if (!audio) return
+      if (this.loadingResolve) return
       if (this.playing) {
         audio.pause()
         this.playing = false
-      } else {
-        audio.play().then(function() {}).catch(function() {})
-        this.playing = true
+        return
       }
+      this.playing = true
+      if (!audio.src) {
+        this.loadSong()
+        return
+      }
+      audio.play().then(function() {}).catch(function() { self.playing = false })
     },
     prev: function() {
       this.currentIndex = (this.currentIndex - 1 + this.playlist.length) % this.playlist.length
@@ -149,16 +230,12 @@ export default {
       this.currentIndex = (this.currentIndex + 1) % this.playlist.length
     },
     playSong: function(idx) {
-      this.currentIndex = idx
       this.playing = true
-      var self = this
-      this.$nextTick(function() {
-        self.$refs.audio && self.$refs.audio.play().catch(function() {})
-      })
+      this.currentIndex = idx
     },
     toggleLoop: function() {
       this.loop = !this.loop
-      this.$refs.audio && (this.$refs.audio.loop = this.loop)
+      if (this.$refs.audio) this.$refs.audio.loop = this.loop
     },
     onTimeUpdate: function() {
       this.currentTime = this.$refs.audio ? this.$refs.audio.currentTime : 0
@@ -180,8 +257,64 @@ export default {
       if (!s || isNaN(s)) return '0:00'
       var m = Math.floor(s / 60)
       var sec = Math.floor(s % 60)
-      return m + ':' + String(sec).padStart(2, '0')
+      return m + ':' + (sec < 10 ? '0' : '') + sec
     }
   }
 }
 </script>
+
+<style scoped>
+.music-player-wrap {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9200;
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border-color, #e8eaed);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+  overflow: hidden;
+  transition: width 0.3s ease, background 0.2s, border-color 0.2s;
+  color: var(--text-primary, #202124);
+}
+.mp-collapsed { padding: 8px; display: flex; justify-content: center; }
+.mp-icon-btn {
+  background: none; border: none; cursor: pointer; width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+  color: inherit;
+}
+.mp-icon-btn:hover { background: var(--bg-hover, #f1f3f4); }
+.mp-expanded { padding: 12px; }
+.mp-title { font-size: 12px; font-weight: 600; }
+.mp-close {
+  background: none; border: none; cursor: pointer; color: var(--text-muted, #80868b); padding: 2px;
+}
+.mp-line-name { font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mp-line-artist { font-size: 11px; color: var(--text-secondary, #80868b); margin-top: 2px; }
+.mp-progress-bg {
+  height: 3px; background: var(--bg-hover, #e8eaed); border-radius: 2px; cursor: pointer; position: relative;
+}
+.mp-progress-fill {
+  height: 100%; background: #1a73e8; border-radius: 2px; transition: width 0.1s;
+}
+.mp-time { font-size: 10px; color: var(--text-muted, #9aa0a6); }
+.mp-ctrl { background: none; border: none; cursor: pointer; color: var(--text-secondary, #5f6368); padding: 4px; }
+.mp-play {
+  background: #1a73e8; border: none; cursor: pointer; color: white; width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+.mp-play:disabled { opacity: 0.6; }
+.mp-err { color: #c62828; }
+.mp-list { margin-top: 10px; max-height: 120px; overflow-y: auto; }
+.mp-row {
+  padding: 5px 6px; border-radius: 6px; cursor: pointer; font-size: 12px;
+  display: flex; align-items: center; gap: 6px; color: var(--text-primary, #3c4043);
+  transition: background 0.1s;
+}
+.mp-row:hover { background: var(--bg-hover, #f8f9fa); }
+.mp-row--active { background: rgba(26, 115, 232, 0.12); color: #1a73e8; }
+.mp-row-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
+.mp-spin { animation: mp-rot 0.8s linear infinite; }
+@keyframes mp-rot { to { transform: rotate(360deg); } }
+</style>

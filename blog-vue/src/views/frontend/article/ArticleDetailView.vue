@@ -1,4 +1,5 @@
 ﻿<template>
+<<<<<<< HEAD
   <v-app class="front-shell">
     <!-- 阅读进度条 + 回到顶部 -->
     <ReadingProgress />
@@ -15,17 +16,25 @@
         </router-link>
         <v-spacer />
         <!-- 分享按钮 -->
+=======
+  <v-app style="background: var(--bg-primary);">
+    <!-- 阅读进度条 + 回到顶部 -->
+    <ReadingProgress />
+
+    <FrontendNavBar variant="back" container-max-width="1200px">
+      <template #actions>
+>>>>>>> cab4ca2899de7ec70ce6a25b534fbe02e1d9ca49
         <v-btn
           icon
           variant="text"
-          @click="copyLink"
-          style="color: #5f6368;"
           title="复制链接"
+          style="color: var(--text-secondary);"
+          @click="copyLink"
         >
           <v-icon size="20">mdi-share-variant-outline</v-icon>
         </v-btn>
-      </v-container>
-    </v-app-bar>
+      </template>
+    </FrontendNavBar>
 
     <!-- 复制成功提示 -->
     <v-snackbar
@@ -411,11 +420,11 @@
 <script>
 import { marked } from 'marked'
 import CommentList from '@/components/frontend/CommentList.vue'
+import FrontendNavBar from '@/components/frontend/FrontendNavBar.vue'
 import ReadingProgress from '@/components/frontend/ReadingProgress.vue'
 import TableOfContents from '@/components/frontend/TableOfContents.vue'
 import ArticleFavorite from '@/components/frontend/ArticleFavorite.vue'
 import Breadcrumb from '@/components/frontend/Breadcrumb.vue'
-import ImageLightbox from '@/components/frontend/ImageLightbox.vue'
 import EmojiPicker from '@/components/frontend/EmojiPicker.vue'
 import FontSizeControl from '@/components/frontend/FontSizeControl.vue'
 import QRCodeShare from '@/components/frontend/QRCodeShare.vue'
@@ -427,7 +436,7 @@ import request from '@/api/request.js'
 
 export default {
   name: 'ArticleDetailView',
-  components: { CommentList, ReadingProgress, TableOfContents, ArticleFavorite, Breadcrumb, ImageLightbox, EmojiPicker, FontSizeControl, QRCodeShare, RewardButton },
+  components: { CommentList, FrontendNavBar, ReadingProgress, TableOfContents, ArticleFavorite, Breadcrumb, EmojiPicker, FontSizeControl, QRCodeShare, RewardButton },
   data: function() {
     return {
       article: null,

@@ -1,8 +1,13 @@
 <template>
   <!-- 文章卡片 —— Google Material Design 3 风格 -->
   <v-card
+<<<<<<< HEAD
     class="mb-4 card-clickable front-card article-card-modern"
     rounded="xl"
+=======
+    class="mb-4 card-clickable article-card-root"
+    rounded="lg"
+>>>>>>> cab4ca2899de7ec70ce6a25b534fbe02e1d9ca49
     elevation="0"
     @click="goDetail"
   >
@@ -51,8 +56,12 @@
 
       <!-- 标题 -->
       <h3
+<<<<<<< HEAD
         class="text-h6 font-weight-bold mb-2 line-clamp-2"
         style="color: var(--front-text); line-height: 1.4;"
+=======
+        class="text-h6 font-weight-bold mb-2 line-clamp-2 article-card-title"
+>>>>>>> cab4ca2899de7ec70ce6a25b534fbe02e1d9ca49
       >
         {{ article.title }}
       </h3>
@@ -60,8 +69,12 @@
       <!-- 摘要 -->
       <p
         v-if="article.summary"
+<<<<<<< HEAD
         class="text-body-2 line-clamp-3 mb-3"
         style="color: var(--front-text-soft); line-height: 1.7;"
+=======
+        class="text-body-2 line-clamp-3 mb-3 article-card-summary"
+>>>>>>> cab4ca2899de7ec70ce6a25b534fbe02e1d9ca49
       >
         {{ article.summary }}
       </p>
@@ -69,7 +82,11 @@
       <!-- 底部：时间 + 阅读数 + 评论数 + 字数 + 标签 -->
       <div class="d-flex align-center justify-space-between flex-wrap" style="gap: 8px;">
         <!-- 左侧：元信息 -->
+<<<<<<< HEAD
         <div class="d-flex align-center flex-wrap article-meta">
+=======
+        <div class="d-flex align-center flex-wrap article-card-meta" style="gap: 10px; font-size: 12px;">
+>>>>>>> cab4ca2899de7ec70ce6a25b534fbe02e1d9ca49
           <span class="d-flex align-center" style="gap: 3px;">
             <v-icon size="13" color="grey">mdi-calendar-outline</v-icon>
             {{ formatDate(article.createTime) }}
@@ -146,6 +163,7 @@ export default {
 </script>
 
 <style scoped>
+<<<<<<< HEAD
 .article-card-modern {
   overflow: hidden;
 }
@@ -172,5 +190,20 @@ export default {
   gap: 10px;
   color: var(--front-muted);
   font-size: 12px;
+=======
+.article-card-root {
+  border: 1px solid var(--border-color, #e8eaed) !important;
+}
+.article-card-title {
+  color: var(--text-primary, #202124);
+  line-height: 1.4;
+}
+.article-card-summary {
+  color: var(--text-secondary, #5f6368);
+  line-height: 1.6;
+}
+.article-card-meta {
+  color: var(--text-muted, #80868b);
+>>>>>>> cab4ca2899de7ec70ce6a25b534fbe02e1d9ca49
 }
 </style>

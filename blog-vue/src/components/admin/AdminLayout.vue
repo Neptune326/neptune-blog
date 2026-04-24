@@ -218,6 +218,7 @@ export default {
         { title: '登录日志', icon: 'mdi-login-variant', to: '/admin/logs/login' },
         { title: '关于我', icon: 'mdi-account-circle-outline', to: '/admin/about' },
         { title: '管理员账号', icon: 'mdi-account-key-outline', to: '/admin/admin-users' },
+        { title: '集成功能说明', icon: 'mdi-book-open-page-variant-outline', to: '/admin/feature-guide' },
         { title: '系统设置', icon: 'mdi-cog-outline', to: '/admin/sys-config' }
       ]
     }
@@ -239,7 +240,8 @@ export default {
         '/admin/logs/login': '登录日志',
         '/admin/about': '关于我',
         '/admin/admin-users': '管理员账号',
-        '/admin/sys-config': '系统设置'
+        '/admin/sys-config': '系统设置',
+        '/admin/feature-guide': '集成功能说明'
       }
       return map[this.route.path] || '博客管理'
     }
