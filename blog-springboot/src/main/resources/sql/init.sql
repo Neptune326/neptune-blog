@@ -343,8 +343,7 @@ INSERT INTO sys_config (config_key, config_value, config_desc, create_time, upda
 ('particle_type', 'sakura', '粒子类型：sakura=樱花，snow=雪花，star=星星', NOW(), NOW()),
 ('particle_count', '25', '粒子数量', NOW(), NOW()),
 ('mouse_trail_enabled', 'false', '是否开启鼠标轨迹特效', NOW(), NOW()),
-<<<<<<< HEAD
-('music_playlist', '[]', '音乐播放列表（JSON数组，每项含name/artist/url）', NOW(), NOW()),
+('music_playlist', '[]', '音乐播放列表（JSON数组；直链用 url，平台曲用 server+id）', NOW(), NOW()),
 ('comment_blacklist', '[]', '评论黑名单（JSON数组，含IP和关键词）', NOW(), NOW()),
 ('ai_enabled', 'false', 'Enable AI writing assistant', NOW(), NOW()),
 ('ai_base_url', 'https://api.openai.com', 'OpenAI compatible base URL', NOW(), NOW()),
@@ -355,16 +354,12 @@ INSERT INTO sys_config (config_key, config_value, config_desc, create_time, upda
 ('frontend_theme_enabled', 'true', 'Enable frontend immersive themes', NOW(), NOW()),
 ('frontend_theme_switcher_enabled', 'true', 'Show frontend theme switcher', NOW(), NOW()),
 ('frontend_theme_default', 'sakura', 'Default frontend theme', NOW(), NOW()),
-('frontend_ambient_enabled', 'true', 'Enable frontend ambient layer', NOW(), NOW());
-=======
+('frontend_ambient_enabled', 'true', 'Enable frontend ambient layer', NOW(), NOW()),
 -- 2026-04-24：音乐播放与 Meting（直链 / 各平台 server+id 解析，对应前台音乐播放器与系统设置 meting_api_base）
-('music_playlist', '[]', '音乐播放列表（JSON数组；直链用 url，平台曲用 server+id）', NOW(), NOW()),
 ('meting_api_base', 'https://api.injahow.cn/meting/', 'Meting 兼容 API 根地址（解析网易云/QQ音乐等，可自建）', NOW(), NOW()),
--- 2026-04-24：可配置趣味功能（Konami 彩蛋、侧栏开发者小签，对应 easter_konami_enabled、dev_fortune_enabled）
+-- 2026-04-24：可配置趣味功能（Konami 彩蛋、侧栏开发者今日小签，对应 easter_konami_enabled、dev_fortune_enabled）
 ('easter_konami_enabled', 'true', '是否开启 Konami 键盘彩蛋（上上下下左右左右BA）', NOW(), NOW()),
-('dev_fortune_enabled', 'true', '是否显示侧栏开发者今日小签', NOW(), NOW()),
-('comment_blacklist', '[]', '评论黑名单（JSON数组，含IP和关键词）', NOW(), NOW());
->>>>>>> cab4ca2899de7ec70ce6a25b534fbe02e1d9ca49
+('dev_fortune_enabled', 'true', '是否显示侧栏开发者今日小签', NOW(), NOW());
 
 -- =====================================================
 -- 后续变更追加区

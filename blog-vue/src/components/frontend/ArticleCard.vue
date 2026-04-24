@@ -1,17 +1,10 @@
 <template>
-  <!-- 文章卡片 —— Google Material Design 3 风格 -->
   <v-card
-<<<<<<< HEAD
     class="mb-4 card-clickable front-card article-card-modern"
     rounded="xl"
-=======
-    class="mb-4 card-clickable article-card-root"
-    rounded="lg"
->>>>>>> cab4ca2899de7ec70ce6a25b534fbe02e1d9ca49
     elevation="0"
     @click="goDetail"
   >
-    <!-- 封面图 -->
     <v-img
       v-if="article.coverUrl"
       :src="article.coverUrl"
@@ -19,7 +12,6 @@
       cover
       class="rounded-t-xl article-cover"
     >
-      <!-- 分类标签 + 置顶标识 浮层 -->
       <template #default>
         <div class="pa-3 d-flex align-center justify-space-between">
           <v-chip
@@ -44,7 +36,6 @@
     </v-img>
 
     <v-card-text class="pa-5">
-      <!-- 无封面时显示分类 + 置顶 -->
       <div v-if="!article.coverUrl" class="mb-2 d-flex align-center justify-space-between">
         <v-chip v-if="article.categoryName" size="small" color="primary" variant="tonal">
           {{ article.categoryName }}
@@ -54,39 +45,19 @@
         </v-chip>
       </div>
 
-      <!-- 标题 -->
-      <h3
-<<<<<<< HEAD
-        class="text-h6 font-weight-bold mb-2 line-clamp-2"
-        style="color: var(--front-text); line-height: 1.4;"
-=======
-        class="text-h6 font-weight-bold mb-2 line-clamp-2 article-card-title"
->>>>>>> cab4ca2899de7ec70ce6a25b534fbe02e1d9ca49
-      >
+      <h3 class="text-h6 font-weight-bold mb-2 line-clamp-2 article-card-title">
         {{ article.title }}
       </h3>
 
-      <!-- 摘要 -->
       <p
         v-if="article.summary"
-<<<<<<< HEAD
-        class="text-body-2 line-clamp-3 mb-3"
-        style="color: var(--front-text-soft); line-height: 1.7;"
-=======
         class="text-body-2 line-clamp-3 mb-3 article-card-summary"
->>>>>>> cab4ca2899de7ec70ce6a25b534fbe02e1d9ca49
       >
         {{ article.summary }}
       </p>
 
-      <!-- 底部：时间 + 阅读数 + 评论数 + 字数 + 标签 -->
       <div class="d-flex align-center justify-space-between flex-wrap" style="gap: 8px;">
-        <!-- 左侧：元信息 -->
-<<<<<<< HEAD
         <div class="d-flex align-center flex-wrap article-meta">
-=======
-        <div class="d-flex align-center flex-wrap article-card-meta" style="gap: 10px; font-size: 12px;">
->>>>>>> cab4ca2899de7ec70ce6a25b534fbe02e1d9ca49
           <span class="d-flex align-center" style="gap: 3px;">
             <v-icon size="13" color="grey">mdi-calendar-outline</v-icon>
             {{ formatDate(article.createTime) }}
@@ -109,7 +80,6 @@
           </span>
         </div>
 
-        <!-- 右侧：标签 -->
         <div class="d-flex flex-wrap" style="gap: 4px;">
           <v-chip
             v-for="tag in (article.tags || []).slice(0, 3)"
@@ -141,8 +111,8 @@ export default {
       return content.replace(/\s/g, '').length
     },
     readingTime: function() {
-      var wc = this.wordCount
-      return wc > 0 ? Math.max(1, Math.ceil(wc / 300)) : 0
+      var count = this.wordCount
+      return count > 0 ? Math.max(1, Math.ceil(count / 300)) : 0
     }
   },
   setup: function(props) {
@@ -163,7 +133,6 @@ export default {
 </script>
 
 <style scoped>
-<<<<<<< HEAD
 .article-card-modern {
   overflow: hidden;
 }
@@ -186,24 +155,19 @@ export default {
   backdrop-filter: blur(10px);
 }
 
+.article-card-title {
+  color: var(--front-text);
+  line-height: 1.4;
+}
+
+.article-card-summary {
+  color: var(--front-text-soft);
+  line-height: 1.7;
+}
+
 .article-meta {
   gap: 10px;
   color: var(--front-muted);
   font-size: 12px;
-=======
-.article-card-root {
-  border: 1px solid var(--border-color, #e8eaed) !important;
-}
-.article-card-title {
-  color: var(--text-primary, #202124);
-  line-height: 1.4;
-}
-.article-card-summary {
-  color: var(--text-secondary, #5f6368);
-  line-height: 1.6;
-}
-.article-card-meta {
-  color: var(--text-muted, #80868b);
->>>>>>> cab4ca2899de7ec70ce6a25b534fbe02e1d9ca49
 }
 </style>

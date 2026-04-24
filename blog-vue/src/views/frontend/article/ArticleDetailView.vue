@@ -1,29 +1,9 @@
 ﻿<template>
-<<<<<<< HEAD
   <v-app class="front-shell">
-    <!-- 阅读进度条 + 回到顶部 -->
-    <ReadingProgress />
-
-    <!-- 顶部导航栏 -->
-    <v-app-bar elevation="0" class="front-app-bar">
-      <v-container style="max-width: 1200px; display: flex; align-items: center; padding: 0 16px;">
-        <v-btn icon variant="text" @click="$router.back()" style="color: #5f6368;">
-          <v-icon>mdi-arrow-left</v-icon>
-        </v-btn>
-        <router-link to="/" class="d-flex align-center text-decoration-none ml-2" style="gap: 6px;">
-          <v-icon color="primary" size="22">mdi-pencil-circle</v-icon>
-          <span class="front-title" style="font-size: 16px; font-weight: 700;">我的博客</span>
-        </router-link>
-        <v-spacer />
-        <!-- 分享按钮 -->
-=======
-  <v-app style="background: var(--bg-primary);">
-    <!-- 阅读进度条 + 回到顶部 -->
     <ReadingProgress />
 
     <FrontendNavBar variant="back" container-max-width="1200px">
       <template #actions>
->>>>>>> cab4ca2899de7ec70ce6a25b534fbe02e1d9ca49
         <v-btn
           icon
           variant="text"

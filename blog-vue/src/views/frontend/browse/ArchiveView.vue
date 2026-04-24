@@ -1,130 +1,113 @@
-﻿<template>
-  <v-app style="background: var(--bg-primary);">
-    <FrontendNavBar variant="back" container-max-width="1100px" />
+<template>
+  <v-app class="front-shell">
+    <FrontendNavBar variant="back" container-max-width="1200px" />
 
     <v-main>
-      <v-container style="max-width: 760px; padding: 32px 16px;">
-
-        <!-- 页面标题 -->
-        <div class="d-flex align-center mb-8" style="gap: 12px;">
-          <div
-            style="
-              width: 40px; height: 40px;
-              background: #e8f0fe;
-              border-radius: 10px;
-              display: flex; align-items: center; justify-content: center;
-            "
-          >
-            <v-icon color="primary" size="22">mdi-archive-outline</v-icon>
-          </div>
-          <div>
-            <h1 style="font-size: 22px; font-weight: 700; color: #202124; margin: 0;">文章归档</h1>
-            <p style="font-size: 13px; color: #80868b; margin: 2px 0 0;">共 {{ totalCount }} 篇文章</p>
-          </div>
-        </div>
-
-        <!-- 加载中 -->
-        <div v-if="loading" class="d-flex justify-center py-12">
-          <v-progress-circular indeterminate color="primary" size="40" />
-        </div>
-
-        <!-- 归档内容 -->
-        <template v-else>
-          <div v-if="archiveList.length === 0" class="text-center py-16">
-            <v-icon size="64" color="grey-lighten-2">mdi-archive-outline</v-icon>
-            <p class="mt-4" style="color: #80868b;">暂无归档数据</p>
-          </div>
-
-          <!-- 按年分组 -->
-          <div v-for="yearGroup in archiveList" :key="yearGroup.year" class="mb-8">
-            <!-- 年份标题 -->
-            <div
-              class="d-flex align-center mb-4"
-              style="gap: 12px;"
-            >
+      <v-container style="max-width: 1200px; padding: 32px 16px;">
+        <v-row>
+          <v-col cols="12" md="8">
+            <div class="d-flex align-center mb-8" style="gap: 12px;">
               <div
                 style="
-                  background: #1a73e8;
-                  color: white;
-                  font-size: 15px;
-                  font-weight: 700;
-                  padding: 4px 14px;
-                  border-radius: 20px;
-                  letter-spacing: 0.5px;
+                  width: 40px; height: 40px;
+                  background: color-mix(in srgb, var(--front-accent) 12%, transparent);
+                  border-radius: 10px;
+                  display: flex; align-items: center; justify-content: center;
                 "
               >
-                {{ yearGroup.year }}
+                <v-icon color="primary" size="22">mdi-archive-outline</v-icon>
               </div>
-              <span style="color: #80868b; font-size: 13px;">{{ yearGroup.count }} 篇</span>
-              <div style="flex: 1; height: 1px; background: #e8eaed;"></div>
+              <div>
+                <h1 class="front-title" style="font-size: 22px; font-weight: 700; margin: 0;">文章归档</h1>
+                <p class="front-muted" style="font-size: 13px; margin: 2px 0 0;">共 {{ totalCount }} 篇文章</p>
+              </div>
             </div>
 
-            <!-- 按月分组 -->
-            <div v-for="monthGroup in yearGroup.months" :key="monthGroup.month" class="mb-5 ml-2">
-              <!-- 月份标题 -->
-              <div
-                class="d-flex align-center mb-3"
-                style="gap: 8px; color: #5f6368; font-size: 13px; font-weight: 500;"
-              >
-                <v-icon size="14" color="grey">mdi-calendar-month-outline</v-icon>
-                {{ monthGroup.month }} 月
-                <span style="color: #9aa0a6;">· {{ monthGroup.articles.length }} 篇</span>
+            <div v-if="loading" class="d-flex justify-center py-12">
+              <v-progress-circular indeterminate color="primary" size="40" />
+            </div>
+
+            <template v-else>
+              <div v-if="archiveList.length === 0" class="text-center py-16">
+                <v-icon size="64" color="grey-lighten-2">mdi-archive-outline</v-icon>
+                <p class="mt-4 front-muted">暂无归档数据</p>
               </div>
 
-              <!-- 文章列表 -->
-              <div class="ml-4">
-                <div
-                  v-for="article in monthGroup.articles"
-                  :key="article.id"
-                  class="d-flex align-center mb-2"
-                  style="gap: 12px;"
-                >
-                  <!-- 时间点 -->
-                  <div style="position: relative; display: flex; align-items: center;">
-                    <div
-                      style="
-                        width: 8px; height: 8px;
-                        background: #1a73e8;
-                        border-radius: 50%;
-                        flex-shrink: 0;
-                      "
-                    ></div>
+              <div v-for="yearGroup in archiveList" :key="yearGroup.year" class="mb-8">
+                <div class="d-flex align-center mb-4" style="gap: 12px;">
+                  <div
+                    style="
+                      background: var(--front-accent);
+                      color: white;
+                      font-size: 15px;
+                      font-weight: 700;
+                      padding: 4px 14px;
+                      border-radius: 20px;
+                      letter-spacing: 0.5px;
+                    "
+                  >
+                    {{ yearGroup.year }}
+                  </div>
+                  <span class="front-muted" style="font-size: 13px;">{{ yearGroup.count }} 篇</span>
+                  <div style="flex: 1; height: 1px; background: var(--front-border);"></div>
+                </div>
+
+                <div v-for="monthGroup in yearGroup.months" :key="monthGroup.month" class="mb-5 ml-2">
+                  <div class="d-flex align-center mb-3 front-soft" style="gap: 8px; font-size: 13px; font-weight: 500;">
+                    <v-icon size="14" color="grey">mdi-calendar-month-outline</v-icon>
+                    {{ monthGroup.month }} 月
+                    <span class="front-muted">· {{ monthGroup.articles.length }} 篇</span>
                   </div>
 
-                  <!-- 日期 -->
-                  <span
-                    style="
-                      font-size: 12px;
-                      color: #9aa0a6;
-                      min-width: 48px;
-                      font-family: 'Roboto Mono', monospace;
-                    "
-                  >
-                    {{ formatDay(article.createTime) }}
-                  </span>
+                  <div class="ml-4">
+                    <div
+                      v-for="article in monthGroup.articles"
+                      :key="article.id"
+                      class="d-flex align-center mb-2"
+                      style="gap: 12px;"
+                    >
+                      <div style="position: relative; display: flex; align-items: center;">
+                        <div
+                          style="
+                            width: 8px; height: 8px;
+                            background: var(--front-accent);
+                            border-radius: 50%;
+                            flex-shrink: 0;
+                          "
+                        ></div>
+                      </div>
 
-                  <!-- 文章标题 -->
-                  <router-link
-                    :to="'/article/' + article.id"
-                    style="
-                      color: #202124;
-                      font-size: 14px;
-                      text-decoration: none;
-                      transition: color 0.2s;
-                      flex: 1;
-                      white-space: nowrap;
-                      overflow: hidden;
-                      text-overflow: ellipsis;
-                    "
-                    class="archive-link"
-                  >
-                    {{ article.title }}
-                  </router-link>
+                      <span class="front-muted" style="font-size: 12px; min-width: 48px; font-family: 'Roboto Mono', monospace;">
+                        {{ formatDay(article.createTime) }}
+                      </span>
+
+                      <router-link
+                        :to="'/article/' + article.id"
+                        class="archive-link"
+                        style="
+                          color: var(--front-text);
+                          font-size: 14px;
+                          text-decoration: none;
+                          transition: color 0.2s;
+                          flex: 1;
+                          white-space: nowrap;
+                          overflow: hidden;
+                          text-overflow: ellipsis;
+                        "
+                      >
+                        {{ article.title }}
+                      </router-link>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </template>
+            </template>
+          </v-col>
+
+          <v-col cols="12" md="4" class="d-none d-md-block">
+            <BlogSidebar />
+          </v-col>
+        </v-row>
       </v-container>
     </v-main>
   </v-app>
@@ -133,10 +116,11 @@
 <script>
 import { getArchive } from '@/api/article.js'
 import FrontendNavBar from '@/components/frontend/FrontendNavBar.vue'
+import BlogSidebar from '@/components/frontend/BlogSidebar.vue'
 
 export default {
   name: 'ArchiveView',
-  components: { FrontendNavBar },
+  components: { FrontendNavBar, BlogSidebar },
   data: function() {
     return {
       archiveList: [],
@@ -200,8 +184,6 @@ export default {
 
 <style scoped>
 .archive-link:hover {
-  color: #1a73e8 !important;
+  color: var(--front-accent) !important;
 }
 </style>
-
-
