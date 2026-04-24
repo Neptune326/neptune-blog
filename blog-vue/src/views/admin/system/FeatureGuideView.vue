@@ -57,6 +57,26 @@
 
       <v-expansion-panel>
         <v-expansion-panel-title class="font-weight-medium">
+          <v-icon start color="teal" size="22">mdi-gamepad-outline</v-icon>
+          趣味彩蛋与小签
+        </v-expansion-panel-title>
+        <v-expansion-panel-text>
+          <p class="mb-2">在 <strong>系统设置 → 功能开关</strong> 中可分别开启：</p>
+          <ul class="ml-4 mb-2">
+            <li>
+              <strong>Konami 键盘彩蛋（<code>easter_konami_enabled</code>）：</strong>访客在前台用键盘按顺序输入
+              <strong>上、上、下、下、左、右、左、右、B、A</strong>（与经典 Konami 码一致）时，会短暂放礼花并出现提示。若系统已开启「减少动效」则只显示文字提示、不播放礼花动画。
+            </li>
+            <li>
+              <strong>侧栏开发者今日小签（<code>dev_fortune_enabled</code>）：</strong>在带侧栏的页面（如文章列表）显示一张小卡片，内容为按日期随机的「宜 / 忌」幽默短句，无第三方接口。
+            </li>
+          </ul>
+          <p class="mb-0 text-body-2">关闭任一项后，对应行为立即在前台不再出现（需刷新页面）。</p>
+        </v-expansion-panel-text>
+      </v-expansion-panel>
+
+      <v-expansion-panel>
+        <v-expansion-panel-title class="font-weight-medium">
           <v-icon start color="deep-purple" size="22">mdi-image-multiple-outline</v-icon>
           动漫主题首页与背景画廊
         </v-expansion-panel-title>

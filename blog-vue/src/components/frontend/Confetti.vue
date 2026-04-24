@@ -14,16 +14,56 @@ export default {
     return {
       active: false,
       particles: [],
-      animId: null
+      animId: null,
+      manualStopTimer: null
     }
   },
   mounted: function() {
     this.checkSpecialDate()
   },
   beforeUnmount: function() {
-    if (this.animId) cancelAnimationFrame(this.animId)
+    this.stopAll()
+  },
+  beforeDestroy: function() {
+    this.stopAll()
   },
   methods: {
+    /**
+     * 停止动画与定时器（供 Konami 等手动触发前清理）
+     */
+    stopAll: function() {
+      if (this.manualStopTimer) {
+        clearTimeout(this.manualStopTimer)
+        this.manualStopTimer = null
+      }
+      if (this.animId) {
+        cancelAnimationFrame(this.animId)
+        this.animId = null
+      }
+    },
+    /**
+     * 短时有礼花（如 Konami 彩蛋），ms 后收起 canvas
+     * @param {number} [durationMs] 默认 4000
+     */
+    playFor: function(durationMs) {
+      var self = this
+      var ms = durationMs > 0 ? durationMs : 4000
+      self.stopAll()
+      self.particles = []
+      self.active = true
+      self.$nextTick(function() {
+        self.launch()
+        self.manualStopTimer = setTimeout(function() {
+          self.active = false
+          self.particles = []
+          if (self.animId) {
+            cancelAnimationFrame(self.animId)
+            self.animId = null
+          }
+          self.manualStopTimer = null
+        }, ms)
+      })
+    },
     checkSpecialDate: function() {
       var now = new Date()
       var month = now.getMonth() + 1
@@ -44,6 +84,12 @@ export default {
       }
     },
     launch: function() {
+      var self = this
+      self.particles = []
+      if (self.animId) {
+        cancelAnimationFrame(self.animId)
+        self.animId = null
+      }
       var canvas = this.$refs.canvas
       if (!canvas) return
       canvas.width = window.innerWidth

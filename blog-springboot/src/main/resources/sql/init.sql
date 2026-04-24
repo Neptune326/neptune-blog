@@ -346,6 +346,9 @@ INSERT INTO sys_config (config_key, config_value, config_desc, create_time, upda
 -- 2026-04-24：音乐播放与 Meting（直链 / 各平台 server+id 解析，对应前台音乐播放器与系统设置 meting_api_base）
 ('music_playlist', '[]', '音乐播放列表（JSON数组；直链用 url，平台曲用 server+id）', NOW(), NOW()),
 ('meting_api_base', 'https://api.injahow.cn/meting/', 'Meting 兼容 API 根地址（解析网易云/QQ音乐等，可自建）', NOW(), NOW()),
+-- 2026-04-24：可配置趣味功能（Konami 彩蛋、侧栏开发者小签，对应 easter_konami_enabled、dev_fortune_enabled）
+('easter_konami_enabled', 'true', '是否开启 Konami 键盘彩蛋（上上下下左右左右BA）', NOW(), NOW()),
+('dev_fortune_enabled', 'true', '是否显示侧栏开发者今日小签', NOW(), NOW()),
 ('comment_blacklist', '[]', '评论黑名单（JSON数组，含IP和关键词）', NOW(), NOW());
 
 -- =====================================================
@@ -356,6 +359,7 @@ INSERT INTO sys_config (config_key, config_value, config_desc, create_time, upda
 -- 2026-04-22：合并 reset_admin_password.sql。
 -- 已将 admin 账号初始密码 admin123 的 BCrypt 哈希和重置语义合并到 admin 初始化数据中。
 -- 2026-04-24：sys_config 音乐与 Meting 相关行（见上方「INSERT INTO sys_config」中 2026-04-24 行注释）。
+-- 2026-04-24：easter_konami_enabled、dev_fortune_enabled（见本文件 INSERT 中 2026-04-24 趣味功能行注释）。
 -- 后续新增 SQL 请按以下格式追加：
 --
 -- yyyy-MM-dd：变更说明

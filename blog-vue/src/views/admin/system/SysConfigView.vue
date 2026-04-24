@@ -191,6 +191,36 @@
                 />
               </div>
             </div>
+
+            <!-- Konami 键盘彩蛋 -->
+            <div class="d-flex align-center justify-space-between" style="padding: 12px 16px; background: #f8f9fa; border-radius: 10px;">
+              <div>
+                <div style="font-size: 14px; font-weight: 500; color: #202124;">Konami 键盘彩蛋</div>
+                <div style="font-size: 12px; color: #80868b; margin-top: 2px;">前台依次输入 上上下下左右左右BA 时触发短礼花与提示（受访客「减少动效」与前台礼花总开关影响）</div>
+              </div>
+              <v-switch
+                v-model="form.easter_konami_enabled"
+                color="teal"
+                hide-details
+                true-value="true"
+                false-value="false"
+              />
+            </div>
+
+            <!-- 侧栏开发者今日小签 -->
+            <div class="d-flex align-center justify-space-between" style="padding: 12px 16px; background: #f8f9fa; border-radius: 10px;">
+              <div>
+                <div style="font-size: 14px; font-weight: 500; color: #202124;">侧栏开发者今日小签</div>
+                <div style="font-size: 12px; color: #80868b; margin-top: 2px;">在含侧栏的首页等页面展示宜/忌趣味短句（仅本地展示，不请求接口）</div>
+              </div>
+              <v-switch
+                v-model="form.dev_fortune_enabled"
+                color="teal"
+                hide-details
+                true-value="true"
+                false-value="false"
+              />
+            </div>
           </div>
         </div>
       </v-card>
@@ -333,7 +363,9 @@ export default {
         particle_type: 'sakura',
         particle_count: '25',
         music_playlist: '[]',
-        meting_api_base: ''
+        meting_api_base: '',
+        easter_konami_enabled: 'true',
+        dev_fortune_enabled: 'true'
       }
     }
   },

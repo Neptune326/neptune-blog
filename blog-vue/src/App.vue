@@ -28,8 +28,8 @@
     <!-- 音乐播放器（仅前台，有歌单时显示） -->
     <MusicPlayer v-if="isFrontend" :playlist="musicPlaylist" />
 
-    <!-- 彩带礼花（特殊日期自动触发） -->
-    <Confetti v-if="showHeavyEffects" />
+    <!-- 彩带礼花（特殊日期或 Konami 彩蛋） -->
+    <Confetti v-if="showHeavyEffects" ref="confettiRef" />
 
     <!-- 连续访问里程碑（7 / 30 天） -->
     <v-snackbar
@@ -41,6 +41,18 @@
       elevation="6"
     >
       <span style="color: var(--text-primary);">{{ visitMilestoneText }}</span>
+    </v-snackbar>
+
+    <!-- Konami 彩蛋提示 -->
+    <v-snackbar
+      v-model="konamiSnackbar"
+      :timeout="4200"
+      location="top"
+      color="surface"
+      rounded="lg"
+      elevation="6"
+    >
+      <span style="color: var(--text-primary);">{{ konamiText }}</span>
     </v-snackbar>
   </v-app>
 </template>
@@ -58,6 +70,9 @@ import ColorClickEffect from './components/frontend/ColorClickEffect.vue'
 
 export default {
   name: 'App',
+  provide: function() {
+    return { neptuneApp: this }
+  },
   components: { ParticleCanvas, ClickEffect, ImageLightbox, MouseTrail, MusicPlayer, Confetti, ColorClickEffect },
   data: function() {
     return {
@@ -69,7 +84,12 @@ export default {
       musicPlaylist: [],
       reduceMotion: false,
       visitMilestoneSnackbar: false,
-      visitMilestoneText: ''
+      visitMilestoneText: '',
+      easterKonamiEnabled: true,
+      devFortuneEnabled: true,
+      konamiIndex: 0,
+      konamiSnackbar: false,
+      konamiText: ''
     }
   },
   computed: {
@@ -89,6 +109,9 @@ export default {
     this.initReduceMotion()
     this.applyVisitStreakMilestone()
     this.loadEffectConfig()
+    if (document.addEventListener) {
+      document.addEventListener('keydown', this.onKonamiKey, true)
+    }
     // 复制保护：复制文章内容时追加版权声明
     document.addEventListener('copy', function(e) {
       var selection = window.getSelection()
@@ -102,7 +125,47 @@ export default {
       }
     })
   },
+  beforeDestroy: function() {
+    if (document.removeEventListener) {
+      document.removeEventListener('keydown', this.onKonamiKey, true)
+    }
+  },
+  beforeUnmount: function() {
+    if (document.removeEventListener) {
+      document.removeEventListener('keydown', this.onKonamiKey, true)
+    }
+  },
   methods: {
+    onKonamiKey: function(e) {
+      if (!e) return
+      if (e.target) {
+        var tag = (e.target.tagName || '').toLowerCase()
+        if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable) return
+      }
+      if (!this.isFrontend) return
+      if (!this.easterKonamiEnabled) return
+      if (e.repeat) return
+      var code = (e.keyCode != null && e.keyCode) ? e.keyCode : (e.which != null ? e.which : 0)
+      if (!code) return
+      var KONAMI = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65]
+      var k = this.konamiIndex || 0
+      if (code === KONAMI[k]) {
+        this.konamiIndex = k + 1
+        if (this.konamiIndex >= KONAMI.length) {
+          this.konamiIndex = 0
+          this.fireKonamiEaster()
+        }
+      } else {
+        this.konamiIndex = (code === KONAMI[0]) ? 1 : 0
+      }
+    },
+    fireKonamiEaster: function() {
+      this.konamiText = 'Neptune 秘技解锁：感谢常来坐——今日代码顺顺利利。'
+      this.konamiSnackbar = true
+      if (this.showHeavyEffects && this.$refs.confettiRef && typeof this.$refs.confettiRef.playFor === 'function') {
+        this.$refs.confettiRef.playFor(4000)
+      }
+    },
     initReduceMotion: function() {
       var self = this
       if (!window.matchMedia) {
@@ -146,10 +209,18 @@ export default {
               self.musicPlaylist = Array.isArray(pl) ? pl : []
             } catch (e) {}
           }
+          self.easterKonamiEnabled = (data.easter_konami_enabled == null)
+            ? true
+            : (String(data.easter_konami_enabled) === 'true')
+          self.devFortuneEnabled = (data.dev_fortune_enabled == null)
+            ? true
+            : (String(data.dev_fortune_enabled) === 'true')
         })
         .catch(function() {
           self.clickEffectEnabled = 'true'
           self.particleEnabled = true
+          self.easterKonamiEnabled = true
+          self.devFortuneEnabled = true
         })
     }
   }

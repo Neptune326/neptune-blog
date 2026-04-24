@@ -42,7 +42,9 @@ public class SiteConfigFrontController {
             "live2d_enabled",
             "about_enabled",
             "message_enabled",
-            "like_enabled"
+            "like_enabled",
+            "easter_konami_enabled",
+            "dev_fortune_enabled"
     ));
 
     /**
