@@ -223,7 +223,7 @@ CREATE TABLE friend_link (
 
 -- 初始管理员账号：admin
 -- 初始管理员密码：admin123
--- BCrypt 哈希：$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBpOsl7iKVSHDK
+-- BCrypt 哈希：$2a$10$X4wjSvYEe.utRzBGKojakuAWr6Q2yIa615mVSdp2m23go2ktxdQ3.
 -- 2026-04-24: fix admin default password hash for admin123
 INSERT INTO admin (username, password, role, create_time, create_by, update_time, update_by)
 VALUES (
@@ -374,6 +374,7 @@ INSERT INTO sys_config (config_key, config_value, config_desc, create_time, upda
 -- 已将新增字段、字段修改、建表和初始数据统一折叠到上方最终初始化结构中。
 -- 2026-04-22：合并 reset_admin_password.sql。
 -- 已将 admin 账号初始密码 admin123 的 BCrypt 哈希和重置语义合并到 admin 初始化数据中。
+-- 2026-04-24：修正 admin 初始密码 admin123 的 BCrypt 哈希，避免默认账号无法登录。
 -- 2026-04-24：sys_config 音乐与 Meting 相关行（见上方「INSERT INTO sys_config」中 2026-04-24 行注释）。
 -- 2026-04-24：easter_konami_enabled、dev_fortune_enabled（见本文件 INSERT 中 2026-04-24 趣味功能行注释）。
 -- 2026-04-24：upload_image_*、upload_file_*（见本文件 INSERT 中 2026-04-24 上传限制配置行注释）。
