@@ -406,7 +406,6 @@ import ReadingProgress from '@/components/frontend/ReadingProgress.vue'
 import TableOfContents from '@/components/frontend/TableOfContents.vue'
 import ArticleFavorite from '@/components/frontend/ArticleFavorite.vue'
 import Breadcrumb from '@/components/frontend/Breadcrumb.vue'
-import ImageLightbox from '@/components/frontend/ImageLightbox.vue'
 import EmojiPicker from '@/components/frontend/EmojiPicker.vue'
 import FontSizeControl from '@/components/frontend/FontSizeControl.vue'
 import QRCodeShare from '@/components/frontend/QRCodeShare.vue'
@@ -418,7 +417,7 @@ import request from '@/api/request.js'
 
 export default {
   name: 'ArticleDetailView',
-  components: { CommentList, FrontendNavBar, ReadingProgress, TableOfContents, ArticleFavorite, Breadcrumb, ImageLightbox, EmojiPicker, FontSizeControl, QRCodeShare, RewardButton },
+  components: { CommentList, FrontendNavBar, ReadingProgress, TableOfContents, ArticleFavorite, Breadcrumb, EmojiPicker, FontSizeControl, QRCodeShare, RewardButton },
   data: function() {
     return {
       article: null,

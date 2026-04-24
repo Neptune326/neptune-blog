@@ -58,15 +58,18 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue'
 import request from './api/request.js'
 import { syncVisitStreak } from './utils/visitStreak.js'
-import ParticleCanvas from './components/frontend/ParticleCanvas.vue'
-import ClickEffect from './components/frontend/ClickEffect.vue'
-import ImageLightbox from './components/frontend/ImageLightbox.vue'
-import MouseTrail from './components/frontend/MouseTrail.vue'
-import MusicPlayer from './components/frontend/MusicPlayer.vue'
-import Confetti from './components/frontend/Confetti.vue'
-import ColorClickEffect from './components/frontend/ColorClickEffect.vue'
+
+// 动效/播放器与首屏无强耦合，拆成异步块以缩小入口 JS、并行下载
+var ParticleCanvas = defineAsyncComponent(function() { return import('./components/frontend/ParticleCanvas.vue') })
+var ClickEffect = defineAsyncComponent(function() { return import('./components/frontend/ClickEffect.vue') })
+var ColorClickEffect = defineAsyncComponent(function() { return import('./components/frontend/ColorClickEffect.vue') })
+var ImageLightbox = defineAsyncComponent(function() { return import('./components/frontend/ImageLightbox.vue') })
+var MouseTrail = defineAsyncComponent(function() { return import('./components/frontend/MouseTrail.vue') })
+var MusicPlayer = defineAsyncComponent(function() { return import('./components/frontend/MusicPlayer.vue') })
+var Confetti = defineAsyncComponent(function() { return import('./components/frontend/Confetti.vue') })
 
 export default {
   name: 'App',
@@ -106,9 +109,15 @@ export default {
     }
   },
   mounted: function() {
+    var self = this
     this.initReduceMotion()
     this.applyVisitStreakMilestone()
-    this.loadEffectConfig()
+    // 站点配置对首屏 DOM 不阻塞：空闲时再拉，减轻与路由页竞争主线程
+    if (typeof requestIdleCallback === 'function') {
+      requestIdleCallback(function() { self.loadEffectConfig() }, { timeout: 1800 })
+    } else {
+      setTimeout(function() { self.loadEffectConfig() }, 0)
+    }
     if (document.addEventListener) {
       document.addEventListener('keydown', this.onKonamiKey, true)
     }
