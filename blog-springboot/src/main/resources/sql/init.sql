@@ -224,10 +224,11 @@ CREATE TABLE friend_link (
 -- 初始管理员账号：admin
 -- 初始管理员密码：admin123
 -- BCrypt 哈希：$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBpOsl7iKVSHDK
+-- 2026-04-24: fix admin default password hash for admin123
 INSERT INTO admin (username, password, role, create_time, create_by, update_time, update_by)
 VALUES (
     'admin',
-    '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBpOsl7iKVSHDK',
+    '$2a$10$X4wjSvYEe.utRzBGKojakuAWr6Q2yIa615mVSdp2m23go2ktxdQ3.',
     'super',
     NOW(),
     'system',
@@ -359,6 +360,11 @@ INSERT INTO sys_config (config_key, config_value, config_desc, create_time, upda
 ('meting_api_base', 'https://api.injahow.cn/meting/', 'Meting 兼容 API 根地址（解析网易云/QQ音乐等，可自建）', NOW(), NOW()),
 -- 2026-04-24：可配置趣味功能（Konami 彩蛋、侧栏开发者今日小签，对应 easter_konami_enabled、dev_fortune_enabled）
 ('easter_konami_enabled', 'true', '是否开启 Konami 键盘彩蛋（上上下下左右左右BA）', NOW(), NOW()),
+-- 2026-04-24：上传限制配置（图片上传与通用文件上传，对应 upload_image_*、upload_file_*）
+('upload_image_max_size_mb', '5', 'Image upload max size in MB', NOW(), NOW()),
+('upload_image_allowed_exts', '.jpg,.jpeg,.png,.gif,.webp,.svg', 'Allowed image upload extensions', NOW(), NOW()),
+('upload_file_max_size_mb', '10', 'Generic file upload max size in MB', NOW(), NOW()),
+('upload_file_allowed_exts', '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.md,.zip,.rar,.7z', 'Allowed generic file upload extensions', NOW(), NOW()),
 ('dev_fortune_enabled', 'true', '是否显示侧栏开发者今日小签', NOW(), NOW());
 
 -- =====================================================
@@ -370,6 +376,7 @@ INSERT INTO sys_config (config_key, config_value, config_desc, create_time, upda
 -- 已将 admin 账号初始密码 admin123 的 BCrypt 哈希和重置语义合并到 admin 初始化数据中。
 -- 2026-04-24：sys_config 音乐与 Meting 相关行（见上方「INSERT INTO sys_config」中 2026-04-24 行注释）。
 -- 2026-04-24：easter_konami_enabled、dev_fortune_enabled（见本文件 INSERT 中 2026-04-24 趣味功能行注释）。
+-- 2026-04-24：upload_image_*、upload_file_*（见本文件 INSERT 中 2026-04-24 上传限制配置行注释）。
 -- 后续新增 SQL 请按以下格式追加：
 --
 -- yyyy-MM-dd：变更说明

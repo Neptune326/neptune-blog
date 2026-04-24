@@ -81,6 +81,61 @@
                 :max="1440"
                 prepend-inner-icon="mdi-timer-lock-outline"
                 hint="锁定后需等待该时长才能重新登录"
+              persistent-hint
+              />
+            </v-col>
+          </v-row>
+        </div>
+      </v-card>
+
+      <v-card elevation="0" rounded="xl" style="border: 1px solid #e8eaed; margin-bottom: 20px;">
+        <div class="pa-5">
+          <div class="d-flex align-center mb-4" style="gap: 8px;">
+            <v-icon color="indigo" size="20">mdi-upload-outline</v-icon>
+            <span style="font-size: 15px; font-weight: 600; color: #202124;">上传设置</span>
+          </div>
+          <v-row dense>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model="form.upload_image_max_size_mb"
+                label="图片最大大小（MB）"
+                variant="outlined"
+                density="comfortable"
+                type="number"
+                min="1"
+                prepend-inner-icon="mdi-image-size-select-large"
+              />
+            </v-col>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model="form.upload_file_max_size_mb"
+                label="文件最大大小（MB）"
+                variant="outlined"
+                density="comfortable"
+                type="number"
+                min="1"
+                prepend-inner-icon="mdi-file-outline"
+              />
+            </v-col>
+            <v-col cols="12">
+              <v-text-field
+                v-model="form.upload_image_allowed_exts"
+                label="图片允许扩展名"
+                variant="outlined"
+                density="comfortable"
+                prepend-inner-icon="mdi-image-multiple-outline"
+                hint="使用逗号分隔，例如 .jpg,.jpeg,.png,.gif,.webp,.svg"
+                persistent-hint
+              />
+            </v-col>
+            <v-col cols="12">
+              <v-text-field
+                v-model="form.upload_file_allowed_exts"
+                label="文件允许扩展名"
+                variant="outlined"
+                density="comfortable"
+                prepend-inner-icon="mdi-file-document-multiple-outline"
+                hint="使用逗号分隔，例如 .pdf,.docx,.xlsx,.zip"
                 persistent-hint
               />
             </v-col>
@@ -470,6 +525,10 @@ export default {
         blog_description: '',
         login_max_fail_count: '5',
         login_lock_duration: '10',
+        upload_image_max_size_mb: '5',
+        upload_image_allowed_exts: '.jpg,.jpeg,.png,.gif,.webp,.svg',
+        upload_file_max_size_mb: '10',
+        upload_file_allowed_exts: '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.md,.zip,.rar,.7z',
         comment_audit_enabled: 'true',
         anime_theme_enabled: 'false',
         gallery_images: '[]',
@@ -556,6 +615,38 @@ export default {
           self.$toast.error('Meting API 根地址必须以 http:// 或 https:// 开头')
           return
         }
+      }
+      var uploadRules = [
+        { sizeKey: 'upload_image_max_size_mb', extKey: 'upload_image_allowed_exts', label: '图片上传' },
+        { sizeKey: 'upload_file_max_size_mb', extKey: 'upload_file_allowed_exts', label: '文件上传' }
+      ]
+      for (var r = 0; r < uploadRules.length; r++) {
+        var rule = uploadRules[r]
+        var sizeText = String(self.form[rule.sizeKey] || '').trim()
+        if (!/^[1-9]\d*$/.test(sizeText)) {
+          self.$toast.error(rule.label + '大小必须是正整数 MB')
+          return
+        }
+        var extText = String(self.form[rule.extKey] || '').trim()
+        if (!extText) {
+          self.$toast.error(rule.label + '允许扩展名不能为空')
+          return
+        }
+        var extList = extText.split(',')
+          .map(function(item) { return item.trim() })
+          .filter(function(item) { return !!item })
+        if (!extList.length) {
+          self.$toast.error(rule.label + '允许扩展名不能为空')
+          return
+        }
+        for (var e = 0; e < extList.length; e++) {
+          if (extList[e].charAt(0) !== '.') {
+            self.$toast.error(rule.label + '扩展名必须以 . 开头')
+            return
+          }
+        }
+        self.form[rule.sizeKey] = sizeText
+        self.form[rule.extKey] = extList.join(',')
       }
       self.saving = true
       updateSysConfig(self.form)

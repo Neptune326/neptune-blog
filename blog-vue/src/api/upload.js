@@ -16,3 +16,19 @@ export function uploadImage(file) {
     headers: { 'Content-Type': 'multipart/form-data' }
   })
 }
+
+/**
+ * 上传通用文件
+ * @param {File} file - 文件对象
+ * @returns {Promise<Object>} 文件元数据
+ */
+export function uploadFile(file) {
+  var formData = new FormData()
+  formData.append('file', file)
+  return request({
+    method: 'post',
+    url: '/api/admin/upload/file',
+    data: formData,
+    headers: { 'Content-Type': 'multipart/form-data' }
+  })
+}
