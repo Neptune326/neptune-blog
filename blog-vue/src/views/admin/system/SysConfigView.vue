@@ -203,15 +203,26 @@
             <span style="font-size: 15px; font-weight: 600; color: #202124;">背景音乐</span>
           </div>
           <p style="font-size: 12px; color: #80868b; margin: 0 0 12px;">
-            JSON 数组，每项含 name、artist（可选）、url（音频直链）。为空 <code>[]</code> 时不显示前台播放器。详见
+            支持直链 <code>url</code>，或通过 <strong>server + 歌曲 id</strong> 由 Meting 兼容 API 解析（网易、QQ 音乐等）。为空 <code>[]</code> 时不显示前台播放器。详见
             <router-link to="/admin/feature-guide">集成功能说明</router-link>。
           </p>
+          <v-text-field
+            v-model="form.meting_api_base"
+            class="mb-3"
+            label="Meting API 根地址（可选）"
+            variant="outlined"
+            density="comfortable"
+            prepend-inner-icon="mdi-api"
+            placeholder="https://api.injahow.cn/meting/"
+            hint="留空则使用默认；若公共接口不可用可自建并填写，须以 / 结尾或保存后由服务端自动补全"
+            persistent-hint
+          />
           <v-textarea
             v-model="form.music_playlist"
             variant="outlined"
             density="comfortable"
             rows="6"
-            placeholder='[{"name":"曲名","artist":"作者","url":"https://..."}]'
+            placeholder='[{"name":"曲名","url":"https://..."}] 或 [{"server":"netease","id":"歌曲id","name":"可选"}]'
             class="font-mono text-body-2"
             hint="须为合法 JSON；保存后前台刷新即可"
             persistent-hint
@@ -321,7 +332,8 @@ export default {
         particle_enabled: 'true',
         particle_type: 'sakura',
         particle_count: '25',
-        music_playlist: '[]'
+        music_playlist: '[]',
+        meting_api_base: ''
       }
     }
   },
@@ -365,8 +377,25 @@ export default {
         try {
           var pl = JSON.parse(self.form.music_playlist)
           if (!Array.isArray(pl)) throw new Error('须为数组')
+          for (var pi = 0; pi < pl.length; pi++) {
+            var item = pl[pi]
+            if (!item || typeof item !== 'object') throw new Error('项须为对象')
+            var u = item.url != null && String(item.url).trim() !== ''
+            var sv = item.server != null && String(item.server).trim() !== '' &&
+              item.id != null && String(item.id).trim() !== ''
+            if (!u && !sv) {
+              throw new Error('每项须包含 url，或同时包含 server 与 id')
+            }
+          }
         } catch (e) {
-          self.$toast.error('背景音乐须为合法 JSON 数组，例如 [{"name":"...","url":"https://..."}]')
+          self.$toast.error(e.message || '背景音乐 JSON 不合法，参见集成功能说明')
+          return
+        }
+      }
+      if (self.form.meting_api_base && String(self.form.meting_api_base).trim() !== '') {
+        var b = String(self.form.meting_api_base).trim()
+        if (!/^https?:\/\//i.test(b)) {
+          self.$toast.error('Meting API 根地址须以 http:// 或 https:// 开头')
           return
         }
       }

@@ -15,18 +15,24 @@
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <p class="mb-2"><strong>是否已实现：</strong>已实现。前台右下角出现悬浮播放器（有歌单时显示）。</p>
-          <p class="mb-2"><strong>如何配置：</strong>进入 <router-link to="/admin/sys-config">系统设置</router-link>，在「背景音乐」中填写 JSON 播放列表并保存。</p>
-          <p class="mb-2"><strong>数据格式：</strong><code>music_playlist</code> 为 JSON 数组，每项包含：</p>
+          <p class="mb-2"><strong>如何配置：</strong>进入 <router-link to="/admin/sys-config">系统设置</router-link>，在「背景音乐」中填写 JSON 播放列表；可选填写「Meting API 根地址」后保存。</p>
+          <p class="mb-2"><strong>数据格式：</strong><code>music_playlist</code> 为 JSON 数组。每一项二选一：</p>
           <ul class="ml-4 mb-2">
-            <li><code>name</code>：曲名（必填）</li>
-            <li><code>artist</code>：艺术家（可选）</li>
-            <li><code>url</code>：音频直链地址（必填，需浏览器可直接访问的 mp3 等）</li>
+            <li><strong>直链：</strong><code>name</code>（建议）、<code>artist</code>（可选）、<code>url</code>（mp3 等可直连地址，浏览器能访问即可）</li>
+            <li><strong>平台解析（网易 / QQ 等）：</strong><code>server</code>、<code>id</code> 必填；<code>name</code>、<code>artist</code> 可选（解析成功后会以接口返回为准补充）</li>
           </ul>
-          <v-sheet color="grey-lighten-4" class="pa-3 rounded text-body-2 font-mono text-break">
+          <p class="mb-1 text-body-2"><code>server</code> 常用取值：<code>netease</code>（网易云）、<code>tencent</code>（QQ 音乐）、<code>kugou</code> 等。歌曲 <code>id</code> 为各平台曲目的数字 ID（可从分享链接或网页参数中取得）。</p>
+          <p class="mb-2 text-body-2">解析依赖 <strong>Meting 兼容 API</strong>（与开源 <a href="https://github.com/metowolf/Meting" target="_blank" rel="noopener">Meting</a> / <a href="https://github.com/injahow/meting-api" target="_blank" rel="noopener">meting-api</a> 同族）。默认使用公共实例，不稳定时可自建服务，并在系统设置中填写「Meting API 根地址」。</p>
+          <p class="mb-1 text-body-2 font-weight-medium">直链示例</p>
+          <v-sheet color="grey-lighten-4" class="pa-3 rounded text-body-2 font-mono text-break mb-2">
             [{"name":"示例曲","artist":"示例","url":"https://example.com/music.mp3"}]
           </v-sheet>
+          <p class="mb-1 text-body-2 font-weight-medium">网易云 / QQ 音乐（server + id）示例</p>
+          <v-sheet color="grey-lighten-4" class="pa-3 rounded text-body-2 font-mono text-break">
+            [{"server":"netease","id":"0000000","name":"显示名"} , {"server":"tencent","id":"000000","name":"QQ曲"}]
+          </v-sheet>
           <p class="text-caption text-medium-emphasis mt-2 mb-0">
-            若配置为空数组 <code>[]</code>，播放器不会显示。注意跨域与 HTTPS 混源时浏览器可能拦截音频。
+            若配置为空数组 <code>[]</code>，播放器不会显示。直链须注意跨域与 HTTPS 混源。仅使用平台解析时，请确保服务器能访问所填 Meting API。
           </p>
         </v-expansion-panel-text>
       </v-expansion-panel>
