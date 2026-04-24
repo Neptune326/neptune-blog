@@ -1,5 +1,5 @@
 <template>
-  <v-app style="background: #f8f9fa;">
+  <v-app style="background: var(--bg-primary);">
     <v-main>
       <div
         style="

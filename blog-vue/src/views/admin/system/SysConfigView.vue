@@ -171,16 +171,51 @@
                 />
               </div>
               <!-- 粒子类型选择 -->
-              <div v-if="form.particle_enabled === 'true'" class="d-flex align-center" style="gap: 8px; margin-top: 8px;">
+              <div v-if="form.particle_enabled === 'true'" class="d-flex flex-wrap align-center" style="gap: 8px; margin-top: 8px;">
                 <span style="font-size: 12px; color: #80868b;">类型：</span>
                 <v-btn-toggle v-model="form.particle_type" density="compact" variant="outlined" color="pink">
                   <v-btn value="sakura" size="small">🌸 樱花</v-btn>
                   <v-btn value="snow" size="small">❄️ 雪花</v-btn>
                   <v-btn value="star" size="small">⭐ 星星</v-btn>
                 </v-btn-toggle>
+                <v-text-field
+                  v-model="form.particle_count"
+                  type="number"
+                  min="5"
+                  max="80"
+                  density="compact"
+                  variant="outlined"
+                  hide-details
+                  style="max-width: 100px;"
+                  label="数量"
+                />
               </div>
             </div>
           </div>
+        </div>
+      </v-card>
+
+      <!-- 背景音乐（前台悬浮播放器） -->
+      <v-card elevation="0" rounded="xl" style="border: 1px solid #e8eaed; margin-bottom: 20px;">
+        <div class="pa-5">
+          <div class="d-flex align-center mb-1" style="gap: 8px;">
+            <v-icon color="primary" size="20">mdi-music-note</v-icon>
+            <span style="font-size: 15px; font-weight: 600; color: #202124;">背景音乐</span>
+          </div>
+          <p style="font-size: 12px; color: #80868b; margin: 0 0 12px;">
+            JSON 数组，每项含 name、artist（可选）、url（音频直链）。为空 <code>[]</code> 时不显示前台播放器。详见
+            <router-link to="/admin/feature-guide">集成功能说明</router-link>。
+          </p>
+          <v-textarea
+            v-model="form.music_playlist"
+            variant="outlined"
+            density="comfortable"
+            rows="6"
+            placeholder='[{"name":"曲名","artist":"作者","url":"https://..."}]'
+            class="font-mono text-body-2"
+            hint="须为合法 JSON；保存后前台刷新即可"
+            persistent-hint
+          />
         </div>
       </v-card>
 
@@ -284,7 +319,9 @@ export default {
         click_effect_enabled: 'true',
         mouse_trail_enabled: 'false',
         particle_enabled: 'true',
-        particle_type: 'sakura'
+        particle_type: 'sakura',
+        particle_count: '25',
+        music_playlist: '[]'
       }
     }
   },
@@ -323,6 +360,16 @@ export default {
       var self = this
       // 将画廊图片同步到 form
       self.form.gallery_images = JSON.stringify(self.galleryImages)
+      // 校验音乐播放列表 JSON
+      if (self.form.music_playlist && self.form.music_playlist.trim()) {
+        try {
+          var pl = JSON.parse(self.form.music_playlist)
+          if (!Array.isArray(pl)) throw new Error('须为数组')
+        } catch (e) {
+          self.$toast.error('背景音乐须为合法 JSON 数组，例如 [{"name":"...","url":"https://..."}]')
+          return
+        }
+      }
       self.saving = true
       updateSysConfig(self.form)
         .then(function() {

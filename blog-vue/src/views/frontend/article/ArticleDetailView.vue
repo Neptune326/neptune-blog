@@ -1,31 +1,21 @@
 ﻿<template>
-  <v-app style="background: var(--bg-primary, #f8f9fa);">
+  <v-app style="background: var(--bg-primary);">
     <!-- 阅读进度条 + 回到顶部 -->
     <ReadingProgress />
 
-    <!-- 顶部导航栏 -->
-    <v-app-bar color="white" elevation="0" style="border-bottom: 1px solid #e8eaed;">
-      <v-container style="max-width: 1200px; display: flex; align-items: center; padding: 0 16px;">
-        <v-btn icon variant="text" @click="$router.back()" style="color: #5f6368;">
-          <v-icon>mdi-arrow-left</v-icon>
-        </v-btn>
-        <router-link to="/" class="d-flex align-center text-decoration-none ml-2" style="gap: 6px;">
-          <v-icon color="primary" size="22">mdi-pencil-circle</v-icon>
-          <span style="font-size: 16px; font-weight: 600; color: #202124;">我的博客</span>
-        </router-link>
-        <v-spacer />
-        <!-- 分享按钮 -->
+    <FrontendNavBar variant="back" container-max-width="1200px">
+      <template #actions>
         <v-btn
           icon
           variant="text"
-          @click="copyLink"
-          style="color: #5f6368;"
           title="复制链接"
+          style="color: var(--text-secondary);"
+          @click="copyLink"
         >
           <v-icon size="20">mdi-share-variant-outline</v-icon>
         </v-btn>
-      </v-container>
-    </v-app-bar>
+      </template>
+    </FrontendNavBar>
 
     <!-- 复制成功提示 -->
     <v-snackbar
@@ -411,6 +401,7 @@
 <script>
 import { marked } from 'marked'
 import CommentList from '@/components/frontend/CommentList.vue'
+import FrontendNavBar from '@/components/frontend/FrontendNavBar.vue'
 import ReadingProgress from '@/components/frontend/ReadingProgress.vue'
 import TableOfContents from '@/components/frontend/TableOfContents.vue'
 import ArticleFavorite from '@/components/frontend/ArticleFavorite.vue'
@@ -427,7 +418,7 @@ import request from '@/api/request.js'
 
 export default {
   name: 'ArticleDetailView',
-  components: { CommentList, ReadingProgress, TableOfContents, ArticleFavorite, Breadcrumb, ImageLightbox, EmojiPicker, FontSizeControl, QRCodeShare, RewardButton },
+  components: { CommentList, FrontendNavBar, ReadingProgress, TableOfContents, ArticleFavorite, Breadcrumb, ImageLightbox, EmojiPicker, FontSizeControl, QRCodeShare, RewardButton },
   data: function() {
     return {
       article: null,

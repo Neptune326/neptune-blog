@@ -36,9 +36,7 @@ import AboutEditView from '@/views/admin/system/AboutEditView.vue'
 import AdminUserView from '@/views/admin/system/AdminUserView.vue'
 import FriendLinkView from '@/views/admin/system/FriendLinkView.vue'
 import DataBackupView from '@/views/admin/system/DataBackupView.vue'
-// logs
-import OperationLogView from '@/views/admin/logs/OperationLogView.vue'
-import LoginLogView from '@/views/admin/logs/LoginLogView.vue'
+import FeatureGuideView from '@/views/admin/system/FeatureGuideView.vue'
 
 var routes = [
   // ===== 前台路由（无需登录）=====
@@ -82,9 +80,9 @@ var routes = [
       { path: 'admin-users',        component: AdminUserView,        meta: { requiresAuth: true } },
       { path: 'friend-links',       component: FriendLinkView,       meta: { requiresAuth: true } },
       { path: 'data-backup',        component: DataBackupView,       meta: { requiresAuth: true } },
+      { path: 'feature-guide',      component: FeatureGuideView,     meta: { requiresAuth: true } },
       // logs
-      { path: 'logs/operation',     component: OperationLogView,     meta: { requiresAuth: true } },
-      { path: 'logs/login',         component: LoginLogView,         meta: { requiresAuth: true } }
+      // 日志页面文件当前缺失，暂时下线路由以避免 Vite 启动时扫描报错
     ]
   }
 ]

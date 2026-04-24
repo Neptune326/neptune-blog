@@ -37,6 +37,8 @@ public class SiteConfigFrontController {
             "particle_enabled",
             "particle_type",
             "particle_count",
+            "mouse_trail_enabled",
+            "music_playlist",
             "live2d_enabled",
             "about_enabled",
             "message_enabled",

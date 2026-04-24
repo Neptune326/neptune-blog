@@ -1,10 +1,9 @@
 <template>
   <!-- 文章卡片 —— Google Material Design 3 风格 -->
   <v-card
-    class="mb-4 card-clickable"
+    class="mb-4 card-clickable article-card-root"
     rounded="lg"
     elevation="0"
-    style="border: 1px solid #e8eaed;"
     @click="goDetail"
   >
     <!-- 封面图 -->
@@ -52,8 +51,7 @@
 
       <!-- 标题 -->
       <h3
-        class="text-h6 font-weight-bold mb-2 line-clamp-2"
-        style="color: #202124; line-height: 1.4;"
+        class="text-h6 font-weight-bold mb-2 line-clamp-2 article-card-title"
       >
         {{ article.title }}
       </h3>
@@ -61,8 +59,7 @@
       <!-- 摘要 -->
       <p
         v-if="article.summary"
-        class="text-body-2 line-clamp-3 mb-3"
-        style="color: #5f6368; line-height: 1.6;"
+        class="text-body-2 line-clamp-3 mb-3 article-card-summary"
       >
         {{ article.summary }}
       </p>
@@ -70,7 +67,7 @@
       <!-- 底部：时间 + 阅读数 + 评论数 + 字数 + 标签 -->
       <div class="d-flex align-center justify-space-between flex-wrap" style="gap: 8px;">
         <!-- 左侧：元信息 -->
-        <div class="d-flex align-center flex-wrap" style="gap: 10px; color: #80868b; font-size: 12px;">
+        <div class="d-flex align-center flex-wrap article-card-meta" style="gap: 10px; font-size: 12px;">
           <span class="d-flex align-center" style="gap: 3px;">
             <v-icon size="13" color="grey">mdi-calendar-outline</v-icon>
             {{ formatDate(article.createTime) }}
@@ -145,3 +142,20 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.article-card-root {
+  border: 1px solid var(--border-color, #e8eaed) !important;
+}
+.article-card-title {
+  color: var(--text-primary, #202124);
+  line-height: 1.4;
+}
+.article-card-summary {
+  color: var(--text-secondary, #5f6368);
+  line-height: 1.6;
+}
+.article-card-meta {
+  color: var(--text-muted, #80868b);
+}
+</style>
