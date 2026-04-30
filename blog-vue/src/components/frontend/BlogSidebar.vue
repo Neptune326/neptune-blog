@@ -6,6 +6,8 @@
     <DevFortune v-if="neptuneApp && neptuneApp.devFortuneEnabled" />
 
     <WeatherWidget />
+    
+    <SubscribeCard />
 
     <!-- 博主简介卡片 -->
     <div class="sidebar-card blog-sidebar-section" style="padding: 20px; text-align: center;">
@@ -222,12 +224,13 @@ import request from '@/api/request.js'
 import DailyQuote from './DailyQuote.vue'
 import DevFortune from './DevFortune.vue'
 import WeatherWidget from './WeatherWidget.vue'
+import SubscribeCard from './SubscribeCard.vue'
 import { useRouter } from 'vue-router'
 import { syncVisitStreak } from '@/utils/visitStreak.js'
 
 export default {
   name: 'BlogSidebar',
-  components: { DailyQuote, DevFortune, WeatherWidget },
+  components: { DailyQuote, DevFortune, WeatherWidget, SubscribeCard },
   inject: {
     neptuneApp: { default: null }
   },

@@ -276,6 +276,15 @@
         <div class="d-flex justify-end gap-3 mt-4">
           <v-btn variant="outlined" @click="goBack">取消</v-btn>
           <v-btn
+            color="warning"
+            variant="tonal"
+            :loading="submitting"
+            prepend-icon="mdi-content-save-edit-outline"
+            @click="saveServerDraft"
+          >
+            保存草稿
+          </v-btn>
+          <v-btn
             color="primary"
             type="submit"
             :loading="submitting"
@@ -602,6 +611,41 @@ export default {
         .finally(function() {
           self.submitting = false
         })
+    },
+    saveServerDraft: function() {
+      var self = this
+      if (!self.form.title) {
+        self.errorMsg = '请输入文章标题后再保存草稿'
+        return
+      }
+      self.submitting = true
+      self.errorMsg = ''
+      var tagIds = (self.form.tagIds || []).map(function(t) {
+        return typeof t === 'object' ? t.id : t
+      }).filter(function(id) { return !!id })
+      var payload = {
+        title: self.form.title,
+        categoryId: self.form.categoryId,
+        tagIds: tagIds,
+        summary: self.form.summary,
+        coverUrl: self.form.coverUrl,
+        content: self.form.content,
+        status: 0,
+        publishTime: null
+      }
+      var promise = self.isEdit
+        ? updateArticle(self.route.params.id, payload)
+        : createArticle(payload)
+      promise.then(function() {
+        self.$toast.success('草稿已保存到服务器')
+        if (!self.isEdit) {
+          self.router.push('/admin/articles')
+        }
+      }).catch(function(err) {
+        self.errorMsg = err.message || '保存草稿失败'
+      }).finally(function() {
+        self.submitting = false
+      })
     },
     goBack: function() {
       this.router.push('/admin/articles')

@@ -46,6 +46,19 @@
         </v-col>
         <v-col cols="12" sm="3">
           <v-select
+            v-model="filters.tagId"
+            :items="tags"
+            item-title="name"
+            item-value="id"
+            label="标签"
+            variant="outlined"
+            density="compact"
+            clearable
+            hide-details
+          />
+        </v-col>
+        <v-col cols="12" sm="2">
+          <v-select
             v-model="filters.status"
             :items="statusOptions"
             item-title="label"
@@ -57,7 +70,10 @@
             hide-details
           />
         </v-col>
-        <v-col cols="12" sm="2" class="d-flex gap-2">
+        <v-col cols="12" sm="3" class="d-flex gap-2">
+          <v-btn variant="tonal" color="info" @click="toggleRecentEdited">
+            {{ recentEditedOnly ? '全部文章' : '最近编辑' }}
+          </v-btn>
           <v-btn color="primary" @click="loadArticles">搜索</v-btn>
           <v-btn variant="outlined" @click="resetFilters">重置</v-btn>
         </v-col>
@@ -209,6 +225,7 @@
 <script>
 import { adminGetArticles, deleteArticle } from '@/api/article.js'
 import { adminGetCategories } from '@/api/category.js'
+import { adminGetTags } from '@/api/tag.js'
 import request from '@/api/request.js'
 import { useRouter } from 'vue-router'
 import TablePagination from '@/components/admin/TablePagination.vue'
@@ -226,7 +243,9 @@ export default {
     return {
       loading: false,
       articles: [],
+      rawArticles: [],
       categories: [],
+      tags: [],
       // 草稿提示
       hasDraft: false,
       draftTitle: '',
@@ -234,8 +253,10 @@ export default {
       filters: {
         keyword: '',
         categoryId: null,
+        tagId: null,
         status: null
       },
+      recentEditedOnly: false,
       // 状态选项（与后端一致：0=草稿，1=已发布）
       statusOptions: [
         { label: '已发布', value: 1 },
@@ -271,6 +292,7 @@ export default {
   },
   mounted: function() {
     this.loadCategories()
+    this.loadTags()
     this.loadArticles()
     this.checkDraft()
   },
@@ -308,6 +330,12 @@ export default {
           console.error('加载分类失败:', err)
         })
     },
+    loadTags: function() {
+      var self = this
+      adminGetTags()
+        .then(function(data) { self.tags = data || [] })
+        .catch(function() {})
+    },
     // 加载文章列表
     loadArticles: function() {
       var self = this
@@ -319,11 +347,13 @@ export default {
       }
       if (self.filters.keyword) params.keyword = self.filters.keyword
       if (self.filters.categoryId) params.categoryId = self.filters.categoryId
-      if (self.filters.status) params.status = self.filters.status
+      if (self.filters.tagId) params.tagId = self.filters.tagId
+      if (self.filters.status !== null && self.filters.status !== undefined) params.status = self.filters.status
 
       adminGetArticles(params)
         .then(function(data) {
-          self.articles = data.list || data.records || []
+          self.rawArticles = data.list || data.records || []
+          self.articles = self.filterRecent(self.rawArticles)
           self.pagination.total = data.total || 0
           self.pagination.totalPages = data.totalPages || Math.ceil((data.total || 0) / self.pagination.pageSize) || 1
         })
@@ -338,9 +368,24 @@ export default {
     resetFilters: function() {
       this.filters.keyword = ''
       this.filters.categoryId = null
+      this.filters.tagId = null
       this.filters.status = null
+      this.recentEditedOnly = false
       this.pagination.page = 1
       this.loadArticles()
+    },
+    toggleRecentEdited: function() {
+      this.recentEditedOnly = !this.recentEditedOnly
+      this.articles = this.filterRecent(this.rawArticles)
+    },
+    filterRecent: function(list) {
+      if (!this.recentEditedOnly) return list || []
+      var now = Date.now()
+      var sevenDaysMs = 7 * 24 * 60 * 60 * 1000
+      return (list || []).filter(function(item) {
+        var t = item && item.createTime ? new Date(item.createTime).getTime() : 0
+        return t > 0 && (now - t) <= sevenDaysMs
+      })
     },
     // 弹出删除确认框
     confirmDelete: function(article) {

@@ -221,6 +221,7 @@ export default {
           children: [
             { title: '评论管理', icon: 'mdi-comment-outline', to: '/admin/comments' },
             { title: '留言管理', icon: 'mdi-message-text-outline', to: '/admin/messages' },
+            { title: '订阅管理', icon: 'mdi-email-outline', to: '/admin/subscribers' },
             { title: '评论黑名单', icon: 'mdi-shield-off-outline', to: '/admin/comment-blacklist' }
           ]
         },
@@ -256,6 +257,7 @@ export default {
         '/admin/tags': '标签管理',
         '/admin/comments': '评论管理',
         '/admin/messages': '留言管理',
+        '/admin/subscribers': '订阅管理',
         '/admin/friend-links': '友情链接',
         '/admin/comment-blacklist': '评论黑名单',
         '/admin/data-backup': '数据备份',

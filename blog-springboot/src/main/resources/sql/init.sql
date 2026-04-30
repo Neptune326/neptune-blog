@@ -20,6 +20,7 @@ DROP TABLE IF EXISTS comment;
 DROP TABLE IF EXISTS article_like;
 DROP TABLE IF EXISTS article_favorite;
 DROP TABLE IF EXISTS article_history;
+DROP TABLE IF EXISTS subscriber;
 DROP TABLE IF EXISTS visit_log;
 DROP TABLE IF EXISTS message;
 DROP TABLE IF EXISTS friend_link;
@@ -226,6 +227,14 @@ CREATE TABLE friend_link (
     update_time DATETIME COMMENT '更新时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='友情链接表';
 
+CREATE TABLE subscriber (
+    id          BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '主键 ID',
+    email       VARCHAR(100) NOT NULL UNIQUE COMMENT '订阅邮箱',
+    status      TINYINT NOT NULL DEFAULT 1 COMMENT '状态：1启用 0停用',
+    source      VARCHAR(50) DEFAULT 'frontend' COMMENT '来源',
+    create_time DATETIME COMMENT '创建时间'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='订阅表';
+
 -- =====================================================
 -- 初始数据
 -- =====================================================
@@ -391,6 +400,7 @@ INSERT INTO sys_config (config_key, config_value, config_desc, create_time, upda
 -- 2026-04-24：easter_konami_enabled、dev_fortune_enabled（见本文件 INSERT 中 2026-04-24 趣味功能行注释）。
 -- 2026-04-24：upload_image_*、upload_file_*（见本文件 INSERT 中 2026-04-24 上传限制配置行注释）。
 -- 2026-04-30：新增 article_favorite 收藏表，补充 site_base_url、login_captcha_enabled、upload_url_prefix 配置项。
+-- 2026-04-30：新增 subscriber 访客订阅表，用于文章更新订阅管理。
 -- 后续新增 SQL 请按以下格式追加：
 --
 -- yyyy-MM-dd：变更说明
