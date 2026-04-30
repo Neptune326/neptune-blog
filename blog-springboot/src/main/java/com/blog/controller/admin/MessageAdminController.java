@@ -10,6 +10,8 @@ import com.blog.vo.AdminMessageVO;
 import com.blog.vo.PageVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.springframework.beans.BeanUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -30,8 +32,8 @@ public class MessageAdminController {
 
     @GetMapping
     public Result<PageVO<AdminMessageVO>> list(
-            @RequestParam(defaultValue = "1") Integer pageNum,
-            @RequestParam(defaultValue = "20") Integer pageSize,
+            @RequestParam(defaultValue = "1") @Min(1) Integer pageNum,
+            @RequestParam(defaultValue = "20") @Min(1) @Max(100) Integer pageSize,
             @RequestParam(required = false) Integer status) {
         Page<Message> page = new Page<>(pageNum, pageSize);
         LambdaQueryWrapper<Message> wrapper = new LambdaQueryWrapper<Message>()

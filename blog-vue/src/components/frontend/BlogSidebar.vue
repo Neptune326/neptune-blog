@@ -255,42 +255,74 @@ export default {
     this.loadData()
   },
   methods: {
+    getCacheKey: function() {
+      return 'blog_sidebar_cache_v1'
+    },
+    readCache: function() {
+      try {
+        var raw = sessionStorage.getItem(this.getCacheKey())
+        if (!raw) return null
+        var data = JSON.parse(raw)
+        if (!data || !data.expireAt || data.expireAt < Date.now()) {
+          return null
+        }
+        return data.payload || null
+      } catch (e) {
+        return null
+      }
+    },
+    writeCache: function(payload) {
+      try {
+        sessionStorage.setItem(this.getCacheKey(), JSON.stringify({
+          expireAt: Date.now() + 5 * 60 * 1000,
+          payload: payload
+        }))
+      } catch (e) {}
+    },
+    applySidebarData: function(payload) {
+      if (!payload) return
+      this.categories = payload.categories || []
+      this.tags = payload.tags || []
+      this.recentArticles = payload.recentArticles || []
+      this.hotArticles = payload.hotArticles || []
+      this.friendLinks = payload.friendLinks || []
+      this.stats = payload.stats || { articles: 0, categories: 0, tags: 0 }
+    },
     loadData: function() {
       var self = this
-      getCategories()
-        .then(function(data) {
-          self.categories = (data || []).slice(0, 8)
-          self.stats.categories = (data || []).length
-        })
-        .catch(function() {})
-
-      getTags()
-        .then(function(data) {
-          self.tags = (data || []).slice(0, 20)
-          self.stats.tags = (data || []).length
-        })
-        .catch(function() {})
-
-      getArticles({ pageNum: 1, pageSize: 5 })
-        .then(function(data) {
-          self.recentArticles = (data && data.list) ? data.list.slice(0, 5) : []
-          self.stats.articles = (data && data.total) ? data.total : 0
-        })
-        .catch(function() {})
-
-      getArticles({ pageNum: 1, pageSize: 5, orderBy: 'view_count' })
-        .then(function(data) {
-          var list = (data && data.list) ? data.list.slice(0, 5) : []
-          list.sort(function(a, b) { return (b.viewCount || 0) - (a.viewCount || 0) })
-          self.hotArticles = list
-        })
-        .catch(function() {})
-
-      request({ method: 'get', url: '/api/friend-links' })
-        .then(function(data) {
-          self.friendLinks = data || []
-        })
-        .catch(function() {})
+      var cache = self.readCache()
+      if (cache) {
+        self.applySidebarData(cache)
+      }
+      Promise.all([
+        getCategories().catch(function() { return [] }),
+        getTags().catch(function() { return [] }),
+        getArticles({ pageNum: 1, pageSize: 5 }).catch(function() { return {} }),
+        getArticles({ pageNum: 1, pageSize: 5, orderBy: 'view_count' }).catch(function() { return {} }),
+        request({ method: 'get', url: '/api/friend-links' }).catch(function() { return [] })
+      ]).then(function(results) {
+        var categoryData = results[0] || []
+        var tagData = results[1] || []
+        var recentData = results[2] || {}
+        var hotData = results[3] || {}
+        var linkData = results[4] || []
+        var hotList = hotData.list ? hotData.list.slice(0, 5) : []
+        hotList.sort(function(a, b) { return (b.viewCount || 0) - (a.viewCount || 0) })
+        var payload = {
+          categories: categoryData.slice(0, 8),
+          tags: tagData.slice(0, 20),
+          recentArticles: recentData.list ? recentData.list.slice(0, 5) : [],
+          hotArticles: hotList,
+          friendLinks: linkData,
+          stats: {
+            articles: recentData.total || 0,
+            categories: categoryData.length,
+            tags: tagData.length
+          }
+        }
+        self.applySidebarData(payload)
+        self.writeCache(payload)
+      })
     },
     formatDate: function(dateStr) {
       if (!dateStr) return ''

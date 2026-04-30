@@ -2,7 +2,7 @@ package com.blog.common.aspect;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.blog.common.annotation.OperationLog;
-import com.blog.mapper.OperationLogMapper;
+import com.blog.service.AsyncLogService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class OperationLogAspect {
 
-    private final OperationLogMapper operationLogMapper;
+    private final AsyncLogService asyncLogService;
     private final ObjectMapper objectMapper;
 
     @Around("@annotation(com.blog.common.annotation.OperationLog)")
@@ -99,13 +99,7 @@ public class OperationLogAspect {
         } finally {
             // 记录耗时并异步保存日志
             logEntity.setCostTime((int) (System.currentTimeMillis() - startTime));
-            try {
-                operationLogMapper.insert(logEntity);
-                log.debug("操作日志记录：{} - {} - {}ms",
-                        logEntity.getModule(), logEntity.getAction(), logEntity.getCostTime());
-            } catch (Exception e) {
-                log.warn("操作日志保存失败", e);
-            }
+            asyncLogService.saveOperationLog(logEntity);
         }
 
         return result;

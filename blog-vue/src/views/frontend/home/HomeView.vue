@@ -5,8 +5,14 @@
 
     <v-main>
       <v-container style="max-width: 1200px; padding: 32px 16px;">
+        <div class="d-flex flex-wrap mb-4" style="gap: 8px;">
+          <v-btn size="small" variant="tonal" prepend-icon="mdi-format-list-bulleted" @click="scrollToSection('latest-section')">最新</v-btn>
+          <v-btn size="small" variant="tonal" prepend-icon="mdi-fire" @click="scrollToSection('hot-section')">热门</v-btn>
+          <v-btn size="small" variant="tonal" prepend-icon="mdi-star-outline" @click="scrollToSection('recommend-section')">推荐</v-btn>
+        </div>
         <v-row>
           <v-col cols="12" md="8">
+            <div id="latest-section" />
             <div class="d-flex align-center justify-space-between mb-4" style="gap: 8px;">
               <div class="front-soft" style="font-size: 14px;">
                 共 <strong class="front-title">{{ total }}</strong> 篇文章
@@ -30,6 +36,7 @@
                 >最热</v-btn>
               </div>
             </div>
+            <div id="hot-section" />
 
             <ArticleSkeleton v-if="loading" :count="3" />
 
@@ -55,6 +62,7 @@
           </v-col>
 
           <v-col cols="12" md="4" class="d-none d-md-block">
+            <div id="recommend-section" />
             <BlogSidebar />
           </v-col>
         </v-row>
@@ -106,6 +114,30 @@ export default {
     this.loadArticles()
   },
   methods: {
+    getCacheKey: function() {
+      return 'home_articles_cache_v1_' + this.sortBy + '_' + this.pageNum + '_' + this.pageSize
+    },
+    readCache: function() {
+      try {
+        var raw = sessionStorage.getItem(this.getCacheKey())
+        if (!raw) return null
+        var data = JSON.parse(raw)
+        if (!data || !data.expireAt || data.expireAt < Date.now()) {
+          return null
+        }
+        return data.payload || null
+      } catch (e) {
+        return null
+      }
+    },
+    writeCache: function(payload) {
+      try {
+        sessionStorage.setItem(this.getCacheKey(), JSON.stringify({
+          expireAt: Date.now() + 60 * 1000,
+          payload: payload
+        }))
+      } catch (e) {}
+    },
     loadArticles: function() {
       var self = this
       self.loading = true
@@ -113,11 +145,23 @@ export default {
       if (self.sortBy === 'hot') {
         params.orderBy = 'view_count'
       }
+      var cache = self.readCache()
+      if (cache) {
+        self.articles = cache.list || []
+        self.total = cache.total || 0
+        self.pages = cache.pages || 1
+        self.loading = false
+      }
       getArticles(params)
         .then(function(data) {
           self.articles = data.list || []
           self.total = data.total || 0
           self.pages = data.pages || 1
+          self.writeCache({
+            list: self.articles,
+            total: self.total,
+            pages: self.pages
+          })
         })
         .catch(function(err) {
           console.error('加载文章失败:', err)
@@ -135,6 +179,17 @@ export default {
       this.pageNum = page
       this.loadArticles()
       smoothScrollToTop(400)
+    },
+    scrollToSection: function(sectionId) {
+      if (sectionId === 'hot-section' && this.sortBy !== 'hot') {
+        this.setSort('hot')
+      }
+      if (sectionId === 'latest-section' && this.sortBy !== 'latest') {
+        this.setSort('latest')
+      }
+      var el = document.getElementById(sectionId)
+      if (!el) return
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
   }
 }

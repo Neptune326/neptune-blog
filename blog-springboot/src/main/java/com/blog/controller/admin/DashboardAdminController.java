@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+
 @RestController
 @RequestMapping("/api/admin/dashboard")
 @Validated
@@ -26,18 +29,35 @@ public class DashboardAdminController {
     private final TagMapper tagMapper;
     private final CommentMapper commentMapper;
     private final MessageMapper messageMapper;
+    private final Executor blogTaskExecutor;
 
     @GetMapping
     public Result<DashboardVO> dashboard() {
-        DashboardVO vo = new DashboardVO();
-        vo.setArticleCount(articleMapper.selectCount(null));
-        vo.setCategoryCount(categoryMapper.selectCount(null));
-        vo.setTagCount(tagMapper.selectCount(null));
-        vo.setCommentCount(commentMapper.selectCount(null));
-        vo.setPendingCommentCount(commentMapper.selectCount(
+        CompletableFuture<Long> articleCountFuture = CompletableFuture.supplyAsync(() -> articleMapper.selectCount(null), blogTaskExecutor);
+        CompletableFuture<Long> categoryCountFuture = CompletableFuture.supplyAsync(() -> categoryMapper.selectCount(null), blogTaskExecutor);
+        CompletableFuture<Long> tagCountFuture = CompletableFuture.supplyAsync(() -> tagMapper.selectCount(null), blogTaskExecutor);
+        CompletableFuture<Long> commentCountFuture = CompletableFuture.supplyAsync(() -> commentMapper.selectCount(null), blogTaskExecutor);
+        CompletableFuture<Long> pendingCommentCountFuture = CompletableFuture.supplyAsync(() -> commentMapper.selectCount(
                 new LambdaQueryWrapper<Comment>().eq(Comment::getStatus, 0)
-        ));
-        vo.setMessageCount(messageMapper.selectCount(null));
+        ), blogTaskExecutor);
+        CompletableFuture<Long> messageCountFuture = CompletableFuture.supplyAsync(() -> messageMapper.selectCount(null), blogTaskExecutor);
+
+        CompletableFuture.allOf(
+                articleCountFuture,
+                categoryCountFuture,
+                tagCountFuture,
+                commentCountFuture,
+                pendingCommentCountFuture,
+                messageCountFuture
+        ).join();
+
+        DashboardVO vo = new DashboardVO();
+        vo.setArticleCount(articleCountFuture.join());
+        vo.setCategoryCount(categoryCountFuture.join());
+        vo.setTagCount(tagCountFuture.join());
+        vo.setCommentCount(commentCountFuture.join());
+        vo.setPendingCommentCount(pendingCommentCountFuture.join());
+        vo.setMessageCount(messageCountFuture.join());
         return Result.success(vo);
     }
 }

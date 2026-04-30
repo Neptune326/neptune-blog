@@ -394,6 +394,16 @@
         </v-row>
       </v-container>
     </v-main>
+    <v-btn
+      v-show="showBackTop"
+      icon
+      color="primary"
+      size="small"
+      class="back-top-btn"
+      @click="scrollTop"
+    >
+      <v-icon>mdi-chevron-up</v-icon>
+    </v-btn>
   </v-app>
 </template>
 
@@ -432,7 +442,8 @@ export default {
       commentForm: { nickname: '', email: '', content: '' },
       prevArticle: null,
       nextArticle: null,
-      snackbar: { show: false, text: '' }
+      snackbar: { show: false, text: '' },
+      showBackTop: false
     }
   },
   computed: {
@@ -446,6 +457,10 @@ export default {
   mounted: function() {
     this.loadArticle()
     this.loadComments()
+    window.addEventListener('scroll', this.onScroll, { passive: true })
+  },
+  beforeUnmount: function() {
+    window.removeEventListener('scroll', this.onScroll)
   },
   watch: {
     // 路由变化时重新加载（从上一篇/下一篇跳转）
@@ -603,6 +618,12 @@ export default {
     printArticle: function() {
       window.print()
     },
+    onScroll: function() {
+      this.showBackTop = window.scrollY > 360
+    },
+    scrollTop: function() {
+      smoothScrollToTop(400)
+    },
     // 插入 Emoji 到评论框
     insertEmoji: function(emoji) {
       this.commentForm.content = (this.commentForm.content || '') + emoji
@@ -646,6 +667,12 @@ export default {
   background: linear-gradient(90deg, #f1f3f4 25%, #e8eaed 50%, #f1f3f4 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
+}
+.back-top-btn {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 30;
 }
 @keyframes shimmer {
   0% { background-position: 200% 0; }

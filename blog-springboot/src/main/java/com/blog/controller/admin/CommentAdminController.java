@@ -5,6 +5,8 @@ import com.blog.service.CommentService;
 import com.blog.vo.CommentVO;
 import com.blog.vo.PageVO;
 import lombok.RequiredArgsConstructor;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,8 +26,8 @@ public class CommentAdminController {
      */
     @GetMapping
     public Result<PageVO<CommentVO>> list(
-            @RequestParam(defaultValue = "1") Integer pageNum,
-            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(defaultValue = "1") @Min(1) Integer pageNum,
+            @RequestParam(defaultValue = "10") @Min(1) @Max(100) Integer pageSize,
             @RequestParam(required = false) Integer status) {
         return Result.success(commentService.adminList(pageNum, pageSize, status));
     }
