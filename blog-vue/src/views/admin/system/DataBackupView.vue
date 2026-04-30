@@ -44,6 +44,26 @@
         </v-btn>
       </div>
     </v-card>
+
+    <v-card elevation="0" rounded="xl" style="border: 1px solid #e8eaed; margin-top: 16px;">
+      <div class="pa-5">
+        <div style="font-size: 15px; font-weight: 600; color: #202124; margin-bottom: 10px;">数据恢复</div>
+        <div class="d-flex align-center" style="gap: 10px;">
+          <input ref="restoreInput" type="file" accept=".json,application/json" @change="onRestoreFileChange" />
+          <v-select
+            v-model="restoreMode"
+            :items="[{ title: '覆盖更新', value: 'upsert' }, { title: '仅新增', value: 'insert' }]"
+            item-title="title"
+            item-value="value"
+            variant="outlined"
+            density="compact"
+            style="max-width: 160px;"
+            hide-details
+          />
+          <v-btn color="error" :loading="loading.restore" prepend-icon="mdi-database-import-outline" @click="restoreData">导入恢复</v-btn>
+        </div>
+      </div>
+    </v-card>
   </div>
 </template>
 
@@ -55,13 +75,16 @@ export default {
   data: function() {
     return {
       loading: {},
+      restoreMode: 'upsert',
+      restoreFile: null,
       backupItems: [
         { key: 'articles', label: '文章', desc: '含正文、标签、分类', icon: 'mdi-file-document-outline', color: '#1a73e8', bgColor: '#e8f0fe', url: '/api/admin/articles', params: { pageNum: 1, pageSize: 9999 } },
         { key: 'categories', label: '分类', desc: '所有分类数据', icon: 'mdi-folder-outline', color: '#34a853', bgColor: '#e6f4ea', url: '/api/admin/categories', params: {} },
         { key: 'tags', label: '标签', desc: '所有标签数据', icon: 'mdi-tag-outline', color: '#f29900', bgColor: '#fef7e0', url: '/api/admin/tags', params: {} },
         { key: 'comments', label: '评论', desc: '所有评论数据', icon: 'mdi-comment-outline', color: '#9334e6', bgColor: '#f3e8fd', url: '/api/admin/comments', params: { pageNum: 1, pageSize: 9999 } },
         { key: 'messages', label: '留言', desc: '所有留言数据', icon: 'mdi-message-text-outline', color: '#00bcd4', bgColor: '#e0f7fa', url: '/api/admin/messages', params: { pageNum: 1, pageSize: 9999 } },
-        { key: 'friendLinks', label: '友情链接', desc: '所有友情链接', icon: 'mdi-link-variant', color: '#ea4335', bgColor: '#fce8e6', url: '/api/admin/friend-links', params: {} }
+        { key: 'friendLinks', label: '友情链接', desc: '所有友情链接', icon: 'mdi-link-variant', color: '#ea4335', bgColor: '#fce8e6', url: '/api/admin/friend-links', params: {} },
+        { key: 'sysConfig', label: '系统配置', desc: '全局配置项', icon: 'mdi-cog-outline', color: '#546e7a', bgColor: '#eceff1', url: '/api/admin/sys-config', params: {} }
       ]
     }
   },
@@ -76,6 +99,33 @@ export default {
         })
         .catch(function() { self.$toast.error('导出失败') })
         .finally(function() { self.loading[item.key] = false })
+    },
+    onRestoreFileChange: function(event) {
+      var files = event.target.files || []
+      this.restoreFile = files.length ? files[0] : null
+    },
+    restoreData: function() {
+      var self = this
+      if (!self.restoreFile) {
+        self.$toast.error('请先选择备份文件')
+        return
+      }
+      var form = new FormData()
+      form.append('file', self.restoreFile)
+      form.append('mode', self.restoreMode || 'upsert')
+      self.loading.restore = true
+      request({
+        method: 'post',
+        url: '/api/admin/data/restore',
+        data: form,
+        headers: { 'Content-Type': 'multipart/form-data' }
+      }).then(function(data) {
+        self.$toast.success('恢复完成：' + JSON.stringify(data))
+      }).catch(function() {
+        self.$toast.error('恢复失败')
+      }).finally(function() {
+        self.loading.restore = false
+      })
     },
     exportAll: function() {
       var self = this

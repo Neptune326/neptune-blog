@@ -250,6 +250,28 @@
           />
         </div>
 
+        <div v-if="isEdit" class="mb-4" style="border: 1px solid #e8eaed; border-radius: 8px; padding: 12px;">
+          <div class="d-flex align-center justify-space-between mb-2">
+            <div style="font-size: 14px; font-weight: 600;">版本差异对比</div>
+            <v-btn size="small" variant="outlined" @click="loadHistory">刷新版本</v-btn>
+          </div>
+          <div class="d-flex align-center" style="gap: 10px;">
+            <v-select
+              v-model="selectedVersionId"
+              :items="historyVersions"
+              item-title="remark"
+              item-value="id"
+              label="选择历史版本"
+              variant="outlined"
+              density="comfortable"
+              hide-details
+              style="max-width: 320px;"
+            />
+            <v-btn size="small" color="primary" variant="tonal" @click="compareVersion">对比</v-btn>
+          </div>
+          <pre v-if="diffContent" style="white-space: pre-wrap; word-break: break-word; margin-top: 10px; background: #f8f9fa; padding: 10px; border-radius: 8px; max-height: 240px; overflow: auto;">{{ diffContent }}</pre>
+        </div>
+
         <!-- 操作按钮 -->
         <div class="d-flex justify-end gap-3 mt-4">
           <v-btn variant="outlined" @click="goBack">取消</v-btn>
@@ -272,7 +294,7 @@
 <script>
 import { MdEditor } from 'md-editor-v3'
 import 'md-editor-v3/lib/style.css'
-import { adminGetArticleById, createArticle, updateArticle } from '@/api/article.js'
+import { adminGetArticleById, createArticle, getArticleHistory, updateArticle } from '@/api/article.js'
 import { adminGetCategories } from '@/api/category.js'
 import { adminGetTags } from '@/api/tag.js'
 import { generateAiWriting } from '@/api/ai.js'
@@ -338,6 +360,10 @@ export default {
       draftSavedAt: '',
       autoSaveIndicator: false,
       _debounceTimer: null
+      ,
+      historyVersions: [],
+      selectedVersionId: null,
+      diffContent: ''
     }
   },
   computed: {
@@ -364,6 +390,7 @@ export default {
     this.loadTags()
     if (this.isEdit) {
       this.loadArticle()
+      this.loadHistory()
     } else if (this.route.query.restore === '1') {
       // 只有从文章列表页点"继续编辑"才恢复草稿
       this._restoreDraft()
@@ -403,6 +430,52 @@ export default {
           console.error('加载文章失败:', err)
           self.errorMsg = '加载文章失败'
         })
+    },
+    loadHistory: function() {
+      var self = this
+      if (!self.isEdit) return
+      getArticleHistory(self.route.params.id).then(function(data) {
+        self.historyVersions = (data || []).map(function(item) {
+          return {
+            id: item.id,
+            remark: 'v' + item.version + ' - ' + (item.remark || '历史版本')
+          }
+        })
+      }).catch(function() {})
+    },
+    compareVersion: function() {
+      var self = this
+      if (!self.selectedVersionId) {
+        self.$toast.error('请先选择历史版本')
+        return
+      }
+      getArticleHistory(self.route.params.id).then(function(data) {
+        var target = (data || []).find(function(item) { return item.id === self.selectedVersionId })
+        if (!target) {
+          self.$toast.error('历史版本不存在')
+          return
+        }
+        self.diffContent = self.buildSimpleDiff(target.content || '', self.form.content || '')
+      })
+    },
+    buildSimpleDiff: function(oldText, newText) {
+      var oldLines = oldText.split('\n')
+      var newLines = newText.split('\n')
+      var max = Math.max(oldLines.length, newLines.length)
+      var result = []
+      for (var i = 0; i < max; i++) {
+        var oldLine = oldLines[i] || ''
+        var newLine = newLines[i] || ''
+        if (oldLine === newLine) {
+          continue
+        }
+        if (oldLine) result.push('- ' + oldLine)
+        if (newLine) result.push('+ ' + newLine)
+      }
+      if (!result.length) {
+        return '当前内容与所选版本一致'
+      }
+      return result.join('\n')
     },
     runAiAction: function(action) {
       var self = this

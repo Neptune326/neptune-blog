@@ -45,6 +45,17 @@
                 prepend-inner-icon="mdi-text-box-outline"
               />
             </v-col>
+            <v-col cols="12">
+              <v-text-field
+                v-model="form.site_base_url"
+                label="站点基础地址"
+                variant="outlined"
+                density="comfortable"
+                prepend-inner-icon="mdi-web"
+                hint="用于 sitemap/rss/robots 生成，示例：https://blog.example.com"
+                persistent-hint
+              />
+            </v-col>
           </v-row>
         </div>
       </v-card>
@@ -158,6 +169,20 @@
               </div>
               <v-switch
                 v-model="form.comment_audit_enabled"
+                color="primary"
+                hide-details
+                true-value="true"
+                false-value="false"
+              />
+            </div>
+
+            <div class="d-flex align-center justify-space-between setting-row">
+              <div>
+                <div class="setting-title">后台登录验证码</div>
+                <div class="setting-desc">开启后后台登录需输入动态算术验证码。</div>
+              </div>
+              <v-switch
+                v-model="form.login_captcha_enabled"
                 color="primary"
                 hide-details
                 true-value="true"
@@ -522,6 +547,7 @@ export default {
       form: {
         blog_name: '',
         blog_author: '',
+        site_base_url: 'http://localhost:8080',
         blog_description: '',
         login_max_fail_count: '5',
         login_lock_duration: '10',
@@ -530,6 +556,7 @@ export default {
         upload_file_max_size_mb: '10',
         upload_file_allowed_exts: '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.md,.zip,.rar,.7z',
         comment_audit_enabled: 'true',
+        login_captcha_enabled: 'true',
         anime_theme_enabled: 'false',
         gallery_images: '[]',
         click_effect_enabled: 'true',

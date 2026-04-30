@@ -10,6 +10,7 @@ var routes = [
   { path: '/tag/:id', component: function() { return import('@/views/frontend/browse/TagView.vue') } },
   { path: '/archive', component: function() { return import('@/views/frontend/browse/ArchiveView.vue') } },
   { path: '/about', component: function() { return import('@/views/frontend/other/AboutView.vue') } },
+  { path: '/favorites', component: function() { return import('@/views/frontend/other/FavoritesView.vue') } },
   { path: '/message', component: function() { return import('@/views/frontend/other/MessageView.vue') } },
   { path: '/search', component: function() { return import('@/views/frontend/browse/SearchView.vue') } },
   { path: '/:pathMatch(.*)*', component: function() { return import('@/views/frontend/other/NotFoundView.vue') } },

@@ -29,7 +29,7 @@
 </template>
 
 <script>
-var STORAGE_KEY = 'blog_favorites'
+import { getFavoriteStatus, toggleFavorite } from '@/api/favorite.js'
 
 export default {
   name: 'ArticleFavorite',
@@ -39,41 +39,32 @@ export default {
   },
   data: function() {
     return {
-      isFavorited: false
+      isFavorited: false,
+      favoriteCount: 0
     }
   },
   mounted: function() {
-    this.checkFavorite()
+    this.loadStatus()
   },
   watch: {
     articleId: function() {
-      this.checkFavorite()
+      this.loadStatus()
     }
   },
   methods: {
-    getFavorites: function() {
-      try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
-      } catch (e) { return [] }
-    },
-    checkFavorite: function() {
-      var id = String(this.articleId)
-      var favs = this.getFavorites()
-      this.isFavorited = favs.some(function(f) { return String(f.id) === id })
+    loadStatus: function() {
+      var self = this
+      getFavoriteStatus(self.articleId).then(function(data) {
+        self.isFavorited = !!data.favorited
+        self.favoriteCount = Number(data.favoriteCount || 0)
+      }).catch(function() {})
     },
     toggle: function() {
-      var id = String(this.articleId)
-      var favs = this.getFavorites()
-      var idx = favs.findIndex(function(f) { return String(f.id) === id })
-      if (idx >= 0) {
-        favs.splice(idx, 1)
-        this.isFavorited = false
-      } else {
-        favs.unshift({ id: id, title: this.articleTitle, time: Date.now() })
-        if (favs.length > 50) favs = favs.slice(0, 50)
-        this.isFavorited = true
-      }
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(favs)) } catch (e) {}
+      var self = this
+      toggleFavorite(self.articleId).then(function(data) {
+        self.isFavorited = !!data.favorited
+        self.favoriteCount = Number(data.favoriteCount || 0)
+      }).catch(function() {})
     }
   }
 }

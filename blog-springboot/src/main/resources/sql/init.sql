@@ -18,6 +18,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS article_tag;
 DROP TABLE IF EXISTS comment;
 DROP TABLE IF EXISTS article_like;
+DROP TABLE IF EXISTS article_favorite;
 DROP TABLE IF EXISTS article_history;
 DROP TABLE IF EXISTS visit_log;
 DROP TABLE IF EXISTS message;
@@ -206,6 +207,14 @@ CREATE TABLE article_like (
     UNIQUE KEY uk_article_ip (article_id, like_ip)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='文章点赞表';
 
+CREATE TABLE article_favorite (
+    id          BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '主键 ID',
+    article_id  BIGINT NOT NULL COMMENT '文章 ID',
+    visitor_id  VARCHAR(100) NOT NULL COMMENT '访客标识（IP+UA 哈希）',
+    create_time DATETIME COMMENT '收藏时间',
+    UNIQUE KEY uk_article_visitor (article_id, visitor_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='文章收藏表';
+
 CREATE TABLE friend_link (
     id          BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '主键 ID',
     name        VARCHAR(100) NOT NULL COMMENT '链接名称',
@@ -331,12 +340,14 @@ INSERT INTO sys_config (config_key, config_value, config_desc, create_time, upda
 ('blog_name', '我的博客', '博客名称', NOW(), NOW()),
 ('blog_description', '记录技术成长，分享开发心得', '博客描述', NOW(), NOW()),
 ('blog_author', 'Admin', '博主名称', NOW(), NOW()),
+('site_base_url', 'http://localhost:8080', '站点基础地址（用于 sitemap/rss/robots）', NOW(), NOW()),
 ('about_content', '# 关于我\n\n你好，我是博客的作者。\n\n这里是我的个人博客，记录技术成长，分享开发心得。\n\n## 技术栈\n\n- 后端：Java、Spring Boot、MySQL\n- 前端：Vue 3、Vuetify\n\n## 联系方式\n\n- GitHub：https://github.com/your-username\n- Email：your-email@example.com', '关于我页面内容（Markdown）', NOW(), NOW()),
 ('about_enabled', 'true', '是否显示关于我页面', NOW(), NOW()),
 ('sitemap_enabled', 'true', '是否开启 Sitemap', NOW(), NOW()),
 ('message_enabled', 'true', '是否开启留言板', NOW(), NOW()),
 ('like_enabled', 'true', '是否开启文章点赞', NOW(), NOW()),
 ('visit_stats_enabled', 'true', '是否开启访问统计', NOW(), NOW()),
+('login_captcha_enabled', 'true', '是否开启后台登录验证码', NOW(), NOW()),
 ('anime_theme_enabled', 'false', '是否开启动漫主题首页（开启后首页切换为暗色动漫风格，背景图从画廊轮播）', NOW(), NOW()),
 ('gallery_images', '[]', '首页背景画廊图片列表（JSON 数组，存储图片 URL）', NOW(), NOW()),
 ('click_effect_enabled', 'true', '是否开启鼠标点击特效（点击飘出 Emoji 粒子）', NOW(), NOW()),
@@ -378,6 +389,7 @@ INSERT INTO sys_config (config_key, config_value, config_desc, create_time, upda
 -- 2026-04-24：sys_config 音乐与 Meting 相关行（见上方「INSERT INTO sys_config」中 2026-04-24 行注释）。
 -- 2026-04-24：easter_konami_enabled、dev_fortune_enabled（见本文件 INSERT 中 2026-04-24 趣味功能行注释）。
 -- 2026-04-24：upload_image_*、upload_file_*（见本文件 INSERT 中 2026-04-24 上传限制配置行注释）。
+-- 2026-04-30：新增 article_favorite 收藏表，补充 site_base_url 与 login_captcha_enabled 配置项。
 -- 后续新增 SQL 请按以下格式追加：
 --
 -- yyyy-MM-dd：变更说明

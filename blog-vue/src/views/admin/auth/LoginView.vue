@@ -40,7 +40,7 @@
                 />
               </div>
 
-              <div class="mb-6">
+              <div class="mb-4">
                 <label style="font-size: 13px; font-weight: 500; color: #3c4043; display: block; margin-bottom: 6px;">密码</label>
                 <v-text-field
                   v-model="form.password"
@@ -54,6 +54,25 @@
                   :rules="[function(v) { return !!v || '请输入密码' }]"
                   @click:append-inner="showPassword = !showPassword"
                 />
+              </div>
+
+              <div class="mb-6">
+                <label style="font-size: 13px; font-weight: 500; color: #3c4043; display: block; margin-bottom: 6px;">验证码</label>
+                <div class="d-flex align-center" style="gap: 10px;">
+                  <v-text-field
+                    v-model="form.captchaCode"
+                    variant="outlined"
+                    density="comfortable"
+                    prepend-inner-icon="mdi-shield-check-outline"
+                    placeholder="请输入验证码结果"
+                    hide-details="auto"
+                    :rules="[function(v) { return !!v || '请输入验证码' }]"
+                    style="flex: 1;"
+                  />
+                  <v-btn variant="tonal" color="primary" @click="loadCaptcha" style="min-width: 120px;">
+                    {{ captchaQuestion || '获取验证码' }}
+                  </v-btn>
+                </div>
               </div>
 
               <v-alert
@@ -91,7 +110,7 @@
 </template>
 
 <script>
-import { login } from '@/api/auth.js'
+import { getLoginCaptcha, login } from '@/api/auth.js'
 import { useAuthStore } from '@/store/auth.js'
 import { useRouter } from 'vue-router'
 
@@ -104,17 +123,31 @@ export default {
   },
   data: function() {
     return {
-      form: { username: '', password: '' },
+      form: { username: '', password: '', captchaId: '', captchaCode: '' },
       loading: false,
       errorMsg: '',
-      showPassword: false
+      showPassword: false,
+      captchaQuestion: ''
     }
   },
+  mounted: function() {
+    this.loadCaptcha()
+  },
   methods: {
+    loadCaptcha: function() {
+      var self = this
+      getLoginCaptcha().then(function(data) {
+        self.form.captchaId = data.captchaId || ''
+        self.captchaQuestion = data.captchaQuestion || ''
+        self.form.captchaCode = ''
+      }).catch(function() {
+        self.captchaQuestion = '获取失败，点击重试'
+      })
+    },
     handleLogin: function() {
       var self = this
-      if (!self.form.username || !self.form.password) {
-        self.errorMsg = '请填写用户名和密码'
+      if (!self.form.username || !self.form.password || !self.form.captchaCode) {
+        self.errorMsg = '请填写完整登录信息'
         return
       }
       self.loading = true
@@ -126,6 +159,7 @@ export default {
         })
         .catch(function(err) {
           self.errorMsg = err.message || '用户名或密码错误'
+          self.loadCaptcha()
         })
         .finally(function() {
           self.loading = false

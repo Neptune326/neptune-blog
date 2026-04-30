@@ -92,3 +92,10 @@ export function deleteArticle(id) {
     url: '/api/admin/articles/' + id
   })
 }
+
+export function getArticleHistory(id) {
+  return request({
+    method: 'get',
+    url: '/api/admin/articles/' + id + '/history'
+  })
+}

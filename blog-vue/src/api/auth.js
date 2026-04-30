@@ -14,6 +14,16 @@ export function login(data) {
 }
 
 /**
+ * 获取登录验证码
+ */
+export function getLoginCaptcha() {
+  return request({
+    method: 'get',
+    url: '/api/admin/auth/captcha'
+  })
+}
+
+/**
  * 管理员登出
  */
 export function logout() {

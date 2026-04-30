@@ -79,6 +79,13 @@
             >留言</v-btn>
             <v-btn
               variant="text"
+              to="/favorites"
+              class="nav-link"
+              :class="{ 'nav-link--active': isPathActive('/favorites') }"
+              style="min-width: auto;"
+            >收藏</v-btn>
+            <v-btn
+              variant="text"
               to="/search"
               class="nav-link"
               :class="{ 'nav-link--active': isPathActive('/search') }"
@@ -154,6 +161,7 @@ export default {
         { to: '/archive', label: '归档', icon: 'mdi-archive-outline' },
         { to: '/about', label: '关于', icon: 'mdi-account-circle-outline' },
         { to: '/message', label: '留言', icon: 'mdi-message-text-outline' },
+        { to: '/favorites', label: '收藏', icon: 'mdi-bookmark-outline' },
         { to: '/search', label: '搜索', icon: 'mdi-magnify' }
       ]
     }

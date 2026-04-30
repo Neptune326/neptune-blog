@@ -33,9 +33,7 @@ public class SitemapController {
             return "<?xml version=\"1.0\" encoding=\"UTF-8\"?><urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\"></urlset>";
         }
 
-        String blogName = sysConfigService.getValue("blog_name");
-        // 实际部署时替换为真实域名
-        String baseUrl = "https://yourdomain.com";
+        String baseUrl = getBaseUrl();
 
         List<Article> articles = articleMapper.selectList(
                 new LambdaQueryWrapper<Article>()
@@ -66,5 +64,61 @@ public class SitemapController {
         xml.append("</urlset>");
         log.debug("Sitemap 生成完成，共 {} 篇文章", articles.size());
         return xml.toString();
+    }
+
+    @GetMapping(value = "/rss.xml", produces = MediaType.APPLICATION_XML_VALUE)
+    public String rss() {
+        String baseUrl = getBaseUrl();
+        String title = defaultIfBlank(sysConfigService.getValue("blog_name"), "Neptune Blog");
+        String description = defaultIfBlank(sysConfigService.getValue("blog_description"), "Blog feed");
+        List<Article> articles = articleMapper.selectList(
+                new LambdaQueryWrapper<Article>()
+                        .eq(Article::getStatus, 1)
+                        .orderByDesc(Article::getCreateTime)
+                        .last("LIMIT 20")
+        );
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        StringBuilder xml = new StringBuilder();
+        xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+                .append("<rss version=\"2.0\"><channel>")
+                .append("<title>").append(escapeXml(title)).append("</title>")
+                .append("<link>").append(baseUrl).append("</link>")
+                .append("<description>").append(escapeXml(description)).append("</description>");
+        for (Article article : articles) {
+            xml.append("<item>")
+                    .append("<title>").append(escapeXml(article.getTitle())).append("</title>")
+                    .append("<link>").append(baseUrl).append("/article/").append(article.getId()).append("</link>")
+                    .append("<description>").append(escapeXml(defaultIfBlank(article.getSummary(), ""))).append("</description>")
+                    .append("<pubDate>")
+                    .append(article.getCreateTime() == null ? "" : article.getCreateTime().format(fmt))
+                    .append("</pubDate>")
+                    .append("</item>");
+        }
+        xml.append("</channel></rss>");
+        return xml.toString();
+    }
+
+    @GetMapping(value = "/robots.txt", produces = MediaType.TEXT_PLAIN_VALUE)
+    public String robots() {
+        return "User-agent: *\nAllow: /\nSitemap: " + getBaseUrl() + "/sitemap.xml\n";
+    }
+
+    private String getBaseUrl() {
+        return defaultIfBlank(sysConfigService.getValue("site_base_url"), "http://localhost:8080");
+    }
+
+    private String defaultIfBlank(String value, String fallback) {
+        return value == null || value.trim().isEmpty() ? fallback : value.trim();
+    }
+
+    private String escapeXml(String value) {
+        if (value == null) {
+            return "";
+        }
+        return value.replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&apos;");
     }
 }
