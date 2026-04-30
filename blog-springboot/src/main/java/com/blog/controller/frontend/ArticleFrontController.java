@@ -6,6 +6,8 @@ import com.blog.vo.ArchiveVO;
 import com.blog.vo.ArticleListVO;
 import com.blog.vo.ArticleVO;
 import com.blog.vo.PageVO;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -29,8 +31,9 @@ public class ArticleFrontController {
      */
     @GetMapping
     public Result<PageVO<ArticleListVO>> list(
-            @RequestParam(defaultValue = "1") Integer pageNum,
-            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(defaultValue = "1") @Min(value = 1, message = "pageNum 最小为 1") Integer pageNum,
+            @RequestParam(defaultValue = "10") @Min(value = 1, message = "pageSize 最小为 1")
+            @Max(value = 100, message = "pageSize 最大为 100") Integer pageSize,
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) Long tagId,
             @RequestParam(required = false) String keyword) {
@@ -59,7 +62,9 @@ public class ArticleFrontController {
      */
     @GetMapping("/{id}/related")
     public Result<List<ArticleListVO>> related(@PathVariable Long id,
-                                               @RequestParam(defaultValue = "5") Integer limit) {
+                                               @RequestParam(defaultValue = "5")
+                                               @Min(value = 1, message = "limit 最小为 1")
+                                               @Max(value = 20, message = "limit 最大为 20") Integer limit) {
         return Result.success(articleService.getRelated(id, limit));
     }
 }

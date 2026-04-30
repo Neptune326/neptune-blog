@@ -42,3 +42,14 @@ sa-token:
   is-concurrent: false
   # Token 风格：uuid（不可预测）
   token-style: uuid
+
+blog:
+  security:
+    cors:
+      # 多个来源使用英文逗号分隔，示例：https://admin.example.com,https://www.example.com
+      allowed-origin-patterns: "*"
+  dev-tool:
+    # 仅开发环境按需开启，默认关闭
+    enabled: false
+    # 访问 /api/dev/** 需携带请求头 X-Dev-Token
+    token: ""

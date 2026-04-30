@@ -47,6 +47,9 @@ public interface ArticleService {
 
     /** 批量修改文章状态 */
     void batchUpdateStatus(java.util.List<Long> ids, Integer status);
+    
+    /** 批量删除文章（软删除） */
+    void batchDelete(java.util.List<Long> ids);
 
     // ===== 前台接口 =====
 

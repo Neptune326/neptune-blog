@@ -36,6 +36,9 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ArticleServiceImpl implements ArticleService {
+    private static final int MAX_PAGE_SIZE = 100;
+    private static final int DEFAULT_RELATED_LIMIT = 5;
+    private static final int MAX_RELATED_LIMIT = 20;
 
     private final ArticleMapper articleMapper;
     private final ArticleTagMapper articleTagMapper;
@@ -48,6 +51,8 @@ public class ArticleServiceImpl implements ArticleService {
     public PageVO<ArticleListVO> adminList(Integer pageNum, Integer pageSize,
                                            Long categoryId, Long tagId,
                                            Integer status, String keyword) {
+        pageNum = normalizePageNum(pageNum);
+        pageSize = normalizePageSize(pageSize);
         Page<ArticleListVO> page = new Page<>(pageNum, pageSize);
         articleMapper.selectArticleListVO(page, categoryId, tagId, status, keyword);
         return PageVO.of(page);
@@ -173,10 +178,22 @@ public class ArticleServiceImpl implements ArticleService {
                 new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<Article>()
                         .in(Article::getId, ids));
     }
+    
+    @Override
+    public void batchDelete(List<Long> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return;
+        }
+        articleMapper.delete(new LambdaQueryWrapper<Article>().in(Article::getId, ids));
+    }
 
     @Override
     public List<ArticleListVO> getRelated(Long articleId, Integer limit) {
-        if (limit == null || limit <= 0) limit = 5;
+        if (limit == null || limit <= 0) {
+            limit = DEFAULT_RELATED_LIMIT;
+        } else if (limit > MAX_RELATED_LIMIT) {
+            limit = MAX_RELATED_LIMIT;
+        }
         // 获取当前文章的标签和分类
         ArticleVO current = articleMapper.selectArticleVOById(articleId);
         if (current == null) return new ArrayList<>();
@@ -236,6 +253,8 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public PageVO<ArticleListVO> frontList(Integer pageNum, Integer pageSize,
                                            Long categoryId, Long tagId, String keyword) {
+        pageNum = normalizePageNum(pageNum);
+        pageSize = normalizePageSize(pageSize);
         Page<ArticleListVO> page = new Page<>(pageNum, pageSize);
         articleMapper.selectArticleListVO(page, categoryId, tagId, 1, keyword);
         return PageVO.of(page);
@@ -303,5 +322,16 @@ public class ArticleServiceImpl implements ArticleService {
             articleTag.setTagId(tagId);
             articleTagMapper.insert(articleTag);
         }
+    }
+    
+    private int normalizePageNum(Integer pageNum) {
+        return pageNum == null || pageNum < 1 ? 1 : pageNum;
+    }
+    
+    private int normalizePageSize(Integer pageSize) {
+        if (pageSize == null || pageSize < 1) {
+            return 10;
+        }
+        return Math.min(pageSize, MAX_PAGE_SIZE);
     }
 }

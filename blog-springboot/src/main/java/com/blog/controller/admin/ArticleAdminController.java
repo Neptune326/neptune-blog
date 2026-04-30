@@ -8,6 +8,8 @@ import com.blog.vo.ArticleListVO;
 import com.blog.vo.ArticleVO;
 import com.blog.vo.PageVO;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -27,8 +29,9 @@ public class ArticleAdminController {
 
     @GetMapping
     public Result<PageVO<ArticleListVO>> list(
-            @RequestParam(defaultValue = "1") Integer pageNum,
-            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(defaultValue = "1") @Min(value = 1, message = "pageNum 最小为 1") Integer pageNum,
+            @RequestParam(defaultValue = "10") @Min(value = 1, message = "pageSize 最小为 1")
+            @Max(value = 100, message = "pageSize 最大为 100") Integer pageSize,
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) Long tagId,
             @RequestParam(required = false) Integer status,
@@ -79,7 +82,6 @@ public class ArticleAdminController {
     @OperationLog(module = "文章管理", action = "批量修改状态")
     @PutMapping("/batch-status")
     public Result<Void> batchUpdateStatus(@RequestBody java.util.Map<String, Object> body) {
-        @SuppressWarnings("unchecked")
         java.util.List<Long> ids = ((java.util.List<?>) body.get("ids")).stream()
                 .map(o -> Long.valueOf(o.toString())).collect(java.util.stream.Collectors.toList());
         Integer status = Integer.valueOf(body.get("status").toString());
@@ -95,14 +97,13 @@ public class ArticleAdminController {
     @OperationLog(module = "文章管理", action = "批量删除文章")
     @DeleteMapping("/batch")
     public Result<Void> batchDelete(@RequestBody java.util.Map<String, Object> body) {
-        @SuppressWarnings("unchecked")
         java.util.List<Long> ids = ((java.util.List<?>) body.get("ids")).stream()
                 .map(o -> Long.valueOf(o.toString())).collect(java.util.stream.Collectors.toList());
         if (ids.isEmpty()) {
             return Result.error(com.blog.common.result.ResultCode.BAD_REQUEST, "参数不能为空");
         }
         log.info("批量删除文章，ids={}", ids);
-        ids.forEach(id -> articleService.delete(id));
+        articleService.batchDelete(ids);
         return Result.success();
     }
 }
