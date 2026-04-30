@@ -376,6 +376,7 @@ INSERT INTO sys_config (config_key, config_value, config_desc, create_time, upda
 ('upload_image_allowed_exts', '.jpg,.jpeg,.png,.gif,.webp,.svg', 'Allowed image upload extensions', NOW(), NOW()),
 ('upload_file_max_size_mb', '10', 'Generic file upload max size in MB', NOW(), NOW()),
 ('upload_file_allowed_exts', '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.md,.zip,.rar,.7z', 'Allowed generic file upload extensions', NOW(), NOW()),
+('upload_url_prefix', 'http://localhost:8080/uploads/', '文件访问地址前缀', NOW(), NOW()),
 ('dev_fortune_enabled', 'true', '是否显示侧栏开发者今日小签', NOW(), NOW());
 
 -- =====================================================
@@ -389,7 +390,7 @@ INSERT INTO sys_config (config_key, config_value, config_desc, create_time, upda
 -- 2026-04-24：sys_config 音乐与 Meting 相关行（见上方「INSERT INTO sys_config」中 2026-04-24 行注释）。
 -- 2026-04-24：easter_konami_enabled、dev_fortune_enabled（见本文件 INSERT 中 2026-04-24 趣味功能行注释）。
 -- 2026-04-24：upload_image_*、upload_file_*（见本文件 INSERT 中 2026-04-24 上传限制配置行注释）。
--- 2026-04-30：新增 article_favorite 收藏表，补充 site_base_url 与 login_captcha_enabled 配置项。
+-- 2026-04-30：新增 article_favorite 收藏表，补充 site_base_url、login_captcha_enabled、upload_url_prefix 配置项。
 -- 后续新增 SQL 请按以下格式追加：
 --
 -- yyyy-MM-dd：变更说明

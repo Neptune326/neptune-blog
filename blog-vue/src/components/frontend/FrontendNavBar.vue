@@ -48,42 +48,42 @@
               class="nav-link"
               :class="{ 'nav-link--active': isPathActive('/') }"
               style="min-width: auto;"
-            >首页</v-btn>
+            ><v-icon size="16" class="mr-1">mdi-home-outline</v-icon>首页</v-btn>
             <v-btn
               variant="text"
               to="/articles"
               class="nav-link"
               :class="{ 'nav-link--active': isPathActive('/articles') }"
               style="min-width: auto;"
-            >文章</v-btn>
+            ><v-icon size="16" class="mr-1">mdi-file-document-outline</v-icon>文章</v-btn>
             <v-btn
               variant="text"
               to="/archive"
               class="nav-link"
               :class="{ 'nav-link--active': isPathActive('/archive') }"
               style="min-width: auto;"
-            >归档</v-btn>
+            ><v-icon size="16" class="mr-1">mdi-archive-outline</v-icon>归档</v-btn>
             <v-btn
               variant="text"
               to="/about"
               class="nav-link"
               :class="{ 'nav-link--active': isPathActive('/about') }"
               style="min-width: auto;"
-            >关于</v-btn>
+            ><v-icon size="16" class="mr-1">mdi-account-circle-outline</v-icon>关于</v-btn>
             <v-btn
               variant="text"
               to="/message"
               class="nav-link"
               :class="{ 'nav-link--active': isPathActive('/message') }"
               style="min-width: auto;"
-            >留言</v-btn>
+            ><v-icon size="16" class="mr-1">mdi-message-text-outline</v-icon>留言</v-btn>
             <v-btn
               variant="text"
               to="/favorites"
               class="nav-link"
               :class="{ 'nav-link--active': isPathActive('/favorites') }"
               style="min-width: auto;"
-            >收藏</v-btn>
+            ><v-icon size="16" class="mr-1">mdi-bookmark-outline</v-icon>收藏</v-btn>
             <v-btn
               variant="text"
               to="/search"

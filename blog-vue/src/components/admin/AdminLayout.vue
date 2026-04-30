@@ -58,25 +58,28 @@
 
       <!-- 导航菜单 -->
       <v-list density="compact" nav class="pa-2">
-        <v-list-item
-          v-for="item in navItems"
-          :key="item.to"
-          :to="item.to"
-          :value="item.to"
-          rounded="lg"
-          class="mb-1"
-          style="min-height: 44px;"
-          color="primary"
-        >
-          <template #prepend>
-            <v-icon :size="20" style="margin-right: 12px;">{{ item.icon }}</v-icon>
-          </template>
-          <v-list-item-title
-            style="font-size: 14px; font-weight: 500;"
+        <template v-for="group in navGroups" :key="group.name">
+          <v-list-subheader v-if="!rail" style="font-size: 12px; color: #80868b; font-weight: 600;">
+            {{ group.name }}
+          </v-list-subheader>
+          <v-list-item
+            v-for="item in group.children"
+            :key="item.to"
+            :to="item.to"
+            :value="item.to"
+            rounded="lg"
+            class="mb-1"
+            style="min-height: 42px;"
+            color="primary"
           >
-            {{ item.title }}
-          </v-list-item-title>
-        </v-list-item>
+            <template #prepend>
+              <v-icon :size="20" style="margin-right: 12px;">{{ item.icon }}</v-icon>
+            </template>
+            <v-list-item-title style="font-size: 14px; font-weight: 500;">
+              {{ item.title }}
+            </v-list-item-title>
+          </v-list-item>
+        </template>
       </v-list>
     </v-navigation-drawer>
 
@@ -203,23 +206,42 @@ export default {
       pwdLoading: false,
       pwdError: '',
       pwdForm: { oldPassword: '', newPassword: '', confirmPassword: '' },
-      navItems: [
-        { title: '仪表盘', icon: 'mdi-view-dashboard-outline', to: '/admin/dashboard' },
-        { title: '文章管理', icon: 'mdi-file-document-outline', to: '/admin/articles' },
-        { title: '文章系列', icon: 'mdi-book-open-variant-outline', to: '/admin/series' },
-        { title: '分类管理', icon: 'mdi-folder-outline', to: '/admin/categories' },
-        { title: '标签管理', icon: 'mdi-tag-outline', to: '/admin/tags' },
-        { title: '评论管理', icon: 'mdi-comment-outline', to: '/admin/comments' },
-        { title: '留言管理', icon: 'mdi-message-text-outline', to: '/admin/messages' },
-        { title: '友情链接', icon: 'mdi-link-variant', to: '/admin/friend-links' },
-        { title: '评论黑名单', icon: 'mdi-shield-off-outline', to: '/admin/comment-blacklist' },
-        { title: '数据备份', icon: 'mdi-database-export-outline', to: '/admin/data-backup' },
-        { title: '操作日志', icon: 'mdi-clipboard-text-clock-outline', to: '/admin/logs/operation' },
-        { title: '登录日志', icon: 'mdi-login-variant', to: '/admin/logs/login' },
-        { title: '关于我', icon: 'mdi-account-circle-outline', to: '/admin/about' },
-        { title: '管理员账号', icon: 'mdi-account-key-outline', to: '/admin/admin-users' },
-        { title: '集成功能说明', icon: 'mdi-book-open-page-variant-outline', to: '/admin/feature-guide' },
-        { title: '系统设置', icon: 'mdi-cog-outline', to: '/admin/sys-config' }
+      navGroups: [
+        {
+          name: '内容管理',
+          children: [
+            { title: '文章管理', icon: 'mdi-file-document-outline', to: '/admin/articles' },
+            { title: '文章系列', icon: 'mdi-book-open-variant-outline', to: '/admin/series' },
+            { title: '分类管理', icon: 'mdi-folder-outline', to: '/admin/categories' },
+            { title: '标签管理', icon: 'mdi-tag-outline', to: '/admin/tags' }
+          ]
+        },
+        {
+          name: '互动管理',
+          children: [
+            { title: '评论管理', icon: 'mdi-comment-outline', to: '/admin/comments' },
+            { title: '留言管理', icon: 'mdi-message-text-outline', to: '/admin/messages' },
+            { title: '评论黑名单', icon: 'mdi-shield-off-outline', to: '/admin/comment-blacklist' }
+          ]
+        },
+        {
+          name: '系统管理',
+          children: [
+            { title: '仪表盘', icon: 'mdi-view-dashboard-outline', to: '/admin/dashboard' },
+            { title: '友情链接', icon: 'mdi-link-variant', to: '/admin/friend-links' },
+            { title: '关于我', icon: 'mdi-account-circle-outline', to: '/admin/about' },
+            { title: '管理员账号', icon: 'mdi-account-key-outline', to: '/admin/admin-users' },
+            { title: '数据备份', icon: 'mdi-database-export-outline', to: '/admin/data-backup' },
+            { title: '系统设置', icon: 'mdi-cog-outline', to: '/admin/sys-config' }
+          ]
+        },
+        {
+          name: '集成设置',
+          children: [
+            { title: '集成配置', icon: 'mdi-api', to: '/admin/integration-config' },
+            { title: '集成功能说明', icon: 'mdi-book-open-page-variant-outline', to: '/admin/feature-guide' }
+          ]
+        }
       ]
     }
   },
@@ -236,11 +258,11 @@ export default {
         '/admin/messages': '留言管理',
         '/admin/friend-links': '友情链接',
         '/admin/comment-blacklist': '评论黑名单',
-        '/admin/data-backup': '数据备份',        '/admin/logs/operation': '操作日志',
-        '/admin/logs/login': '登录日志',
+        '/admin/data-backup': '数据备份',
         '/admin/about': '关于我',
         '/admin/admin-users': '管理员账号',
         '/admin/sys-config': '系统设置',
+        '/admin/integration-config': '集成设置',
         '/admin/feature-guide': '集成功能说明'
       }
       return map[this.route.path] || '博客管理'

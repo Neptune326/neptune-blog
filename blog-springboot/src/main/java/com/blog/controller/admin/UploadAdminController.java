@@ -37,6 +37,7 @@ public class UploadAdminController {
     private static final String IMAGE_ALLOWED_EXTS_KEY = "upload_image_allowed_exts";
     private static final String FILE_MAX_SIZE_MB_KEY = "upload_file_max_size_mb";
     private static final String FILE_ALLOWED_EXTS_KEY = "upload_file_allowed_exts";
+    private static final String URL_PREFIX_KEY = "upload_url_prefix";
     private static final int DEFAULT_IMAGE_MAX_SIZE_MB = 5;
     private static final int DEFAULT_FILE_MAX_SIZE_MB = 10;
     private static final String DEFAULT_IMAGE_ALLOWED_EXTS = ".jpg,.jpeg,.png,.gif,.webp,.svg";
@@ -159,7 +160,9 @@ public class UploadAdminController {
     }
 
     private String buildUrl(String dateDir, String fileName) {
-        String prefix = urlPrefix.endsWith("/") ? urlPrefix : urlPrefix + "/";
+        String configuredPrefix = sysConfigService.getValue(URL_PREFIX_KEY);
+        String basePrefix = (configuredPrefix == null || configuredPrefix.isBlank()) ? urlPrefix : configuredPrefix;
+        String prefix = basePrefix.endsWith("/") ? basePrefix : basePrefix + "/";
         return prefix + dateDir + "/" + fileName;
     }
 

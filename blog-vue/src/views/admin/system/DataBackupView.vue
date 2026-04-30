@@ -20,7 +20,7 @@
             </div>
             <v-btn
               block
-              variant="tonal"
+              variant="outlined"
               :color="item.color"
               :loading="loading[item.key]"
               prepend-icon="mdi-download"
@@ -39,7 +39,7 @@
           <div style="font-size: 15px; font-weight: 600; color: #202124;">全量备份</div>
           <div style="font-size: 13px; color: #80868b; margin-top: 2px;">导出所有数据为单个 JSON 文件</div>
         </div>
-        <v-btn color="primary" :loading="loading.all" prepend-icon="mdi-database-export-outline" @click="exportAll">
+        <v-btn color="primary" variant="tonal" :loading="loading.all" prepend-icon="mdi-database-export-outline" @click="exportAll">
           导出全部
         </v-btn>
       </div>
@@ -60,7 +60,7 @@
             style="max-width: 160px;"
             hide-details
           />
-          <v-btn color="error" :loading="loading.restore" prepend-icon="mdi-database-import-outline" @click="restoreData">导入恢复</v-btn>
+          <v-btn color="error" variant="tonal" :loading="loading.restore" prepend-icon="mdi-database-import-outline" @click="restoreData">导入恢复</v-btn>
         </div>
       </div>
     </v-card>

@@ -45,17 +45,6 @@
                 prepend-inner-icon="mdi-text-box-outline"
               />
             </v-col>
-            <v-col cols="12">
-              <v-text-field
-                v-model="form.site_base_url"
-                label="站点基础地址"
-                variant="outlined"
-                density="comfortable"
-                prepend-inner-icon="mdi-web"
-                hint="用于 sitemap/rss/robots 生成，示例：https://blog.example.com"
-                persistent-hint
-              />
-            </v-col>
           </v-row>
         </div>
       </v-card>
@@ -147,6 +136,17 @@
                 density="comfortable"
                 prepend-inner-icon="mdi-file-document-multiple-outline"
                 hint="使用逗号分隔，例如 .pdf,.docx,.xlsx,.zip"
+                persistent-hint
+              />
+            </v-col>
+            <v-col cols="12">
+              <v-text-field
+                v-model="form.upload_url_prefix"
+                label="文件访问地址前缀"
+                variant="outlined"
+                density="comfortable"
+                prepend-inner-icon="mdi-link-variant"
+                hint="示例：https://blog.example.com/uploads/"
                 persistent-hint
               />
             </v-col>
@@ -356,121 +356,6 @@
         </div>
       </v-card>
 
-      <v-card elevation="0" rounded="xl" style="border: 1px solid #e8eaed; margin-bottom: 20px;">
-        <div class="pa-5">
-          <div class="d-flex align-center mb-1" style="gap: 8px;">
-            <v-icon color="primary" size="20">mdi-music-note</v-icon>
-            <span style="font-size: 15px; font-weight: 600; color: #202124;">背景音乐</span>
-          </div>
-          <p style="font-size: 12px; color: #80868b; margin: 0 0 12px;">
-            支持直链 <code>url</code>，或通过 <strong>server + id</strong> 交给 Meting 兼容接口解析。为空 <code>[]</code> 时前台不展示播放器。
-          </p>
-          <v-text-field
-            v-model="form.meting_api_base"
-            class="mb-3"
-            label="Meting API 根地址（可选）"
-            variant="outlined"
-            density="comfortable"
-            prepend-inner-icon="mdi-api"
-            placeholder="https://api.injahow.cn/meting/"
-            hint="留空则使用默认值；若公共接口不可用可自建后填写"
-            persistent-hint
-          />
-          <v-textarea
-            v-model="form.music_playlist"
-            label="音乐播放列表（JSON）"
-            variant="outlined"
-            density="comfortable"
-            rows="6"
-            placeholder='[{"name":"曲名","url":"https://..."}] 或 [{"server":"netease","id":"歌曲id","name":"可选"}]'
-            class="font-mono text-body-2"
-            hint="必须是合法 JSON 数组；每项至少包含 url，或同时包含 server 和 id"
-            persistent-hint
-          />
-        </div>
-      </v-card>
-
-      <v-card elevation="0" rounded="xl" style="border: 1px solid #e8eaed; margin-bottom: 20px;">
-        <div class="pa-5">
-          <div class="d-flex align-center mb-4" style="gap: 8px;">
-            <v-icon color="primary" size="20">mdi-robot-outline</v-icon>
-            <span style="font-size: 15px; font-weight: 600; color: #202124;">AI 写作助手</span>
-          </div>
-
-          <div class="d-flex align-center justify-space-between mb-4 setting-row">
-            <div>
-              <div class="setting-title">启用 AI 写作</div>
-              <div class="setting-desc">开启后后台文章编辑页可调用 OpenAI 兼容接口。</div>
-            </div>
-            <v-switch
-              v-model="form.ai_enabled"
-              color="primary"
-              hide-details
-              true-value="true"
-              false-value="false"
-            />
-          </div>
-
-          <v-row dense>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="form.ai_base_url"
-                label="Base URL"
-                variant="outlined"
-                density="comfortable"
-                prepend-inner-icon="mdi-link-variant"
-                placeholder="https://api.openai.com"
-              />
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="form.ai_model"
-                label="模型名称"
-                variant="outlined"
-                density="comfortable"
-                prepend-inner-icon="mdi-cube-outline"
-                placeholder="填写服务商提供的模型名称"
-              />
-            </v-col>
-            <v-col cols="12">
-              <v-text-field
-                v-model="form.ai_api_key"
-                label="API Key"
-                variant="outlined"
-                density="comfortable"
-                type="password"
-                prepend-inner-icon="mdi-key-outline"
-                autocomplete="off"
-              />
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="form.ai_temperature"
-                label="温度"
-                variant="outlined"
-                density="comfortable"
-                type="number"
-                min="0"
-                max="2"
-                step="0.1"
-                prepend-inner-icon="mdi-thermometer"
-              />
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="form.ai_max_tokens"
-                label="最大输出 Token"
-                variant="outlined"
-                density="comfortable"
-                type="number"
-                min="128"
-                max="8000"
-                prepend-inner-icon="mdi-counter"
-              />
-            </v-col>
-          </v-row>
-        </div>
-      </v-card>
 
       <v-card elevation="0" rounded="xl" style="border: 1px solid #e8eaed; margin-bottom: 20px;">
         <div class="pa-5">
@@ -518,9 +403,10 @@
       </v-card>
 
       <div class="d-flex justify-end" style="gap: 12px;">
-        <v-btn variant="outlined" @click="loadConfig" :disabled="saving">重置</v-btn>
+        <v-btn variant="outlined" prepend-icon="mdi-refresh" @click="loadConfig" :disabled="saving">重置</v-btn>
         <v-btn
           color="primary"
+          variant="tonal"
           :loading="saving"
           prepend-icon="mdi-content-save-outline"
           @click="saveConfig"
@@ -547,7 +433,6 @@ export default {
       form: {
         blog_name: '',
         blog_author: '',
-        site_base_url: 'http://localhost:8080',
         blog_description: '',
         login_max_fail_count: '5',
         login_lock_duration: '10',
@@ -555,6 +440,7 @@ export default {
         upload_image_allowed_exts: '.jpg,.jpeg,.png,.gif,.webp,.svg',
         upload_file_max_size_mb: '10',
         upload_file_allowed_exts: '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.md,.zip,.rar,.7z',
+        upload_url_prefix: 'http://localhost:8080/uploads/',
         comment_audit_enabled: 'true',
         login_captcha_enabled: 'true',
         anime_theme_enabled: 'false',
@@ -569,15 +455,7 @@ export default {
         frontend_theme_enabled: 'true',
         frontend_theme_switcher_enabled: 'true',
         frontend_theme_default: 'sakura',
-        frontend_ambient_enabled: 'true',
-        music_playlist: '[]',
-        meting_api_base: '',
-        ai_enabled: 'false',
-        ai_base_url: 'https://api.openai.com',
-        ai_model: '',
-        ai_api_key: '',
-        ai_temperature: '0.7',
-        ai_max_tokens: '1200'
+        frontend_ambient_enabled: 'true'
       }
     }
   },
@@ -613,36 +491,6 @@ export default {
     saveConfig: function() {
       var self = this
       self.form.gallery_images = JSON.stringify(self.galleryImages)
-      if (self.form.music_playlist && self.form.music_playlist.trim()) {
-        try {
-          var playlist = JSON.parse(self.form.music_playlist)
-          if (!Array.isArray(playlist)) {
-            throw new Error('音乐播放列表必须是数组')
-          }
-          for (var i = 0; i < playlist.length; i++) {
-            var item = playlist[i]
-            if (!item || typeof item !== 'object') {
-              throw new Error('播放列表中的每一项都必须是对象')
-            }
-            var hasUrl = item.url != null && String(item.url).trim() !== ''
-            var hasServer = item.server != null && String(item.server).trim() !== '' &&
-              item.id != null && String(item.id).trim() !== ''
-            if (!hasUrl && !hasServer) {
-              throw new Error('每项必须包含 url，或同时包含 server 和 id')
-            }
-          }
-        } catch (e) {
-          self.$toast.error(e.message || '背景音乐 JSON 不合法')
-          return
-        }
-      }
-      if (self.form.meting_api_base && String(self.form.meting_api_base).trim() !== '') {
-        var base = String(self.form.meting_api_base).trim()
-        if (!/^https?:\/\//i.test(base)) {
-          self.$toast.error('Meting API 根地址必须以 http:// 或 https:// 开头')
-          return
-        }
-      }
       var uploadRules = [
         { sizeKey: 'upload_image_max_size_mb', extKey: 'upload_image_allowed_exts', label: '图片上传' },
         { sizeKey: 'upload_file_max_size_mb', extKey: 'upload_file_allowed_exts', label: '文件上传' }

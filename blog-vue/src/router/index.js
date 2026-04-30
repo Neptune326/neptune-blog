@@ -32,6 +32,7 @@ var routes = [
       { path: 'messages',           component: function() { return import('@/views/admin/interaction/MessageAdminView.vue') }, meta: { requiresAuth: true } },
       { path: 'comment-blacklist',  component: function() { return import('@/views/admin/interaction/CommentBlacklistView.vue') }, meta: { requiresAuth: true } },
       { path: 'sys-config',         component: function() { return import('@/views/admin/system/SysConfigView.vue') },  meta: { requiresAuth: true } },
+      { path: 'integration-config', component: function() { return import('@/views/admin/system/IntegrationConfigView.vue') }, meta: { requiresAuth: true } },
       { path: 'about',              component: function() { return import('@/views/admin/system/AboutEditView.vue') },    meta: { requiresAuth: true } },
       { path: 'admin-users',        component: function() { return import('@/views/admin/system/AdminUserView.vue') },    meta: { requiresAuth: true } },
       { path: 'friend-links',       component: function() { return import('@/views/admin/system/FriendLinkView.vue') },  meta: { requiresAuth: true } },
